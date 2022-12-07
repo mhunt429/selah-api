@@ -1,1 +1,1 @@
-# selah-api
+# Repository for the Selah core API
