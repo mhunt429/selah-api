@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <UserSecretsId>d9822856-8dcd-4fdd-bc7c-66ccbcab35e9</UserSecretsId>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <DockerfileContext>..\..</DockerfileContext>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AutoMapper" Version="12.0.0" />
+        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+        <PackageReference Include="Evolve" Version="3.0.0" />
+        <PackageReference Include="FluentValidation" Version="11.2.2" />
+        <PackageReference Include="MediatR" Version="11.0.0" />
+        <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.10" />
+        <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
+        <PackageReference Include="Serilog" Version="2.12.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+        <PackageReference Include="Twilio" Version="5.81.0" />
+        <PackageReference Include="Twilio.AspNet.Common" Version="6.0.0" />
+        <PackageReference Include="Twilio.AspNet.Core" Version="6.0.0" />
+        <PackageReference Include="Twilio.AspNet.Mvc" Version="6.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Selah.Application\Selah.Application.csproj" />
+      <ProjectReference Include="..\Selah.Domain\Selah.Domain.csproj" />
+    </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Selah.Infrastructure\Selah.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
