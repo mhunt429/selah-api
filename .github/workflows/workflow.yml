@@ -23,5 +23,7 @@ jobs:
       run: dotnet restore selah-web-api.sln
     - name: Build
       run: dotnet build selah-web-api.sln --no-restore
-    - name: RUn Tests
-      run: dotnet test selah-web-api.sln --no-build --verbosity normal
+    - name: Run Tests
+      run : cd tests/Selah.Api.UnitTests
+      run: dotnet test --no-build --verbosity normal
+      run: cd ../../

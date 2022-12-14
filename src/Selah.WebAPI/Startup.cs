@@ -6,27 +6,27 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using Selah.Domain.Data.SchemaMappings;
-using Selah.WebAPI.DependencyInjection;
 using Selah.WebAPI.Middleware;
-using MediatR;
-using System.Reflection;
 using Selah.WebAPI.DependencyInjection.Extensions;
+using Selah.Infrastructure;
 
 namespace Selah.WebAPI
 {
     public class Startup
     {
+        private readonly IConfiguration _config;
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            _config = configuration;
         }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddSingleton<IDbConnectionFactory>(_ => 
+            new NpgsqlConnectionFactory(_config.GetValue<string>("DB_CONNECTION_STRING")));
+            var test = _config.GetValue<string>("DB_CONNECTION_STRING");
             JwtConfiguration.ConfigureJwt(services);
 
             services.AddAuthorization(options =>

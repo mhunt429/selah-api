@@ -14,54 +14,48 @@ namespace Selah.Infrastructure.Repository
 {
     public class BaseRepository : IBaseRepository
     {
-        private readonly IOptions<EnvVariablesConfig> _envVariables;
-
-
-        public BaseRepository(IOptions<EnvVariablesConfig> envVariables)
+        private readonly IDbConnectionFactory _dbConnectionFactory;
+        public BaseRepository(IDbConnectionFactory dbConnectionFactory)
         {
-            _envVariables = envVariables;
+            _dbConnectionFactory = dbConnectionFactory;
         }
 
         public async Task<T> AddAsync<T>(string sql, object parameters)
         {
-            using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
+            using (var connection = await _dbConnectionFactory.CreateConnectionAsync())
             {
-                await connection.OpenAsync();
                 return await connection.ExecuteScalarAsync<T>(sql, parameters);
             }
         }
 
         public async Task DeleteAsync(string sql, object parameters)
         {
-            using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
+            using (var connection = await _dbConnectionFactory.CreateConnectionAsync())
             {
-                await connection.OpenAsync();
                 await connection.ExecuteAsync(sql, parameters);
             }
         }
         public async Task<IEnumerable<T>> GetAllAsync<T>(string sql, object parameters)
         {
-            using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
+            using (var connection = await _dbConnectionFactory.CreateConnectionAsync())
             {
-                await connection.OpenAsync();
-               return await connection.QueryAsync<T>(sql, parameters);
+                return await connection.QueryAsync<T>(sql, parameters);
             }
         }
 
         public async Task<T> GetFirstOrDefaultAsync<T>(string sql, object parameters)
         {
-            using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
+            using (var connection = await _dbConnectionFactory.CreateConnectionAsync())
             {
-                await connection.OpenAsync();
                 return (await connection.QueryAsync<T>(sql, parameters)).FirstOrDefault();
             }
         }
 
         public async Task UpdateAsync(string sql, object parameters)
         {
-            using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
+            using (var connection = await _dbConnectionFactory.CreateConnectionAsync())
             {
-                await connection.OpenAsync();
+                await connection.ExecuteAsync(sql, parameters);
                 await connection.ExecuteAsync(sql, parameters);
             }
         }
