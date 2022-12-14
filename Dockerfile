@@ -8,10 +8,10 @@ EXPOSE 80
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 
-COPY ["src/Selah.WebAPI/Selah.WebAPI.csproj", "src/Selah.WebAPI/"]
-COPY ["src/Selah.Domain/Selah.Domain.csproj", "src/Selah.Domain/"]
-COPY ["src/Selah.Infrastructure/Selah.Infrastructure.csproj", "src/Selah.Infrastructure/"]
-COPY ["src/Selah.Application/Selah.Application.csproj", "src/Selah.Application/"]
+COPY ["./src/Selah.WebAPI/Selah.WebAPI.csproj", "src/Selah.WebAPI/"]
+COPY ["./src/Selah.Domain/Selah.Domain.csproj", "src/Selah.Domain/"]
+COPY ["./src/Selah.Infrastructure/Selah.Infrastructure.csproj", "src/Selah.Infrastructure/"]
+COPY ["./src/Selah.Application/Selah.Application.csproj", "src/Selah.Application/"]
 
 
 RUN dotnet restore "src/Selah.WebAPI/Selah.WebAPI.csproj"

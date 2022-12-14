@@ -36,5 +36,5 @@ jobs:
           ECR_REPOSITORY: selah-api-production
           IMAGE_TAG: selah_api_latest
         run: |
-          docker-compose build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker-compose push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
