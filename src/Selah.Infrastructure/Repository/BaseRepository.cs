@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using Selah.Domain.Internal;
@@ -15,16 +16,27 @@ namespace Selah.Infrastructure.Repository
     public class BaseRepository : IBaseRepository
     {
         private readonly IDbConnectionFactory _dbConnectionFactory;
-        public BaseRepository(IDbConnectionFactory dbConnectionFactory)
+        private ILogger<BaseRepository> _logger;
+        public BaseRepository(IDbConnectionFactory dbConnectionFactory, ILogger<BaseRepository> logger)
         {
             _dbConnectionFactory = dbConnectionFactory;
+            _logger = logger;
         }
 
         public async Task<T> AddAsync<T>(string sql, object parameters)
         {
             using (var connection = await _dbConnectionFactory.CreateConnectionAsync())
             {
-                return await connection.ExecuteScalarAsync<T>(sql, parameters);
+                try
+                {
+                    return await connection.ExecuteScalarAsync<T>(sql, parameters);
+
+                }
+                catch(Exception ex)
+                {
+                    _logger.LogError($"Add async failed with error {ex.StackTrace}");
+                    return default(T);
+                }
             }
         }
 
