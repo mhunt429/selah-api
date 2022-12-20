@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: selah-api-production
-          image: selah_api_latest
+          image: 494187779433.dkr.ecr.us-east-1.amazonaws.com/selah-api-production:selah_api_latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80
