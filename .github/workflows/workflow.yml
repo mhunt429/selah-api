@@ -45,6 +45,6 @@ jobs:
           ECR_REPOSITORY: selah-api-production
           IMAGE_TAG: ${{ github.sha }}
         run: /
-          kubectl apply -f deploy.yml
-          kubectl apply -f service.yml
-        working-directory: ./kubernetes
+          kubectl apply -f kubernetes/deploy.yml
+          kubectl apply -f kubernetes/service.yml
+          
