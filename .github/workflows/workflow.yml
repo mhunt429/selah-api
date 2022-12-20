@@ -44,7 +44,7 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: selah-api-production
           IMAGE_TAG: ${{ github.sha }}
-        run: /
+        run: |
           kubectl apply -f kubernetes/deploy.yml
           kubectl apply -f kubernetes/service.yml
           
