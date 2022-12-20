@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: selah-api-production-deployment
+  labels:
+    app: selah-api-production
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: selah-api-production
+  template:
+    metadata:
+      labels:
+        app: selah-api-production
+    spec:
+      containers:
+        - name: selah-api-production
+          image: selah_api_latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
