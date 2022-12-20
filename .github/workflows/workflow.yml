@@ -40,11 +40,11 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
       - name: Deploy to EKS 
       - uses: actions-hub/kubectl@master
-      env:
-        KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: selah-api-production
-        IMAGE_TAG: ${{ github.sha }}
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: selah-api-production
+          IMAGE_TAG: ${{ github.sha }}
         run: /
           kubectl apply -f ./kubernetes/deploy.yml
           kubectl apply -f ./kubernetes/service.yml
