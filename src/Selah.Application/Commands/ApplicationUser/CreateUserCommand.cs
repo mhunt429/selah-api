@@ -40,29 +40,25 @@ namespace Selah.Application.Commands.AppUser
         public class Handler : IRequestHandler<CreateUserCommand, UserViewModel>
         {
             private readonly IAppUserRepository _appUserRepository;
-            private readonly IMapper _mapper;
 
-            public Handler(IAppUserRepository appUserRepository, IMapper mapper)
+            public Handler(IAppUserRepository appUserRepository)
             {
                 _appUserRepository = appUserRepository;
-                _mapper = mapper;
             }
 
             public async Task<UserViewModel> Handle(CreateUserCommand request, CancellationToken cancellationToken)
             {
                 request.CreatedUser.Password = BCrypt.Net.BCrypt.HashPassword(request.CreatedUser.Password);
                 Guid userId = await _appUserRepository.CreateUser(request.CreatedUser);
-                var user = new Domain.Data.Models.ApplicationUser.AppUser
+           
+                return new UserViewModel
                 {
                     Id = userId,
                     Email = request.CreatedUser.Email,
                     UserName = request.CreatedUser.UserName,
                     FirstName = request.CreatedUser.FirstName,
                     LastName = request.CreatedUser.LastName,
-                    DateCreated = DateTime.UtcNow,
                 };
-
-                return _mapper.Map<UserViewModel>(user);
             }
         }
     }

@@ -9,12 +9,14 @@ using Microsoft.OpenApi.Models;
 using Selah.WebAPI.Middleware;
 using Selah.WebAPI.DependencyInjection.Extensions;
 using Selah.Infrastructure;
+using System;
 
 namespace Selah.WebAPI
 {
     public class Startup
     {
         private readonly IConfiguration _config;
+        private readonly string _corsPolicy = "SelahCors";
         public Startup(IConfiguration configuration)
         {
             _config = configuration;
@@ -24,10 +26,19 @@ namespace Selah.WebAPI
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddSingleton<IDbConnectionFactory>(_ => 
+            services.AddSingleton<IDbConnectionFactory>(_ =>
             new NpgsqlConnectionFactory(_config.GetValue<string>("DB_CONNECTION_STRING")));
             var test = _config.GetValue<string>("DB_CONNECTION_STRING");
             JwtConfiguration.ConfigureJwt(services);
+
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                    builder.SetIsOriginAllowed(_ => true)
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials());
+            });
 
             services.AddAuthorization(options =>
             {
@@ -59,9 +70,9 @@ namespace Selah.WebAPI
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Selah.WebAPI v1"));
             }
-
             app.UseMiddleware<LoggerMiddleware>();
             app.UseRouting();
+            app.UseCors(); // allow credentials
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseHttpsRedirection();

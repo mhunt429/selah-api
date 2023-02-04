@@ -450,3 +450,5 @@ secrets.env
 env.sh
 runLocal.ps1
 runLocal.sh
+tools/
+.config/

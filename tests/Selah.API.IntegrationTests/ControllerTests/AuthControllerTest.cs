@@ -24,7 +24,7 @@ namespace Selah.API.IntegrationTests.ControllerTests
         }
 
 
-        [Fact(Skip = "Figuring out how to run this on a build server")]
+        [Fact]
         public async Task Should_Return_Unauthorized_On_Invalid_Login()
         {
             //Arrange

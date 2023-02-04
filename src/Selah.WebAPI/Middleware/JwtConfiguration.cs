@@ -11,41 +11,41 @@ namespace Selah.WebAPI.Middleware
 {
 
     public static class JwtConfiguration
-  {
-     static readonly IOptions<EnvVariablesConfig> _envVariables;
-
-    static JwtConfiguration()
     {
-      _envVariables = Options.Create(new EnvVariablesConfig());
-    }
+        static readonly IOptions<EnvVariablesConfig> _envVariables;
 
-    public static void ConfigureJwt(IServiceCollection services)
-    {
-      var jwtTokenConfig = new JwtConfig
-      {
-        AccessTokenExpiration = 85399,
-        Issuer = _envVariables.Value.JwtIssuer,
-        Secret = _envVariables.Value.JwtSecret
-      };
-      services.AddSingleton(jwtTokenConfig);
-      services.AddAuthentication(x =>
-      {
-        x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-      }).AddJwtBearer(x =>
-      {
-        x.RequireHttpsMetadata = true;
-        x.SaveToken = true;
-        x.TokenValidationParameters = new TokenValidationParameters
+        static JwtConfiguration()
         {
-          ValidateIssuerSigningKey = true,
-          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_envVariables.Value.JwtSecret)),
-          ValidateIssuer = false,
+            _envVariables = Options.Create(new EnvVariablesConfig());
+        }
 
-          ValidateAudience = false,
-          ClockSkew = TimeSpan.FromMinutes(1)
-        };
-      });
+        public static void ConfigureJwt(IServiceCollection services)
+        {
+            var jwtTokenConfig = new JwtConfig
+            {
+                AccessTokenExpiration = 85399,
+                Issuer = _envVariables.Value.JwtIssuer,
+                Secret = _envVariables.Value.JwtSecret
+            };
+            services.AddSingleton(jwtTokenConfig);
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = true;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_envVariables.Value.JwtSecret)),
+                    ValidateIssuer = false,
+
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.FromMinutes(1)
+                };
+            });
+        }
     }
-  }
 }

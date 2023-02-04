@@ -7,40 +7,42 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using Selah.Domain.Data.Models;
 using Selah.Domain.Data.Models.Authentication;
-using Selah.WebAPI.Shared;
 using Selah.Domain.Data.Models.ApplicationUser;
-using System.Collections.Generic;
-using Selah.Domain.Data.Dictionaries;
 using Selah.Application.Services.Interfaces;
 using AutoMapper;
 using MediatR;
 using Selah.Application.Queries.ApplicationUser;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Selah.WebAPI.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/v1/oauth")]
     public class AuthController : ControllerBase
     {
         private readonly IUserService _userService;
         private readonly IAuthenticationService _authService;
-        private readonly IMapper _mapper;
         private readonly IMediator _mediatr;
-        public AuthController(IUserService userService, IAuthenticationService authService, IMapper mapper, IMediator mediatr)
+        public AuthController(IUserService userService, IAuthenticationService authService, IMediator mediatr)
         {
             _userService = userService;
             _authService = authService;
-            _mapper = mapper;
             _mediatr = mediatr;
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] GetUserQuery query)
         {
             var user = await _mediatr.Send(query);
             if (user == null)
             {
-                return Unauthorized();
+                return Unauthorized(new HttpResponseViewModel<AppUser>
+                {
+                    StatusCode = 401,
+
+                });
             }
 
             var claims = new[]
@@ -59,41 +61,35 @@ namespace Selah.WebAPI.Controllers
         }
 
         [HttpGet("current-user")]
-        public async Task<IActionResult> GetAuthenticatedUser()
+        public async Task<ActionResult<HttpResponseViewModel<UserViewModel>>> GetAuthenticatedUser()
         {
-            try
+
+            if (Request.Headers.TryGetValue("Authorization", out StringValues authToken))
             {
-                if (Request.Headers.TryGetValue("Authorization", out StringValues authToken))
+                var jwt = authToken.ToString().Replace("Bearer ", "");
+                var handler = new JwtSecurityTokenHandler();
+                var token = handler.ReadJwtToken(jwt);
+
+                var user = await _userService.GetUser(new Guid(token.Claims.First().Value));
+                if (user == null)
                 {
-                    var jwt = authToken.ToString().Replace("Bearer ", "");
-                    var handler = new JwtSecurityTokenHandler();
-                    var token = handler.ReadJwtToken(jwt);
-
-                    var user = await _userService.GetUser(new Guid(token.Claims.First().Value));
-                    if (user == null)
-                    {
-                        return Unauthorized(new HttpResponseViewModel<AppUser>
-                        {
-                            StatusCode = 401,
-
-                        });
-                    }
-                    return Ok(_mapper.Map<UserViewModel>(user));
+                    return Forbid();
                 }
-                return Unauthorized(new HttpResponseViewModel<AppUser>
+                return Ok(new HttpResponseViewModel<UserViewModel>
                 {
-                    StatusCode = 401,
-
+                    StatusCode = 200,
+                    Data = new System.Collections.Generic.List<UserViewModel> { new UserViewModel
+                    {
+                        Id = user.Id,
+                        UserName = user.UserName,
+                        Email = user.Email,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        DateCreated = user.DateCreated
+                    }}
                 });
             }
-            catch (Exception ex)
-            {
-                return BadRequest(new HttpResponseViewModel<AppUser>
-                {
-                    StatusCode = 400,
-
-                });
-            }
+            return Forbid();
         }
     }
 }

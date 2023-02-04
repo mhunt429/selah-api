@@ -44,7 +44,10 @@ namespace Selah.Application.Queries.Analytics
                 {
                     RecentTransactions = await GetRecentTransactions(query.UserId),
                     LastMonthSpending = transactionSummaryTuple.Item1.ToList(),
-                    CurrentMonthSpending = transactionSummaryTuple.Item2.ToList()
+                    CurrentMonthSpending = transactionSummaryTuple.Item2.ToList(),
+                    UpcomingTransactions = new List<RecurringTransaction>(),
+                    PortfolioSummary =  new {},
+                    NetWorthSummary = new NetWorthSummary { }
                 };
             }
 
