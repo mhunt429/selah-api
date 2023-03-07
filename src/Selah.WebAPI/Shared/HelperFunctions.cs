@@ -23,21 +23,6 @@ namespace Selah.WebAPI.Shared
         {
             return request.HttpContext.TraceIdentifier;
         }
-
-        /// <summary>
-        /// Fluent validation returns a pretty big object for failed results so this just cleans up the API response
-        /// </summary>
-        /// <param name="validationResult"></param>
-        /// <returns></returns>
-        public static IEnumerable<ValidationError> MapFluentValidationToErrorModel(FluentValidation.Results.ValidationResult validationResult)
-        {
-            return validationResult.Errors.Select(x => new ValidationError
-            {
-                PropertyName = x.PropertyName,
-                ErrorMessage = x.ErrorMessage,
-                AttemtedValue = x.AttemptedValue.ToString()
-            }); ;
-        }
+      
     }
-
 }

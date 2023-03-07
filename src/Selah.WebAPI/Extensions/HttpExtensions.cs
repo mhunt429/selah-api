@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using FluentValidation.Results;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using Selah.Domain.Data.Models;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 
@@ -19,6 +22,26 @@ namespace Selah.WebAPI.Extensions
             }
 
             return Guid.Empty;
+        }
+
+        public static IEnumerable<ValidationError> GetValidationErrors(this ValidationResult validationResult)
+        {
+            return validationResult.Errors.Select(x => new ValidationError
+            {
+                PropertyName = x.PropertyName,
+                ErrorMessage = x.ErrorMessage,
+                AttemtedValue = x.AttemptedValue.ToString()
+            }); 
+        }
+
+        public static string GetIpAddressFromRequest(this HttpRequest request)
+        {
+            return request.HttpContext.Connection.RemoteIpAddress?.ToString();
+        }
+
+        public static string GetRequestTraceId(this HttpRequest request)
+        {
+            return request.HttpContext.TraceIdentifier;
         }
     }
 }

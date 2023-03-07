@@ -69,8 +69,8 @@ namespace Selah.WebAPI.Controllers
                 return BadRequest(new HttpResponseViewModel<UserViewModel>
                 {
                     StatusCode = 400,
-                    Errors = HelperFunctions.MapFluentValidationToErrorModel(validationResult)
-                }); ;
+                    Errors = validationResult.GetValidationErrors()
+                });
             }
             return Ok(await _mediatr.Send(command));
         }

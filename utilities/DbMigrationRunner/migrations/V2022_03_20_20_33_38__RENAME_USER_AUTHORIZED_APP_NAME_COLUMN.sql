@@ -1,0 +1,1 @@
+ALTER TABLE user_authorized_app RENAME COLUMN application_name TO scope
