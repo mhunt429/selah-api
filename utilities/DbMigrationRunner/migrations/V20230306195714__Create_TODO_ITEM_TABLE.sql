@@ -1,9 +1,17 @@
-CREATE TABLE todo_item(
+CREATE TABLE IF NOT EXISTS todo_item(
     id BIGSERIAL PRIMARY KEY,
     user_id uuid REFERENCES app_user(id) ON DELETE CASCADE,
     recurring BOOLEAN,
     last_completed TIMESTAMP,
-    frequency VARCHAR(16),
+    /*
+ OneTime = 0,
+        Weekly = 1,
+        BiWeekly = 2,
+        Monthly = 3,
+        Annually = 4,
+        Other = 5
+    */
+    frequency int,
     deadline TIMESTAMP
 );
 

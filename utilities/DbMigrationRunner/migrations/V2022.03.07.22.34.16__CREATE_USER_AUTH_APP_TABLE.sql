@@ -1,4 +1,4 @@
-CREATE TABLE user_authorized_app
+CREATE TABLE IF NOT EXISTS user_authorized_app
 (
 	id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
 	user_id uuid references app_user(id),

@@ -11,7 +11,7 @@ namespace Selah.Infrastructure.Repository.Interfaces
 
         public Task Update(TodoItem todoItem);
 
-        public Task<IReadOnlyList<TodoItem>> GetTodoList(Guid userId, int limit, int offeset);
+        public Task<IReadOnlyList<TodoItem>> GetTodoList(Guid userId, int limit, int offset);
 
         public Task<TodoItem> GetTodoByUserAndId(long id, Guid userId);
 

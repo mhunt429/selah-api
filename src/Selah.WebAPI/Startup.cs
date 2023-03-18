@@ -28,7 +28,6 @@ namespace Selah.WebAPI
 
             services.AddSingleton<IDbConnectionFactory>(_ =>
             new NpgsqlConnectionFactory(_config.GetValue<string>("DB_CONNECTION_STRING")));
-            var test = _config.GetValue<string>("DB_CONNECTION_STRING");
             JwtConfiguration.ConfigureJwt(services);
 
             services.AddCors(options =>

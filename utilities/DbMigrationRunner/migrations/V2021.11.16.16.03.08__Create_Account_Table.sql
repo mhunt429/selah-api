@@ -1,6 +1,5 @@
-CREATE TABLE user_bank_account(
+CREATE TABLE IF NOT EXISTS user_bank_account(
 	id BIGSERIAL PRIMARY KEY,
-	external_account_id TEXT,
 	account_mask TEXT,
 	account_name TEXT,
 	available_balance DECIMAL,

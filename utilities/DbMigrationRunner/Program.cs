@@ -21,27 +21,7 @@ namespace DbMigrationRunner
 
             catch (Exception ex)
             {
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
                 Console.WriteLine(ex.StackTrace.ToString());
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-                throw;
-            }
-
-            try
-            {
-                var connection = new NpgsqlConnection(connectionStrings.SelahDbTest);
-                var evolve = new Evolve.Evolve(connection, msg => Console.WriteLine($"Beginning database migrations with {msg}"))
-                {
-                    Locations = new[] { location }
-                };
-                evolve.Migrate();
-            }
-
-            catch (Exception ex)
-            {
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-                Console.WriteLine(ex.StackTrace.ToString());
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
                 throw;
             }
         }

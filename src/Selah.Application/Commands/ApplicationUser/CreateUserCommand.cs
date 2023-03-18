@@ -58,6 +58,7 @@ namespace Selah.Application.Commands.AppUser
                     UserName = request.CreatedUser.UserName,
                     FirstName = request.CreatedUser.FirstName,
                     LastName = request.CreatedUser.LastName,
+                    DateCreated = request.CreatedUser.DateCreated,
                 };
             }
         }

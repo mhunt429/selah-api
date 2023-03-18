@@ -1,4 +1,4 @@
-CREATE TABLE user_transaction(
+CREATE TABLE IF NOT EXISTS user_transaction(
 	id BIGSERIAL PRIMARY KEY,
 	account_id BIGSERIAL REFERENCES user_bank_account(id),
 	user_id uuid  REFERENCES app_user(id),
