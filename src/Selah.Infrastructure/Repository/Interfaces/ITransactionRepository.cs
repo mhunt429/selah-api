@@ -20,11 +20,11 @@ namespace Selah.Infrastructure.Repository.Interfaces
 
         public Task<IEnumerable<UserTransactionQueryResult>> GetTransactionsVM(Guid userId, int take);
 
-        public Task<Guid> CreateTransactionCategory(UserTransactionCategoryCreate category);
+        public Task<long> CreateTransactionCategory(UserTransactionCategoryCreate category);
 
         public Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUser(Guid userId);
 
-        public Task<Guid> InsertTransaction(UserTransaction transaction);
+        public Task<long> InsertTransaction(TransactionCreate transaction);
 
         /// <summary>
         /// Split transactions is the business case for this query
@@ -33,7 +33,7 @@ namespace Selah.Infrastructure.Repository.Interfaces
         /// <returns>1 element per transaction line item</returns>
         public Task<IEnumerable<ItemizedTransactionSql>> GetItemizedTransactionAsync(Guid transactionId);
 
-        public Task InsertTransactionLineItem(TransactionLineItemCreate lineItem);
+        public Task<int> InsertTransactionLineItem(TransactionLineItemCreate lineItem);
 
         /// <summary>
         /// Returns a list of most recent transactions. 

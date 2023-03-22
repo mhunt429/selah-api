@@ -91,11 +91,11 @@ namespace Selah.Infrastructure.Repository
             }
         }
 
-        public async Task<Guid> CreateTransactionCategory(UserTransactionCategoryCreate category)
+        public async Task<long> CreateTransactionCategory(UserTransactionCategoryCreate category)
         {
             using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
             {
-                return await connection.ExecuteScalarAsync<Guid>(@"INSERT INTO 
+                return await connection.ExecuteScalarAsync<long>(@"INSERT INTO 
           user_transaction_category(user_id, category_name) 
           VALUES(@user_id, @category_name) RETURNING(id)", new
                 {
@@ -117,16 +117,16 @@ namespace Selah.Infrastructure.Repository
             }
         }
 
-        public async Task<Guid> InsertTransaction(UserTransaction transaction)
+        public async Task<long> InsertTransaction(TransactionCreate transaction)
         {
             using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
             {
-                return await connection.ExecuteScalarAsync<Guid>(@"INSERT INTO user_transaction(
+                return await connection.ExecuteScalarAsync<long>(@"INSERT INTO user_transaction(
             account_id, user_id, transaction_amount, 
-            transaction_date, merchant_name, transaction_name, pending, payment_method, external_transaction_id
+            transaction_date, merchant_name, transaction_name, pending, payment_method
         )
         VALUES( @account_id, @user_id, @transaction_amount, 
-            @transaction_date, @merchant_name, @transaction_name, @pending, @payment_method, @external_transaction_id) 
+            @transaction_date, @merchant_name, @transaction_name, @pending, @payment_method) 
             RETURNING(id)", new
                 {
                     account_id = transaction.AccountId,
@@ -137,7 +137,6 @@ namespace Selah.Infrastructure.Repository
                     transaction_name = transaction.TransactionName,
                     pending = transaction.Pending,
                     payment_method = transaction.PaymentMethod,
-                    external_transaction_id = transaction.ExternalTransactionId
                 });
             }
         }
@@ -154,7 +153,7 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.GetAllAsync<ItemizedTransactionSql>(sql, parameters);
         }
 
-        public async Task InsertTransactionLineItem(TransactionLineItemCreate lineItem)
+        public async Task<int> InsertTransactionLineItem(TransactionLineItemCreate lineItem)
         {
             var sql = @"INSERT INTO transaction_line_item(transaction_id, transaction_category_id, itemized_amount) 
                         VALUES(@transaction_id, @transaction_category_id, @itemized_amount)";
@@ -166,7 +165,7 @@ namespace Selah.Infrastructure.Repository
                 itemized_amount = lineItem.ItemizedAmount
             };
 
-            await _baseRepository.AddAsync<Guid>(sql, parameters);
+           return await _baseRepository.AddAsync<int>(sql, parameters);
         }
 
         public async Task<IEnumerable<RecentTransactionSql>> GetRecentTransactions(Guid userId)
@@ -190,7 +189,7 @@ namespace Selah.Infrastructure.Repository
             {
                 user_id = userId
             };
-           
+
             return await _baseRepository.GetAllAsync<RecentTransactionSql>(sql, parameters);
         }
 
@@ -204,9 +203,9 @@ namespace Selah.Infrastructure.Repository
                     WHERE 
                     user_id = @userId AND
                     transaction_date BETWEEN @startDate AND @endDate
-                    GROUP BY transaction_date"; 
+                    GROUP BY transaction_date";
 
-            var parameters = new {userId, startDate, endDate};
+            var parameters = new { userId, startDate, endDate };
             return await _baseRepository.GetAllAsync<TransactionSummarySql>(sql, parameters);
         }
     }

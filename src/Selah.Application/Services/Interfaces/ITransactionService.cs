@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Selah.Domain.Data.Models.Transactions;
+using Selah.Domain.Data.Models.Transactions.Commands;
 using Selah.Domain.Data.Models.Transactions.Sql;
 
 namespace Selah.Application.Services.Interfaces
@@ -13,7 +14,7 @@ namespace Selah.Application.Services.Interfaces
         /// </summary>
         /// <param name="institutionId">The Id of the financial institution to import transactions from </param>
         /// <returns></returns>
-        public Task ImportTransactions(Guid institutionId);
+      //  public Task ImportTransactions(Guid institutionId);
 
         public Task<IEnumerable<UserTransaction>> GetTransactions();
 
@@ -22,8 +23,6 @@ namespace Selah.Application.Services.Interfaces
         public Task<UserTransactionCategory> CreateTransactionCategory(UserTransactionCategoryCreate category);
 
         public Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUser(Guid userId);
-
-        public Task<UserTransaction> CreateTransaction(UserTransaction transaction);
 
         public Task<IEnumerable<ItemizedTransactionSql>> GetItemizedTransactionAsync(Guid transactionId);
     }

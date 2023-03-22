@@ -11,6 +11,5 @@ namespace Selah.Domain.Data.Models.ApplicationUser
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime DateCreated { get; set; }
-
     }
 }

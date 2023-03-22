@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Selah.Application.Commands.Transactions;
 using Selah.Application.Services.Interfaces;
 using Selah.Domain.Data.Models;
 using Selah.Domain.Data.Models.ApplicationUser;
@@ -20,32 +22,20 @@ namespace Selah.WebAPI.Controllers
     {
         private readonly ITransactionService _transactionService;
         private readonly IAuthenticationService _authService;
-        public TransactionController(ITransactionService transactionService, IAuthenticationService authService)
+        private readonly IMediator _mediator;
+
+        public TransactionController(ITransactionService transactionService, IAuthenticationService authService, IMediator mediator)
         {
             _transactionService = transactionService;
             _authService = authService;
+            _mediator = mediator;
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTransaction([FromBody] UserTransaction transaction)
+        public async Task<IActionResult> CreateTransaction([FromBody] CreateTransactionCommand command)
         {
-            try
-            {
-                var userId =
-                  _authService.GetUserFromClaims(Request);
-                if (userId == null)
-                {
-                    return Unauthorized();
-                }
-
-                transaction.UserId = userId.Value;
-                var createdTransaction = await _transactionService.CreateTransaction(transaction);
-                return Ok(createdTransaction);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(HelperFunctions.ParseExceptionAsString(ex));
-            }
+            var result = await _mediator.Send(command);
+            return Ok(result);
         }
 
         [HttpGet]
@@ -60,6 +50,7 @@ namespace Selah.WebAPI.Controllers
             return Ok(transactions);
         }
 
+        /*
         [HttpPost("import")]
         public async Task<IActionResult> ImportTransactions([FromQuery(Name = "institutionId")] Guid? institutionId)
         {
@@ -82,7 +73,7 @@ namespace Selah.WebAPI.Controllers
                 errors.Add(new ErrorMessage { Key = null, Message = ex.ParseExceptionAsString() });
                 return BadRequest(errors);
             }
-        }
+        }*/
 
         //TODO add validation to this? Required data annotations should be enough
 

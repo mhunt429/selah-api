@@ -5,7 +5,7 @@ namespace Selah.Domain.Data.Models.Transactions
 {
   public class UserTransactionCategory
   {
-    public Guid Id { get; set; }
+    public long Id { get; set; }
     public Guid UserId { get; set; }
     public string CategoryName { get; set; }
   }
