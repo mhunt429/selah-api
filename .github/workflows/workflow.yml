@@ -20,7 +20,7 @@ jobs:
       - name: Build
         run: dotnet build selah-web-api.sln --no-restore
       - name: Run Tests
-        run: dotnet test ./tests/Selah.Application.UnitTests --no-build --verbosity normal
+        run: dotnet test ./tests/Selah.API.UnitTests --no-build --verbosity normal
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
