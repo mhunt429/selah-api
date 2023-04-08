@@ -44,13 +44,7 @@ namespace Selah.WebAPI.Controllers
 
                 });
             }
-
-            var claims = new[]
-            {
-        new Claim(ClaimTypes.Name,user.Id.ToString()),
-      };
-
-            var jwtResult = _authService.GenerateJwt(claims);
+            var jwtResult = _authService.GenerateJwt(user);
 
             return Ok(new AuthenticationResponse
             {

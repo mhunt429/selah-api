@@ -7,29 +7,32 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
-      - DB_CONNECTION_STRING=User ID=postgres;Password=postgres;Host=localhost;Port=5433;Database=postgres
+      - DB_CONNECTION_STRING=User ID=postgres;Password=postgres;Host=selah-db;Database=postgres
       - INTEGRATION_TEST_DB=User ID=postgres;Password=postgres;Host=selah-test-db;Database=postgres
     ports:
       - 8080:80
       - 8081:443
     env_file: secrets.env
-   # depends_on:
-    #  - "selah-db"
+    depends_on:
+      - "selah-db"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
     networks:
       - dockerapi-dev
-  #selah-db:
-   # image: postgres:13.1-alpine
-    #restart: always
-    #environment:
-      #- POSTGRES_USER=postgres
-    #  - POSTGRES_PASSWORD=postgres
-  #  ports:
-   #   - '65432:5432'
-   # volumes: 
-   #   - db:/var/lib/postgresql/data
+  selah-db:
+    image: postgres:13.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - '65432:5432'
+    volumes: 
+      - db:/var/lib/postgresql/data 
+    networks:
+      - dockerapi-dev
 volumes:
   db:
     driver: local

@@ -1,20 +1,44 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Selah.Domain.Data.Models.Transactions;
 using Selah.Domain.Data.Models.Transactions.Commands;
 using Selah.Infrastructure.Repository.Interfaces;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Transactions;
-
+using System.Linq;
 namespace Selah.Application.Commands.Transactions
 {
     public class CreateTransactionCommand : IRequest<TransactionCreateResponse>
     {
-        public TransactionCreate Transaction { get; set; }
+        [FromBody]
+        public TransactionCreate Data { get; set; }
+
+        public class Validator : AbstractValidator<CreateTransactionCommand>
+        {
+            private readonly ITransactionRepository _trxRepo;
+            public Validator(ITransactionRepository trxRepo)
+            {
+                _trxRepo = trxRepo;
+
+                RuleFor(x => x.Data.MerchantName).NotEmpty().WithMessage("Merchant name cannot be empty");
+                RuleFor(x => x.Data.TransactionAmount).GreaterThan(0);
+                RuleFor(x => x.Data.TransactionDate).LessThanOrEqualTo(System.DateTime.UtcNow).WithMessage("Transaction date cannot be in the future");
+
+                RuleForEach(x => x.Data.LineItems).ChildRules(item =>
+                {
+                    item.RuleFor(x => x.TransactionCategoryId).MustAsync(async (model, id, cancellation) =>
+                    {
+                        var categories = await _trxRepo.GetTransactionCategoryById(model.UserId, id);
+                        return categories.Any();
+                    }).WithMessage("Category for this line item is invalid");
+                });
+            }
+        }
 
         public class Handler : IRequestHandler<CreateTransactionCommand, TransactionCreateResponse>
         {
@@ -25,10 +49,10 @@ namespace Selah.Application.Commands.Transactions
                 _transactionRepository = transactionRepository;
             }
 
-            //TODO add validation to this
+            
             public async Task<TransactionCreateResponse> Handle(CreateTransactionCommand command, CancellationToken cancellationToken)
             {
-                var transaction = command.Transaction;
+                var transaction = command.Data;
                 var transactionId = await _transactionRepository.InsertTransaction(transaction);
 
                 if (transactionId > 0)
@@ -63,9 +87,10 @@ namespace Selah.Application.Commands.Transactions
             /// </summary>
             /// <param name="items">A collection of transaction line items</param>
             /// <returns>returns an empty task because we don't care about the return value</returns>
-            private async Task CreateSplitTransactions(IReadOnlyCollection<TransactionLineItemCreate> items, CancellationToken cancellationToken)
+            private async Task CreateSplitTransactions(List<TransactionLineItemCreate> items, CancellationToken cancellationToken)
             {
-                await Parallel.ForEachAsync(items, async (item, cancellationToken) =>
+                //Open a max of 3 concurrent connections to the database
+                await Parallel.ForEachAsync(items, new ParallelOptions { MaxDegreeOfParallelism = 3 }, async (item, cancellationToken) =>
                 {
                     await _transactionRepository.InsertTransactionLineItem(item);
                 });

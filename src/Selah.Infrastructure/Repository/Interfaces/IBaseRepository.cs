@@ -17,5 +17,6 @@ namespace Selah.Infrastructure.Repository.Interfaces
 
         public Task DeleteAsync(string sql, object parameters);
 
+        public Task<int> AddManyAsync(string sql, IReadOnlyCollection<object> objectsToSave);
     }
 }

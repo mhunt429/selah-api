@@ -34,11 +34,11 @@ namespace Selah.WebAPI
         public async Task<IActionResult> GetHistoryByTicker(string ticker, string period, string frequencyType)
         {
             var userId = _authService.GetUserFromClaims(Request);
-            if (userId == null)
+            if (userId == Guid.Empty)
             {
                 return Unauthorized();
             }
-            var timeSeries = await _investmentService.GetHistoryByTicker(new TimeSeriesRequest { Ticker = ticker, Period = period, FrequencyType = frequencyType }, userId.Value);
+            var timeSeries = await _investmentService.GetHistoryByTicker(new TimeSeriesRequest { Ticker = ticker, Period = period, FrequencyType = frequencyType }, userId);
             if (timeSeries == null)
             {
                 return BadRequest("An error occured fetching time series data");
@@ -57,7 +57,7 @@ namespace Selah.WebAPI
         public async Task<IActionResult> GetOAuthAccessToken([FromBody] OAuthTokenRequest request)
         {
             var userId = _authService.GetUserFromClaims(Request);
-            if (userId == null)
+            if (userId == Guid.Empty)
             {
                 return Unauthorized();
             }
@@ -70,7 +70,7 @@ namespace Selah.WebAPI
                 }
                 var credentialsToSave = new UserAuthorizedAppCreate
                 {
-                    UserId = userId.Value,
+                    UserId = userId,
                     Scope = "TDAmeritrade",
                     EncryptedAccessToken = await _securityService.Encrypt(accessTokenResponse.AccessToken),
                     EncryptedRefreshToken = await _securityService.Encrypt(accessTokenResponse.RefreshToken),
@@ -81,7 +81,7 @@ namespace Selah.WebAPI
                 };
 
                 var saveCredentials = await _authorizedAppService.CreateOAuthCredentials(credentialsToSave); //TODO remove this placeholder
-                if (saveCredentials == null)
+                if (saveCredentials == Guid.Empty)
                 {
                     return NoContent();
                 }

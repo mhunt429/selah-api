@@ -29,11 +29,11 @@ namespace Selah.WebAPI.Controllers
             {
                 var userId =
                   _authService.GetUserFromClaims(Request);
-                if (userId == null)
+                if (userId == Guid.Empty)
                 {
                     return Unauthorized();
                 }
-                institution.User.UserId = userId.Value;
+                institution.User.UserId = userId;
                 var linkedInstitution = await _bankingService.CreateUserInstitution(institution);
                 await _bankingService.ImportAccounts(linkedInstitution.Id);
                 return Ok(linkedInstitution);
@@ -67,7 +67,7 @@ namespace Selah.WebAPI.Controllers
         public async Task<IActionResult> GetAccounts()
         {
             var userId = _authService.GetUserFromClaims(Request);
-            if (userId == null)
+            if (userId == Guid.Empty)
             {
                 return Unauthorized();
             }

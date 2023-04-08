@@ -10,8 +10,8 @@ namespace Selah.Application.Services.Interfaces
   public interface IAuthenticationService
   {
 
-    public JwtResponse GenerateJwt(Claim[] claims);
+    public JwtResponse GenerateJwt(UserViewModel user);
 
-    public Guid? GetUserFromClaims(HttpRequest request);
+    public Guid GetUserFromClaims(HttpRequest request);
   }
 }

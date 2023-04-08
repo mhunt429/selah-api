@@ -53,5 +53,14 @@ namespace Selah.Infrastructure.Repository.Interfaces
         /// <returns></returns>
         public Task<IEnumerable<TransactionSummarySql>> GetTransactionSummaryByDateRange(Guid userId, DateTime startDate, DateTime endDate);
 
+        /// <summary>
+        /// returns a transactio is by user and name
+        /// </summary>
+        /// <param name="userId">Id of the user</param>
+        /// <param name="catgoryName">name of the category</param>
+        /// <returns></returns>
+        public Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUser(Guid userId, string catgoryName);
+
+        public Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoryById(Guid userId, long id);
     }
 }

@@ -47,7 +47,7 @@ namespace Selah.Domain.Data.Models.Transactions
 
         public string PaymentMethod { get; set; }
 
-        public IReadOnlyCollection<LineItem> LineItems { get; set; }
+        public List<LineItem> LineItems { get; set; } = new List<LineItem>();
     }
 
     public class LineItem
@@ -57,6 +57,8 @@ namespace Selah.Domain.Data.Models.Transactions
         public decimal ItemizedAmount { get; set; }
 
         public bool DefaultCategory { get; set; }
+        
+        public Guid UserId { get; set; }
     }
 }
 

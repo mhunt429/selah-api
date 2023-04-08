@@ -98,12 +98,12 @@ namespace Selah.WebAPI.Controllers
 
             var userId =
               _authService.GetUserFromClaims(Request);
-            if (userId == null)
+            if (userId == Guid.Empty)
             {
                 return Unauthorized();
             }
 
-            var categories = await _transactionService.GetTransactionCategoriesByUser(userId.Value);
+            var categories = await _transactionService.GetTransactionCategoriesByUser(userId);
             return Ok(categories);
         }
 

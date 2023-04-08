@@ -40,6 +40,28 @@ namespace Selah.Infrastructure.Repository
             }
         }
 
+        public async Task<int> AddManyAsync(string sql, IReadOnlyCollection<object> objectsToSave)
+        {
+            int rowsInserted = 0;
+            using (var connection = await _dbConnectionFactory.CreateConnectionAsync())
+            {
+                try
+                {
+                    foreach(var obj in objectsToSave)
+                    {
+                        rowsInserted += await connection.ExecuteScalarAsync<int>(sql, obj);
+                    }
+                    return rowsInserted;
+
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Add async failed with error {ex.StackTrace}");
+                    return 0;
+                }
+            }
+        }
+
         public async Task DeleteAsync(string sql, object parameters)
         {
             using (var connection = await _dbConnectionFactory.CreateConnectionAsync())

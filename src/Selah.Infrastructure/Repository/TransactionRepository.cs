@@ -117,6 +117,32 @@ namespace Selah.Infrastructure.Repository
             }
         }
 
+        public async Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoryById(Guid userId, long id)
+        {
+            using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
+            {
+                return await connection.QueryAsync<UserTransactionCategory>(@"SELECT id, user_id, category_name 
+            FROM user_transaction_category WHERE user_id = @user_id AND id = id", new
+                {
+                    user_id = userId,
+                    id
+                });
+            }
+        }
+
+        public async Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUser(Guid userId, string catgoryName)
+        {
+            using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
+            {
+                return await connection.QueryAsync<UserTransactionCategory>(@"SELECT id, user_id, category_name 
+            FROM user_transaction_category WHERE user_id = @user_id AND name = @name", new
+                {
+                    user_id = userId,
+                    category_name = catgoryName
+                });
+            }
+        }
+
         public async Task<long> InsertTransaction(TransactionCreate transaction)
         {
             using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
