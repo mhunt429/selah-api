@@ -19,8 +19,14 @@ jobs:
         run: dotnet restore selah-web-api.sln
       - name: Build
         run: dotnet build selah-web-api.sln --no-restore
-      - name: Run Tests
-        run: dotnet test ./tests/Selah.API.UnitTests --no-build --verbosity normal
+      - name: Run Tests and Publish Results
+        run: dotnet test ./tests/Selah.API.UnitTests --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov
+      - name: Publish coverage report to coveralls.io
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: tests/Selah.API.UnitTests/TestResults/coverage.info
+       
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
