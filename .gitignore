@@ -452,3 +452,4 @@ runLocal.ps1
 runLocal.sh
 tools/
 .config/
+coverage/
