@@ -79,6 +79,8 @@ namespace Selah.Application.UnitTests.Transactions
             validationResult.IsValid.Should().BeTrue();
 
             var result = handler.Handle(command, CancellationToken.None);
+
+            //Assert
             _transactionRepoMock.Verify(x => x.InsertTransaction(It.IsAny<TransactionCreate>()), Times.Exactly(1));
             _transactionRepoMock.Verify(x => x.InsertTransactionLineItem(It.IsAny<TransactionLineItemCreate>()), Times.Exactly(4));
 
