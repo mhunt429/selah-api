@@ -1,9 +1,4 @@
 ﻿using Selah.Domain.Data.Models.Transactions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Selah.Application.UnitTests.Transactions.TestHelpers
 {
@@ -76,24 +71,24 @@ namespace Selah.Application.UnitTests.Transactions.TestHelpers
             {
                 new LineItem
                 {
-                    ItemizedAmount = 1,
+                    ItemizedAmount = 25,
                     TransactionCategoryId = 1
                 },
                  new LineItem
                 {
-                    ItemizedAmount = 1,
+                    ItemizedAmount = 25,
                     TransactionCategoryId = 2
                 },
 
                    new LineItem
                 {
-                    ItemizedAmount = 1,
+                    ItemizedAmount = 25,
                     TransactionCategoryId = 3
                 },
 
                      new LineItem
                 {
-                    ItemizedAmount = 1,
+                    ItemizedAmount = 25,
                     TransactionCategoryId = 4
                 },
             };

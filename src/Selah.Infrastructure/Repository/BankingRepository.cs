@@ -103,5 +103,26 @@ namespace Selah.Infrastructure.Repository
         return insertedRows;
       }
     }
-  }
+
+        public async Task<BankAccount> GetAccountById(long id)
+        {
+            using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
+            {
+                var account = await connection.QueryFirstAsync<BankAccount>(@"SELECT 
+                    id, 
+                    external_account_id, 
+                    account_mask,  
+                    account_name, 
+                    available_balance,
+                    current_balance,
+                    user_id,
+                    subtype,
+                    institution_id 
+                    FROM user_bank_account
+                    WHERE id = @id",
+                  new { id });
+                return account;
+            }
+        }
+    }
 }

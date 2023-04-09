@@ -6,17 +6,19 @@ using Selah.Infrastructure.Repository.Interfaces;
 using Selah.Application.UnitTests.Transactions.TestHelpers;
 using FluentValidation.TestHelper;
 using Selah.Domain.Data.Models.Transactions;
-
+using Selah.Domain.Data.Models.Banking;
 
 namespace Selah.Application.UnitTests.Transactions
 {
     public class CreateTransactionUnitTests
     {
         private readonly Mock<ITransactionRepository> _transactionRepoMock = new Mock<ITransactionRepository>();
+        private readonly Mock<IBankingRepository> _bankingRepoMock = new Mock<IBankingRepository>();
 
         public CreateTransactionUnitTests()
         {
             _transactionRepoMock.Setup(x => x.GetTransactionCategoryById(It.IsAny<Guid>(), It.IsAny<long>())).ReturnsAsync(TransactionCategoryTestHelpers.CreateCategories(true));
+            _bankingRepoMock.Setup(x => x.GetAccountById(It.IsAny<long>())).ReturnsAsync((BankAccount)null);
         }
 
         [Fact]
@@ -35,7 +37,7 @@ namespace Selah.Application.UnitTests.Transactions
                 }
             };
 
-            var validator = new CreateTransactionCommand.Validator(_transactionRepoMock.Object);
+            var validator = new CreateTransactionCommand.Validator(_transactionRepoMock.Object, _bankingRepoMock.Object);
 
             //Act
             var result = await validator.TestValidateAsync(command);
@@ -45,6 +47,7 @@ namespace Selah.Application.UnitTests.Transactions
             result.ShouldHaveValidationErrorFor(x => x.Data.TransactionDate);
             result.ShouldHaveValidationErrorFor(x => x.Data.MerchantName);
             result.ShouldHaveValidationErrorFor(x => x.Data.TransactionAmount);
+            result.ShouldHaveValidationErrorFor(x => x.Data.AccountId);
         }
 
         [Fact]
@@ -52,6 +55,7 @@ namespace Selah.Application.UnitTests.Transactions
         {
             _transactionRepoMock.Setup(x => x.GetTransactionCategoryById(It.IsAny<Guid>(), It.IsAny<long>())).ReturnsAsync(TransactionCategoryTestHelpers.CreateCategories(false));
             _transactionRepoMock.Setup(x => x.InsertTransaction(It.IsAny<TransactionCreate>())).ReturnsAsync(1);
+            _bankingRepoMock.Setup(x => x.GetAccountById(It.IsAny<long>())).ReturnsAsync(new BankAccount());
 
             //Arrange
             var command = new CreateTransactionCommand
@@ -59,14 +63,14 @@ namespace Selah.Application.UnitTests.Transactions
                 Data = new TransactionCreate
                 {
                     AccountId = 1,
-                    TransactionAmount = 123,
+                    TransactionAmount = 100,
                     TransactionDate = DateTime.UtcNow.AddDays(-1),
                     MerchantName = "Test Vendor",
                     LineItems = TransactionCategoryTestHelpers.CreateLineItems()
                 }
             };
 
-            var validator = new CreateTransactionCommand.Validator(_transactionRepoMock.Object);
+            var validator = new CreateTransactionCommand.Validator(_transactionRepoMock.Object, _bankingRepoMock.Object);
 
             var handler = new CreateTransactionCommand.Handler(_transactionRepoMock.Object);
 
@@ -82,7 +86,7 @@ namespace Selah.Application.UnitTests.Transactions
             result.Result.TransactionId.Should().Be(1);
             result.Result.TransactionDate.Should().Be(command.Data.TransactionDate);
             result.Result.LineItems.Should().Be(4);
-            result.Result.TranscationAmount.Should().Be(123);
+            result.Result.TranscationAmount.Should().Be(command.Data.LineItems.Sum(x => x.ItemizedAmount));
         }
     }
 }

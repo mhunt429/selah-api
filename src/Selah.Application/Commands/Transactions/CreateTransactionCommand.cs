@@ -1,9 +1,5 @@
 ﻿using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Selah.Domain.Data.Models.Transactions;
 using Selah.Domain.Data.Models.Transactions.Commands;
 using Selah.Infrastructure.Repository.Interfaces;
@@ -15,19 +11,27 @@ namespace Selah.Application.Commands.Transactions
 {
     public class CreateTransactionCommand : IRequest<TransactionCreateResponse>
     {
-        [FromBody]
-        public TransactionCreate Data { get; set; }
+        public TransactionCreate Data { get; set; } = new TransactionCreate();
 
         public class Validator : AbstractValidator<CreateTransactionCommand>
         {
             private readonly ITransactionRepository _trxRepo;
-            public Validator(ITransactionRepository trxRepo)
+            private readonly IBankingRepository _bankingRepo;
+            public Validator(ITransactionRepository trxRepo, IBankingRepository bankingRepo)
             {
                 _trxRepo = trxRepo;
+                _bankingRepo = bankingRepo;
 
-                RuleFor(x => x.Data.MerchantName).NotEmpty().WithMessage("Merchant name cannot be empty");
+                RuleFor(x => x.Data.MerchantName).NotEmpty()
+                    .WithMessage("Merchant name cannot be empty");
+
                 RuleFor(x => x.Data.TransactionAmount).GreaterThan(0);
-                RuleFor(x => x.Data.TransactionDate).LessThanOrEqualTo(System.DateTime.UtcNow).WithMessage("Transaction date cannot be in the future");
+
+                RuleFor(x => x.Data.TransactionDate).LessThanOrEqualTo(System.DateTime.UtcNow)
+                    .WithMessage("Transaction date cannot be in the future");
+
+                RuleFor(x => x.Data.LineItems.Sum(x => x.ItemizedAmount)).Equal(x => x.Data.TransactionAmount)
+                    .WithMessage("The total of all line items must equal the transaction amount");
 
                 RuleForEach(x => x.Data.LineItems).ChildRules(item =>
                 {
@@ -35,8 +39,15 @@ namespace Selah.Application.Commands.Transactions
                     {
                         var categories = await _trxRepo.GetTransactionCategoryById(model.UserId, id);
                         return categories.Any();
-                    }).WithMessage("Category for this line item is invalid");
+                    }).WithMessage("The category associated with this line item could not be found");
                 });
+
+                RuleFor(x => x.Data.AccountId).MustAsync(async (id, cancellation) =>
+                {
+                    var account = await _bankingRepo.GetAccountById(id);
+
+                    return account != null;
+                }).WithMessage("The account associated with this transaction could not be found");
             }
         }
 
