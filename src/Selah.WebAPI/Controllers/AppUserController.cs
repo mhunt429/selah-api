@@ -14,6 +14,7 @@ using Selah.Domain.Data.Models;
 using Selah.Domain.Data.Models.ApplicationUser;
 using Selah.WebAPI.Extensions;
 using Selah.WebAPI.Shared;
+using Selah.Application.Filters;
 
 namespace Selah.WebAPI.Controllers
 {
@@ -23,34 +24,25 @@ namespace Selah.WebAPI.Controllers
     public class AppUserController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly ILogger _logger;
-        private readonly IAuthenticationService _authService;
         private readonly IMapper _mapper;
         private readonly IMediator _mediatr;
 
         private readonly IValidator<CreateUserCommand> _createUserValidator;
 
-        public AppUserController(IUserService userService, ILoggerFactory loggerFactory, IAuthenticationService authService, IMapper mapper, IMediator mediator, IValidator<CreateUserCommand> createUserValidator)
+        public AppUserController(IUserService userService, IMapper mapper, IMediator mediator, IValidator<CreateUserCommand> createUserValidator)
         {
             _userService = userService;
-            _logger = loggerFactory.CreateLogger<AppUserController>();
-            _authService = authService;
             _mapper = mapper;
             _mediatr = mediator;
             _createUserValidator = createUserValidator;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetUsers(int limit, int offset)
-        {
-            var users = await _userService.GetUsers(limit, offset);
-            return Ok(users);
-        }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<UserViewModel>> GetUserById(Guid id)
+        [UserIdParamMatchesClaims]
+        [HttpGet("{userId}")]
+        public async Task<ActionResult<UserViewModel>> GetUserById(Guid userId)
         {
-            var user = await _userService.GetUser(id);
+            var user = await _userService.GetUser(userId);
             if (user == null)
             {
                 return NotFound();
@@ -58,7 +50,7 @@ namespace Selah.WebAPI.Controllers
             return Ok(_mapper.Map<UserViewModel>(user));
 
         }
-
+        //Sign up Endpoint
         [AllowAnonymous]
         [HttpPost]
         public async Task<ActionResult<UserViewModel>> CreateUser(CreateUserCommand command)
@@ -75,7 +67,8 @@ namespace Selah.WebAPI.Controllers
             return Ok(await _mediatr.Send(command));
         }
         //TODO validate on user id 
-        [HttpPut("{id}/update-password")]
+        [UserIdParamMatchesClaims]
+        [HttpPut("{userId}/update-password")]
         public async Task<IActionResult> UpdatePassword(Guid id, [FromBody] PasswordUpdate passwordUpdate)
         {
             var userId = Request.GetUserIdFromRequest();

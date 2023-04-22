@@ -1,78 +1,45 @@
 using System;
 using System.Threading.Tasks;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Selah.Application.Services.Interfaces;
-using Selah.Domain.Data.Models;
-using Selah.Domain.Data.Models.ApplicationUser;
-using Selah.Domain.Data.Models.Plaid;
+using Selah.Application.Queries.Banking;
 
 namespace Selah.WebAPI.Controllers
 {
     [ApiController]
     [Authorize]
-    [Route("api/v1/banking")]
+    [Route("api/v1/users/{userId}/banking")]
     public class BankingController : ControllerBase
     {
-        private readonly IBankingService _bankingService;
-        private readonly IAuthenticationService _authService;
-        public BankingController(IBankingService bankingService, IAuthenticationService authService)
+        private readonly IMediator _mediator;
+        public BankingController(IMediator mediator)
         {
-            _bankingService = bankingService;
-            _authService = authService;
-        }
-
-        [HttpPost("link-institution")]
-        public async Task<IActionResult> LinkInstitution([FromBody] PlaidAccountLinkRequest institution)
-        {
-            try
-            {
-                var userId =
-                  _authService.GetUserFromClaims(Request);
-                if (userId == Guid.Empty)
-                {
-                    return Unauthorized();
-                }
-                institution.User.UserId = userId;
-                var linkedInstitution = await _bankingService.CreateUserInstitution(institution);
-                await _bankingService.ImportAccounts(linkedInstitution.Id);
-                return Ok(linkedInstitution);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(new HttpResponseViewModel<AppUser>
-                {
-                    StatusCode = 400,
-
-                });
-            }
-        }
-
-        [HttpPost("import-accounts")]
-        public async Task<IActionResult> ImportAccounts([FromQuery(Name = "institutionId")] Guid institutionId)
-        {
-            //TODO add more validation on this method but this is just testing for now
-            try
-            {
-                await _bankingService.ImportAccounts(institutionId);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            _mediator = mediator;
         }
 
         [HttpGet("accounts")]
-        public async Task<IActionResult> GetAccounts()
+        public async Task<IActionResult> GetAccounts([FromRoute] Guid userId, [FromQuery(Name = "limit")] int limit, [FromQuery(Name = "offset")] int offset)
         {
-            var userId = _authService.GetUserFromClaims(Request);
             if (userId == Guid.Empty)
             {
                 return Unauthorized();
             }
-            var accounts = await _bankingService.GetAccounts(userId);
-            return Ok(accounts);
+            var query = new GetAllBankAccountsQuery { UserId =  userId, Limit  = limit, Offset = offset };
+            var response = await _mediator.Send(query);
+            return Ok(response);
+        }
+
+        [HttpPost("account")]
+        public async Task CreateManualAccount()
+        {
+
+        }
+
+        [HttpPut("account/{id}")]
+        public async Task UpdateAccount()
+        {
+
         }
     }
 }

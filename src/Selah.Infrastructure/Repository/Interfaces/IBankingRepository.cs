@@ -19,7 +19,7 @@ namespace Selah.Infrastructure.Repository.Interfaces
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public Task<IEnumerable<BankAccount>> GetAccounts(Guid userId);
+        public Task<IEnumerable<BankAccount>> GetAccounts(Guid userId, int limit, int offset);
 
         /// <summary>
         /// Returns a list of accounts by institution

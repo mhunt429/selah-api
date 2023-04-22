@@ -102,7 +102,7 @@ namespace Selah.Application.Services
     //TODO Add paging support
     public async Task<IEnumerable<BankAccount>> GetAccounts(Guid? userId)
     {
-      return await _bankingRepository.GetAccounts(userId.Value);
+      return await _bankingRepository.GetAccounts(userId.Value, 25, 0);
     }
 
     private string errorText(Exception ex)
