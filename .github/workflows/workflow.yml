@@ -28,8 +28,6 @@ jobs:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
     steps:
-      - name: build postgres image
-
       - uses: actions/checkout@v3
       - name: Setup .NET
   
