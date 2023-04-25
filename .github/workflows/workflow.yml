@@ -8,7 +8,10 @@ name: Selah-API CI/CD
       - main
 jobs:
   build-local-postgres-image:
-    uses: mhunt429/selah-api/.github/workflows/databaseMigrations.yml
+   steps:
+      - uses: actions/checkout@v3 # Necessary to access local action
+      - uses: mhunt429/selah-api/.github/workflows/databaseMigrations.yml
+
   build:
     runs-on: ubuntu-latest
     steps:
