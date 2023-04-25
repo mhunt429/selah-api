@@ -8,14 +8,14 @@ name: Selah-API CI/CD
       - main
 jobs:
   build-local-postgres-image:
-   runs-on: ubuntu-latest
    steps:
-      - uses: actions/checkout@v3 # Necessary to access local action
       - uses: ./github/workflows/databaseMigrations.yml
 
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: build postgres image
+
       - uses: actions/checkout@v3
       - name: Setup .NET
   
