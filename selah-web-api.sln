@@ -19,8 +19,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Selah.Application.UnitTests
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{1E704CEA-6953-48FA-857E-394B5E359315}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Selah.WebAPI.UnitTests", "..\Selah.WebAPI.UnitTests\Selah.WebAPI.UnitTests.csproj", "{14C81344-78F8-4D83-B714-7D7E2B0FAE0E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
