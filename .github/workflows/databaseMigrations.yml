@@ -1,5 +1,6 @@
 name: Build Postgres Test Container and Run Migrations
-
+on:
+  workflow_call:
 jobs:
   build postgres:
     runs-on: ubuntu-latest
