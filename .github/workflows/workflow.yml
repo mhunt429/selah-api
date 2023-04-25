@@ -7,6 +7,8 @@ name: Selah-API CI/CD
     branches:
       - main
 jobs:
+  build-local-postgres-image:
+    uses: mhunt429/selah-api/.github.workflows/databaseMigrations.yml
   build:
     runs-on: ubuntu-latest
     steps:
