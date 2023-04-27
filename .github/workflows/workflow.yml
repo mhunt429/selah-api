@@ -34,7 +34,15 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 6.0.x
-
+      env:
+        DB_CONNECTION_STRING=User ID=postgres;Password=postgres;Host=5432;Database=postgres
+      - name: Restore Schema Migration dependencies
+        run: dotnet restore ./utilities/DbMigrationRunner
+      - name: Build Migration Project
+        run: dotnet build ./utilities/DbMigrationRunner --no-restore
+      - name: Run Schema Migrations
+        run: dotnet run --project ./utilities/DbMigrationRunner
+        
       - name: Restore dependencies
         run: dotnet restore selah-web-api.sln
 
