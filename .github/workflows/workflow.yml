@@ -7,42 +7,51 @@ name: Selah-API CI/CD
     branches:
       - main
 jobs:
+
   build:
     runs-on: ubuntu-latest
     services:
+      # Label used to access the service container
       postgres:
+        # Docker Hub image
         image: postgres
+        # Provide the password for postgres
         env:
           POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
         options: >-
-          --health-cmd pg_isready --health-interval 10s --health-timeout 5s
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
           --health-retries 5
         ports:
-          - '5432:5432'
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
     steps:
       - uses: actions/checkout@v3
       - name: Setup .NET
+  
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 6.0.x
+     
       - name: Restore Schema Migration dependencies
-        
         run: dotnet restore ./utilities/DbMigrationRunner
       - name: Build Migration Project
         run: dotnet build ./utilities/DbMigrationRunner --no-restore
       - name: Run Schema Migrations
-      env:
+        env:
           DB_CONNECTION_STRING: User ID=postgres;Password=postgres;Host=selah-db;Database=postgres
         run: dotnet run --project ./utilities/DbMigrationRunner
-        
       - name: Restore dependencies
         run: dotnet restore selah-web-api.sln
+
       - name: Build
         run: dotnet build selah-web-api.sln --no-restore
+
       - name: Run Tests
-        run: >-
-          dotnet test ./tests/Selah.API.UnitTests --no-build --verbosity normal
-          --collect:"XPlat Code Coverage" --results-directory ./coverage
+        run: dotnet test ./tests/Selah.API.UnitTests --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
+
       - name: Code Coverage Report
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
@@ -54,21 +63,26 @@ jobs:
           hide_complexity: true
           indicators: true
           output: both
+          #thresholds: '60 80'
+
       - name: Add Coverage PR Comment
         uses: marocchino/sticky-pull-request-comment@v2
         if: github.event_name == 'pull_request'
         with:
           recreate: true
-          path: code-coverage-results.md
+          path: code-coverage-results.md 
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: '${{ secrets.AWS_ACCESS_KEY_ID }}'
           aws-secret-access-key: '${{ secrets.AWS_SECRET_ACCESS_KEY }}'
           aws-region: us-east-1
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
+
       - name: 'Build, tag, and push image to Amazon ECR'
         env:
           ECR_REGISTRY: '${{ steps.login-ecr.outputs.registry }}'
@@ -77,3 +91,13 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+     # - name: Deploy to Amazon EKS 
+      #  env:
+       #   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+        #  ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+         # ECR_REPOSITORY: selah-api-production
+          #IMAGE_TAG: ${{ github.sha }}
+        #run: |
+         # kubectl apply -f kubernetes/deploy.yml
+          #kubectl apply -f kubernetes/service.yml
+          
