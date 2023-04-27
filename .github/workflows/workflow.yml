@@ -41,7 +41,7 @@ jobs:
         run: dotnet build ./utilities/DbMigrationRunner --no-restore
       - name: Run Schema Migrations
         env:
-          DB_CONNECTION_STRING: User ID=postgres;Password=postgres;Host=selah-db;Database=postgres
+          DB_CONNECTION_STRING: User ID=postgres;Password=postgres;Host=localhost;Port=5432;Database=postgres
         run: dotnet run --project ./utilities/DbMigrationRunner
       - name: Restore dependencies
         run: dotnet restore selah-web-api.sln
