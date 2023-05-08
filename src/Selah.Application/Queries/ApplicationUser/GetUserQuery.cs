@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -31,10 +32,10 @@ namespace Selah.Application.Queries.ApplicationUser
         {
             private readonly IAppUserRepository _appUserRepository;
             private readonly IMapper _mapper;
-            public Handler(IAppUserRepository appUserRepository, IMapper mapper)
+            public Handler(IAppUserRepository appUserRepository)
             {
                 _appUserRepository = appUserRepository;
-                _mapper = mapper;
+
             }
 
             public async Task<UserViewModel> Handle(GetUserQuery query, CancellationToken cancellationToken)
@@ -46,8 +47,15 @@ namespace Selah.Application.Queries.ApplicationUser
                 {
                     return null;
                 }
-
-                return _mapper.Map<UserViewModel>(user);
+                return new UserViewModel
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    UserName = user.UserName,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    DateCreated = user.DateCreated
+                };
             }
         }
     }

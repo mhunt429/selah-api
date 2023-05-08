@@ -1,19 +1,16 @@
 ﻿using MediatR;
 using Selah.Domain.Data.Models.ApplicationUser;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoMapper;
 using System.ComponentModel;
 using FluentValidation;
 using global::Selah.Infrastructure.Repository.Interfaces;
+using FluentValidation.Results;
 
 namespace Selah.Application.Commands.AppUser
 {
-    public class CreateUserCommand : IRequest<UserViewModel>
+    public class CreateUserCommand : IRequest<(UserViewModel, ValidationResult)>
     {
         [DisplayName("createdUser")]
         public AppUserCreate CreatedUser { get; set; }
@@ -37,7 +34,7 @@ namespace Selah.Application.Commands.AppUser
                 }).WithMessage("An account with this email already exists.");
             }
         }
-        public class Handler : IRequestHandler<CreateUserCommand, UserViewModel>
+        public class Handler : IRequestHandler<CreateUserCommand, (UserViewModel, ValidationResult)>
         {
             private readonly IAppUserRepository _appUserRepository;
 
@@ -46,12 +43,19 @@ namespace Selah.Application.Commands.AppUser
                 _appUserRepository = appUserRepository;
             }
 
-            public async Task<UserViewModel> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+            public async Task<(UserViewModel, ValidationResult)> Handle(CreateUserCommand request, CancellationToken cancellationToken)
             {
+                var validator = new Validator(_appUserRepository);
+
+                var validationResult = await validator.ValidateAsync(request);
+                if (!validationResult.IsValid)
+                {
+                    return (null, validationResult);
+                }
                 request.CreatedUser.Password = BCrypt.Net.BCrypt.HashPassword(request.CreatedUser.Password);
                 Guid userId = await _appUserRepository.CreateUser(request.CreatedUser);
            
-                return new UserViewModel
+                var user = new UserViewModel
                 {
                     Id = userId,
                     Email = request.CreatedUser.Email,
@@ -60,6 +64,8 @@ namespace Selah.Application.Commands.AppUser
                     LastName = request.CreatedUser.LastName,
                     DateCreated = request.CreatedUser.DateCreated,
                 };
+
+                return (user, null);
             }
         }
     }

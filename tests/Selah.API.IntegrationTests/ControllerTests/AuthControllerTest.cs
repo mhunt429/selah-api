@@ -15,12 +15,13 @@ using Microsoft.AspNetCore.TestHost;
 
 namespace Selah.API.IntegrationTests.ControllerTests
 {
-    public class AuthControllerTest : IClassFixture<SelahApiTestFactory>
+    public class AuthControllerTest
     {
-        private readonly HttpClient _client;
-        public AuthControllerTest(SelahApiTestFactory httpClientFactory)
+        private SelahApiTestFactory _testFactory;
+        public AuthControllerTest()
         {
-            _client = httpClientFactory.CreateClient();
+            _testFactory = new SelahApiTestFactory();
+            _testFactory.CreateClient();
         }
 
 
@@ -28,10 +29,8 @@ namespace Selah.API.IntegrationTests.ControllerTests
         public async Task Should_Return_Unauthorized_On_Invalid_Login()
         {
             //Arrange
-            var builder = new WebHostBuilder().UseStartup<Startup>();
-            TestServer server = new(builder);
-            var client = server.CreateClient();
-            var login = new AuthenticationRequest { EmailOrUsername = "bad_user", Password = "BadP@ssword"};
+            var client = _testFactory.CreateClient();
+            var login = new AuthenticationRequest { EmailOrUsername = "bad_user", Password = "BadP@ssword" };
             var requestBody = JsonConvert.SerializeObject(login, new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore

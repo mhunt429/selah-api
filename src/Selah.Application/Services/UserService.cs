@@ -7,6 +7,7 @@ using Selah.Infrastructure.Repository.Interfaces;
 
 namespace Selah.Application.Services
 {
+    //TODO meove app this into mediatr handlers
     public class UserService : IUserService
     {
         //TODO add logging and data validation
@@ -16,24 +17,30 @@ namespace Selah.Application.Services
         {
             _userRepository = userRepository;
         }
-        public async Task<IEnumerable<AppUser>> GetUsers(int limit, int offset)
-        {
-            return await _userRepository.GetUsers(limit, offset);
-        }
 
-        public async Task<AppUser> GetUser(Guid id)
+        public async Task<UserViewModel> GetUser(Guid id)
         {
-            return await _userRepository.GetUser(id);
+            var user =  await _userRepository.GetUser(id);
+            if (user == null) return null;
+            return new UserViewModel
+            {
+                Id = id,
+                Email = user.Email,
+                UserName = user.UserName,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                DateCreated = DateTime.UtcNow,
+            };
         }
 
       
 
-        public async Task<AppUser> CreateUser(AppUserCreate user)
+        public async Task<UserViewModel> CreateUser(AppUserCreate user)
         {
             user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
             var userId = await _userRepository.CreateUser(user);
 
-            return new AppUser
+            return new UserViewModel
             {
                 Id = userId,
                 Email = user.Email,
@@ -44,7 +51,7 @@ namespace Selah.Application.Services
             };
         }
 
-        public async Task<AppUser> UpdateUser(AppUserUpdate updatedUser, Guid id)
+        public async Task<UserViewModel> UpdateUser(AppUserUpdate updatedUser, Guid id)
         {
             var currentUser = await _userRepository.GetUser(id);
             if (currentUser == null)
@@ -55,7 +62,7 @@ namespace Selah.Application.Services
             try
             {
                 await _userRepository.UpdateUser(updatedUser, id);
-                return new AppUser
+                return new UserViewModel
                 {
                     Id = currentUser.Id,
                     FirstName = updatedUser.FirstName,

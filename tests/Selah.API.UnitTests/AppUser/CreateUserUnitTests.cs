@@ -86,11 +86,10 @@ namespace Selah.API.UnitTests.AppUser
 
             //Assert
             validationResult.IsValid.Should().BeTrue();
-
-            result.Email.Should().Be("test@selah.com");
-            result.FirstName.Should().Be("Test");
-            result.LastName.Should().Be("User");
-
+            result.Item2.Should().BeNull();
+            result.Item1.Email.Should().Be("test@selah.com");
+            result.Item1.FirstName.Should().Be("Test");
+            result.Item1.LastName.Should().Be("User");
         }
     }
 }

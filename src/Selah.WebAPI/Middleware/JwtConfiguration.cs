@@ -1,31 +1,23 @@
 using System;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Selah.Domain.Data.Models.Authentication;
-using Selah.Domain.Internal;
 
 namespace Selah.WebAPI.Middleware
 {
 
     public static class JwtConfiguration
     {
-        static readonly IOptions<EnvVariablesConfig> _envVariables;
-
-        static JwtConfiguration()
-        {
-            _envVariables = Options.Create(new EnvVariablesConfig());
-        }
-
-        public static void ConfigureJwt(IServiceCollection services)
+        public static void ConfigureJwt(this IServiceCollection services, IConfiguration configuration)
         {
             var jwtTokenConfig = new JwtConfig
             {
-                AccessTokenExpiration = 85399,
-                Issuer = _envVariables.Value.JwtIssuer,
-                Secret = _envVariables.Value.JwtSecret
+                AccessTokenExpiration = 86400,
+                Issuer = configuration["Issuer"],
+                Secret = configuration["JwtSecret"]
             };
             services.AddSingleton(jwtTokenConfig);
             services.AddAuthentication(x =>
@@ -39,10 +31,12 @@ namespace Selah.WebAPI.Middleware
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_envVariables.Value.JwtSecret)),
-                    ValidateIssuer = false,
-
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["JwtSecret"])),
+                    ValidateIssuer = true,
+                    ValidIssuer = configuration["JwtIssuer"],
                     ValidateAudience = false,
+
+          
                     ClockSkew = TimeSpan.FromMinutes(1)
                 };
             });

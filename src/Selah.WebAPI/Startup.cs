@@ -28,7 +28,9 @@ namespace Selah.WebAPI
 
             services.AddSingleton<IDbConnectionFactory>(_ =>
             new NpgsqlConnectionFactory(_config.GetValue<string>("DB_CONNECTION_STRING")));
-            JwtConfiguration.ConfigureJwt(services);
+
+            //Register JWT middleware
+            services.ConfigureJwt(_config);
 
             services.AddCors(options =>
             {
@@ -52,7 +54,6 @@ namespace Selah.WebAPI
 
             services.RegisterDbRepositories();
             services.RegisterApplicationServices();
-            services.RegisterMappings();
             services.RegisterValidators();
             //Register Mediatr Commands/Queries
             services.RegisterQueries();
