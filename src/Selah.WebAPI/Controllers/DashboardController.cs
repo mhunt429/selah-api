@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Selah.Domain.Data.Models.Investments;
 using Microsoft.AspNetCore.Authorization;
-using Selah.Domain.Data.Models.Integrations;
-using Selah.Domain.Data.Models.Integrations.TDAmeritrade;
 using Selah.Application.Services.Interfaces;
 using MediatR;
 using Selah.Application.Queries.Analytics;

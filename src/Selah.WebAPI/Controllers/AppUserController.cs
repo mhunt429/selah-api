@@ -21,28 +21,14 @@ namespace Selah.WebAPI.Controllers
     [Route("api/v1/users")]
     public class AppUserController : ControllerBase
     {
-        private readonly IUserService _userService;
         private readonly IMediator _mediatr;
 
         public AppUserController(IUserService userService, IMediator mediator)
         {
-            _userService = userService;
+
             _mediatr = mediator;
         }
 
-
-        [UserIdParamMatchesClaims]
-        [HttpGet("{userId}")]
-        public async Task<ActionResult<UserViewModel>> GetUserById(Guid userId)
-        {
-            var user = await _userService.GetUser(userId);
-            if (user == null)
-            {
-                return NotFound();
-            }
-            return Ok(user);
-
-        }
         //Sign up Endpoint
         [AllowAnonymous]
         [HttpPost]
@@ -58,32 +44,6 @@ namespace Selah.WebAPI.Controllers
                 default:
                     return BadRequest();
             }
-        }
-
-        //TODO validate on user id 
-        [UserIdParamMatchesClaims]
-        [HttpPut("{userId}/update-password")]
-        public async Task<IActionResult> UpdatePassword(Guid id, [FromBody] PasswordUpdate passwordUpdate)
-        {
-            var userId = Request.GetUserIdFromRequest();
-            if (userId == Guid.Empty)
-            {
-                return Unauthorized();
-            }
-
-
-            if (!await _userService.UpdatePassword(id, passwordUpdate))
-            {
-                var errors = new List<ErrorMessage>();
-                errors.Add(new ErrorMessage
-                {
-                    Key = nameof(HttpErrorKeys.PasswordResetMismatch),
-                    Message = "Updated password and password confirmation do not match."
-                });
-                return Unauthorized();
-            }
-
-            return NoContent();
         }
     }
 }

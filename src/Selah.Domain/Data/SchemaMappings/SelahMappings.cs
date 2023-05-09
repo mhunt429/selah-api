@@ -16,11 +16,6 @@ namespace Selah.Domain.Data.SchemaMappings
 
             FluentMapper.Initialize(config =>
             {
-                config.AddMap(new UserInstitutionSchemaMap());
-            });
-
-            FluentMapper.Initialize(config =>
-            {
                 config.AddMap(new BankAccountSchemaMap());
             });
 
@@ -37,11 +32,6 @@ namespace Selah.Domain.Data.SchemaMappings
             FluentMapper.Initialize(config =>
             {
                 config.AddMap(new UserTransactionCategorySchemaMap());
-            });
-
-            FluentMapper.Initialize(config =>
-            {
-                config.AddMap(new UserAuthorizedSchemaMap());
             });
 
             FluentMapper.Initialize(config =>

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Selah.Domain.Data.Repository;
 using Selah.Domain.Data.SchemaMappings;
 using Selah.Infrastructure.Repository;
 using Selah.Infrastructure.Repository.Interfaces;
@@ -15,10 +14,8 @@ namespace Selah.WebAPI.DependencyInjection.Extensions
 
             services.AddScoped<IBaseRepository, BaseRepository>();
             services.AddScoped<IAppUserRepository, AppUserRepository>();
-            services.AddScoped<IUserInstitutionRepository, UserInstitutionRepository>();
             services.AddScoped<IBankingRepository, BankingRepository>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
-            services.AddScoped<IAuthorizedAppRepository, AuthorizedAppRepository>();
 
             return services;
         }
