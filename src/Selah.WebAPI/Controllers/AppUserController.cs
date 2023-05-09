@@ -7,11 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Selah.Application.Commands.AppUser;
 using Selah.Application.Services.Interfaces;
-using Selah.Domain.Data.Dictionaries;
-using Selah.Domain.Data.Models;
 using Selah.Domain.Data.Models.ApplicationUser;
 using Selah.WebAPI.Extensions;
-using Selah.Application.Filters;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 
 namespace Selah.WebAPI.Controllers
@@ -23,7 +20,7 @@ namespace Selah.WebAPI.Controllers
     {
         private readonly IMediator _mediatr;
 
-        public AppUserController(IUserService userService, IMediator mediator)
+        public AppUserController(IMediator mediator)
         {
 
             _mediatr = mediator;

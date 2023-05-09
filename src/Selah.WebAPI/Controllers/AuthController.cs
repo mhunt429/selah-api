@@ -21,12 +21,11 @@ namespace Selah.WebAPI.Controllers
     [Route("api/v1/oauth")]
     public class AuthController : ControllerBase
     {
-        private readonly IUserService _userService;
         private readonly IAuthenticationService _authService;
         private readonly IMediator _mediatr;
-        public AuthController(IUserService userService, IAuthenticationService authService, IMediator mediatr)
+        public AuthController(IAuthenticationService authService, IMediator mediatr)
         {
-            _userService = userService;
+
             _authService = authService;
             _mediatr = mediatr;
         }
@@ -52,38 +51,6 @@ namespace Selah.WebAPI.Controllers
                 AccessToken = jwtResult.AccessToken,
                 ExpirationTs = jwtResult.ExpirationTs
             });
-        }
-
-        [HttpGet("current-user")]
-        public async Task<ActionResult<HttpResponseViewModel<UserViewModel>>> GetAuthenticatedUser()
-        {
-
-            if (Request.Headers.TryGetValue("Authorization", out StringValues authToken))
-            {
-                var jwt = authToken.ToString().Replace("Bearer ", "");
-                var handler = new JwtSecurityTokenHandler();
-                var token = handler.ReadJwtToken(jwt);
-
-                var user = await _userService.GetUser(new Guid(token.Claims.First().Value));
-                if (user == null)
-                {
-                    return Forbid();
-                }
-                return Ok(new HttpResponseViewModel<UserViewModel>
-                {
-                    StatusCode = 200,
-                    Data = new System.Collections.Generic.List<UserViewModel> { new UserViewModel
-                    {
-                        Id = user.Id,
-                        UserName = user.UserName,
-                        Email = user.Email,
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        DateCreated = user.DateCreated
-                    }}
-                });
-            }
-            return Forbid();
         }
     }
 }
