@@ -11,7 +11,6 @@ namespace Selah.WebAPI.DependencyInjection.Extensions
             services.AddScoped<IAuthenticationService, AuthenticationService>();
          
             services.AddScoped<ISecurityService, SecurityService>();
-            services.AddScoped<ITransactionService, TransactionService>();
             return services;
         }
     }
