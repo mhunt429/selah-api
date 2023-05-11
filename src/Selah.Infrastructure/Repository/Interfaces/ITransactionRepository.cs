@@ -9,19 +9,6 @@ namespace Selah.Infrastructure.Repository.Interfaces
 {
     public interface ITransactionRepository
     {
-        /// <summary>
-        /// Return a key value pair of the transaction id and the total transaction amount
-        /// </summary>
-        /// <param name="transactions"></param>
-        /// <returns></returns>
-        public Task<List<Guid>> InsertTransactions(List<UserTransaction> transactions);
-
-        public Task<IEnumerable<UserTransaction>> GetTransactions();
-
-        public Task<IEnumerable<UserTransactionQueryResult>> GetTransactionsVM(Guid userId, int take);
-
-        public Task<long> CreateTransactionCategory(UserTransactionCategoryCreate category);
-
         public Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUser(Guid userId);
 
         public Task<long> InsertTransaction(TransactionCreate transaction);

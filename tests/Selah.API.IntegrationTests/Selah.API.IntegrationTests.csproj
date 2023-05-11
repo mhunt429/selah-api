@@ -39,4 +39,8 @@
     <ProjectReference Include="..\..\src\Selah.WebAPI\Selah.WebAPI.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="RepositoryTests\" />
+  </ItemGroup>
+
 </Project>

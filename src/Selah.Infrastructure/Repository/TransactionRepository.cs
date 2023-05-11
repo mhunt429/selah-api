@@ -24,72 +24,8 @@ namespace Selah.Infrastructure.Repository
             _baseRepository = baseRepository;
         }
 
-        public async Task<List<Guid>> InsertTransactions(List<UserTransaction> transactions)
-        {
 
-            var insertedTransactions = new List<Guid>();
 
-            using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
-            {
-                foreach (var transaction in transactions)
-                {
-                    var insertedTransaction = await connection.ExecuteScalarAsync<Guid>(@"INSERT INTO user_transaction(
-            id, user_id, account_id,transaction_amount, transaction_date, merchant_name,
-            transaction_name, pending, payment_method, external_transaction_id
-          ) VALUES( @id, @user_id, @account_id, @transaction_amount, @transaction_date, 
-            @merchant_name, @transaction_name, @pending, @payment_method, @external_transaction_id) RETURNING(id)", new
-                    {
-                        id = transaction.Id,
-                        user_id = transaction.UserId,
-                        account_id = transaction.AccountId,
-                        transaction_amount = transaction.TransactionAmount,
-                        transaction_date = transaction.TransactionDate,
-                        merchant_name = transaction.MerchantName,
-                        transaction_name = transaction.TransactionName,
-                        pending = transaction.Pending,
-                        payment_method = transaction.PaymentMethod,
-                        external_transaction_id = transaction.ExternalTransactionId
-                    });
-                    insertedTransactions.Add(insertedTransaction);
-                }
-
-                return insertedTransactions;
-            }
-        }
-
-        public async Task<IEnumerable<UserTransaction>> GetTransactions()
-        {
-            using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
-            {
-                var transactions = await connection.QueryAsync<UserTransaction>(@"SELECT 
-              id, user_id, account_id, transaction_amount, transaction_date, merchant_name,
-              transaction_name, pending, payment_method
-            FROM user_transaction ORDER BY transaction_date DESC LIMIT 25");
-
-                return transactions;
-            }
-        }
-
-        public async Task<IEnumerable<UserTransactionQueryResult>> GetTransactionsVM(Guid userId, int take)
-        {
-            using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
-            {
-                var transactions = await connection.QueryAsync<UserTransactionQueryResult>(@"SELECT id, 
-          transaction_date, transaction_amount, transaction_name, merchant_name, external_transaction_id,
-          Count(id) OVER (partition BY transaction_date) as records
-          FROM  user_transaction
-          WHERE user_id = @user_id 
-          GROUP  BY
-            transaction_date, transaction_amount,
-            transaction_name, id, merchant_name, external_transaction_id
-          ORDER BY transaction_date DESC LIMIT @take ", new
-                {
-                    user_id = userId,
-                    take = take == 0 ? 25 : take
-                });
-                return transactions;
-            }
-        }
 
         public async Task<long> CreateTransactionCategory(UserTransactionCategoryCreate category)
         {
@@ -145,26 +81,29 @@ namespace Selah.Infrastructure.Repository
 
         public async Task<long> InsertTransaction(TransactionCreate transaction)
         {
-            using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
+            string sql = @"
+                INSERT INTO user_transaction(
+                    account_id, user_id, transaction_amount,
+                    transaction_date, merchant_name, transaction_name, pending, payment_method
+                )
+                VALUES (
+                    @account_id, @user_id, @transaction_amount,
+                    @transaction_date, @merchant_name, @transaction_name, @pending, @payment_method
+                )
+                RETURNING id";
+            var objectToSave = new
             {
-                return await connection.ExecuteScalarAsync<long>(@"INSERT INTO user_transaction(
-            account_id, user_id, transaction_amount, 
-            transaction_date, merchant_name, transaction_name, pending, payment_method
-        )
-        VALUES( @account_id, @user_id, @transaction_amount, 
-            @transaction_date, @merchant_name, @transaction_name, @pending, @payment_method) 
-            RETURNING(id)", new
-                {
-                    account_id = transaction.AccountId,
-                    user_id = transaction.UserId,
-                    transaction_amount = transaction.TransactionAmount,
-                    transaction_date = transaction.TransactionDate,
-                    merchant_name = transaction.MerchantName,
-                    transaction_name = transaction.TransactionName,
-                    pending = transaction.Pending,
-                    payment_method = transaction.PaymentMethod,
-                });
-            }
+                account_id = transaction.AccountId,
+                user_id = transaction.UserId,
+                transaction_amount = transaction.TransactionAmount,
+                transaction_date = transaction.TransactionDate,
+                merchant_name = transaction.MerchantName,
+                transaction_name = transaction.TransactionName,
+                pending = transaction.Pending,
+                payment_method = transaction.PaymentMethod,
+            };
+            return await _baseRepository.AddAsync<long>(sql, objectToSave);
+
         }
 
         public async Task<IEnumerable<ItemizedTransactionSql>> GetItemizedTransactionAsync(Guid transactionId)
@@ -183,7 +122,7 @@ namespace Selah.Infrastructure.Repository
         {
             var sql = @"INSERT INTO transaction_line_item(transaction_id, transaction_category_id, itemized_amount) 
                         VALUES(@transaction_id, @transaction_category_id, @itemized_amount)";
-           return await _baseRepository.AddManyAsync<TransactionLineItemCreate>(sql, items);
+            return await _baseRepository.AddManyAsync<TransactionLineItemCreate>(sql, items);
         }
 
         public async Task<IEnumerable<RecentTransactionSql>> GetRecentTransactions(Guid userId)
