@@ -33,7 +33,7 @@ namespace Selah.Infrastructure.Repository.Interfaces
         /// <returns>1 element per transaction line item</returns>
         public Task<IEnumerable<ItemizedTransactionSql>> GetItemizedTransactionAsync(Guid transactionId);
 
-        public Task<int> InsertTransactionLineItem(TransactionLineItemCreate lineItem);
+        public Task<int> InsertTransactionLineItems(IReadOnlyCollection<TransactionLineItemCreate> items);
 
         /// <summary>
         /// Returns a list of most recent transactions. 

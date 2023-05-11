@@ -82,7 +82,7 @@ namespace Selah.Application.UnitTests.Transactions
 
             //Assert
             _transactionRepoMock.Verify(x => x.InsertTransaction(It.IsAny<TransactionCreate>()), Times.Exactly(1));
-            _transactionRepoMock.Verify(x => x.InsertTransactionLineItem(It.IsAny<TransactionLineItemCreate>()), Times.Exactly(4));
+            _transactionRepoMock.Verify(x => x.InsertTransactionLineItems(It.IsAny<IReadOnlyCollection<TransactionLineItemCreate>>()), Times.Exactly(1));
 
             result.Result.Should().NotBeNull();
             result.Result.TransactionId.Should().Be(1);

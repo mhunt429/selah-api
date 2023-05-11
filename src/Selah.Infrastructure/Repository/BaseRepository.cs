@@ -40,7 +40,7 @@ namespace Selah.Infrastructure.Repository
             }
         }
 
-        public async Task<int> AddManyAsync(string sql, IReadOnlyCollection<object> objectsToSave)
+        public async Task<int> AddManyAsync<T>(string sql, IReadOnlyCollection<T> objectsToSave)
         {
             int rowsInserted = 0;
             using (var connection = await _dbConnectionFactory.CreateConnectionAsync())

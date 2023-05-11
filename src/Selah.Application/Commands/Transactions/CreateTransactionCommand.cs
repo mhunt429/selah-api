@@ -79,7 +79,7 @@ namespace Selah.Application.Commands.Transactions
                             TransactionCategoryId = item.TransactionCategoryId
                         });
                     }
-                    await CreateSplitTransactions(lineTitems, cancellationToken);
+                    await _transactionRepository.InsertTransactionLineItems(lineTitems);
 
                     return new TransactionCreateResponse
                     {
@@ -92,20 +92,6 @@ namespace Selah.Application.Commands.Transactions
                 return null;
             }
 
-
-            /// <summary>
-            /// Allows a user to create multiple line items per transactions i.e $90 bucks for groceries and $10 for dog food
-            /// </summary>
-            /// <param name="items">A collection of transaction line items</param>
-            /// <returns>returns an empty task because we don't care about the return value</returns>
-            private async Task CreateSplitTransactions(List<TransactionLineItemCreate> items, CancellationToken cancellationToken)
-            {
-                //Open a max of 3 concurrent connections to the database
-                await Parallel.ForEachAsync(items, new ParallelOptions { MaxDegreeOfParallelism = 3 }, async (item, cancellationToken) =>
-                {
-                    await _transactionRepository.InsertTransactionLineItem(item);
-                });
-            }
         }
     }
 }

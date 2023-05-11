@@ -179,19 +179,11 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.GetAllAsync<ItemizedTransactionSql>(sql, parameters);
         }
 
-        public async Task<int> InsertTransactionLineItem(TransactionLineItemCreate lineItem)
+        public async Task<int> InsertTransactionLineItems(IReadOnlyCollection<TransactionLineItemCreate> items)
         {
             var sql = @"INSERT INTO transaction_line_item(transaction_id, transaction_category_id, itemized_amount) 
                         VALUES(@transaction_id, @transaction_category_id, @itemized_amount)";
-
-            var parameters = new
-            {
-                transaction_id = lineItem.TransactionId,
-                transaction_category_id = lineItem.TransactionCategoryId,
-                itemized_amount = lineItem.ItemizedAmount
-            };
-
-           return await _baseRepository.AddAsync<int>(sql, parameters);
+           return await _baseRepository.AddManyAsync<TransactionLineItemCreate>(sql, items);
         }
 
         public async Task<IEnumerable<RecentTransactionSql>> GetRecentTransactions(Guid userId)
