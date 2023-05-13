@@ -37,8 +37,8 @@ namespace Selah.API.IntegrationTests.RepositoryTests
             var dataToSave = new IncomeStatementCreate
             {
                 UserId = _userId,
-                StartDate = DateTime.Now,
-                EndDate = DateTime.Now.AddDays(14),
+                StatementStartDate = DateTime.Now,
+                StatementEndDate = DateTime.Now.AddDays(14),
                 TotalPay = 500
             };
             var result = await _cashFlowRepository.CreateIncomeStatement(dataToSave);

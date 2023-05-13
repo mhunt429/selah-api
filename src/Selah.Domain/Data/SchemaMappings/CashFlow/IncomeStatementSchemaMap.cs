@@ -11,9 +11,9 @@ namespace Selah.Domain.Data.SchemaMappings.CashFlow
 
             Map(x => x.UserId).ToColumn("user_id");
 
-            Map(x => x.StartDate).ToColumn("start_date");
+            Map(x => x.StatementStartDate).ToColumn("statement_start_date");
 
-            Map(x => x.EndDate).ToColumn("end_date");
+            Map(x => x.StatementEndDate).ToColumn("statement_end_date");
         }
     }
 }

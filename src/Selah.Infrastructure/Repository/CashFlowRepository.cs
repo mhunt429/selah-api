@@ -1,9 +1,9 @@
 ﻿using Selah.Domain.Data.Models.CashFlow;
+using Selah.Domain.Reflection;
 using Selah.Infrastructure.Repository.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
 namespace Selah.Infrastructure.Repository
 {
     public class CashFlowRepository : ICashFlowRepository
@@ -18,14 +18,8 @@ namespace Selah.Infrastructure.Repository
             string sql = @"
                 INSERT INTO income_statement(user_id, statement_start_date, statement_end_date,total_pay) 
                 VALUES(@user_id, @statement_start_date, @statement_end_date, @total_pay) returning(id)";
-            var parameters = new
-            {
-                user_id = incomeStatement.UserId,
-                statement_start_date = incomeStatement.StartDate,
-                statement_end_date = incomeStatement.EndDate,
-                total_pay = incomeStatement.TotalPay
-            };
-            var id = _baseRepository.AddAsync<long>(sql, parameters);
+           
+            var id = _baseRepository.AddAsync<long>(sql, ObjectReflection.ConvertToSnakecase(incomeStatement));
             return id;
         }
 
