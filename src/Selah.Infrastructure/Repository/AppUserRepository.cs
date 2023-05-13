@@ -44,24 +44,25 @@ namespace Selah.Infrastructure.Repository
 
         public async Task<Guid> CreateUser(AppUserCreate createdUser)
         {
-            var sql = @"INSERT INTO app_user(email, 
+            var userId = Guid.NewGuid();
+            var sql = @"INSERT INTO app_user(id, email, 
                      user_name, 
                      password, 
                      first_name, 
                      last_name, 
                      date_created)
                      values(
+                              @id,
                               @email,
                               @user_name,
                               @password, 
                               @first_name, 
                               @last_name, 
                               @date_created
-                            )
-                            RETURNING (id)
-                            ";
+                            )";
             var parameters = new
             {
+                id = userId,
                 email = createdUser.Email,
                 user_name = createdUser.UserName,
                 password = createdUser.Password,
@@ -70,8 +71,8 @@ namespace Selah.Infrastructure.Repository
                 date_created = DateTime.UtcNow
             };
 
-            return await _baseRepository.AddAsync<Guid>(sql, parameters);
-
+            await _baseRepository.AddAsync<int>(sql, parameters);
+            return userId;
         }
 
         public async Task UpdateUser(AppUserUpdate updatedUser, Guid id)

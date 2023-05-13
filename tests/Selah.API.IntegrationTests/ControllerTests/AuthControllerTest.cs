@@ -1,17 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
-using Selah.WebAPI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Xunit;
 using FluentAssertions;
 using Selah.API.IntegrationTests.helpers;
 using Selah.Domain.Data.Models.Authentication;
 using Newtonsoft.Json;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.TestHost;
 
 namespace Selah.API.IntegrationTests.ControllerTests
 {

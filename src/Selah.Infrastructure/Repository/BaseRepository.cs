@@ -90,7 +90,6 @@ namespace Selah.Infrastructure.Repository
             using (var connection = await _dbConnectionFactory.CreateConnectionAsync())
             {
                 await connection.ExecuteAsync(sql, parameters);
-                await connection.ExecuteAsync(sql, parameters);
             }
         }
     }

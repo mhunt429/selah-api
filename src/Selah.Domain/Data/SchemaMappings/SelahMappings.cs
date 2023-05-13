@@ -1,5 +1,6 @@
 using Dapper.FluentMap;
 using Selah.Domain.Data.SchemaMappings.AppUser;
+using Selah.Domain.Data.SchemaMappings.CashFlow;
 using Selah.Domain.Data.SchemaMappings.FinancialAccounts;
 using Selah.Domain.Data.SchemaMappings.Transactions;
 
@@ -47,6 +48,11 @@ namespace Selah.Domain.Data.SchemaMappings
             FluentMapper.Initialize(config =>
             {
                 config.AddMap(new TransactionSummarySchemaMap());
+            });
+
+            FluentMapper.Initialize(config =>
+            {
+                config.AddMap(new IncomeStatementSchemaMap());
             });
         }
     }

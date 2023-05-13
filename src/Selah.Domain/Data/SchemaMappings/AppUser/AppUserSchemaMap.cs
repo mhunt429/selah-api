@@ -1,5 +1,4 @@
 using Dapper.FluentMap.Mapping;
-using Selah.Domain.Data.Models.ApplicationUser;
 namespace Selah.Domain.Data.SchemaMappings.AppUser
 {
     public class AppUserSchemaMap : EntityMap<Models.ApplicationUser.AppUser>
