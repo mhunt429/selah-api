@@ -3,7 +3,7 @@
     public class IncomeStatementDeduction
     {
         public long Id { get; set; }
-        public long IncomeStatementId { get; set; }
+        public long StatementId { get; set; }
 
         public string DeductionName { get; set; }
 
@@ -12,7 +12,7 @@
 
     public class IncomeStatementDeductionCreate
     {
-        public long IncomeStatementId { get; set; }
+        public long StatementId { get; set; }
 
         public string DeductionName { get; set; }
 

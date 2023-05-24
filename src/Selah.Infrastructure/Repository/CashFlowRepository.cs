@@ -3,6 +3,7 @@ using Selah.Domain.Reflection;
 using Selah.Infrastructure.Repository.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 namespace Selah.Infrastructure.Repository
 {
@@ -42,10 +43,10 @@ namespace Selah.Infrastructure.Repository
         public async Task<int> InsertIncomeStatementDeductions(IReadOnlyCollection<IncomeStatementDeduction> deductions)
         {
             string sql = @"
-                INSERT INTO income_statement_deduction (income_statement_id, deduction_name, amount)
-                VALUES(@income_statement_id, @deduction_name, @amount)";
-
-            return await _baseRepository.AddManyAsync<IncomeStatementDeduction>(sql, deductions);
+                INSERT INTO income_statement_deduction (statement_id, deduction_name, amount)
+                VALUES(@statement_id, @deduction_name, @amount)";
+            var parmaters = deductions.Select(x => ObjectReflection.ConvertToSnakecase(x)).ToList();
+            return await _baseRepository.AddManyAsync<IncomeStatementDeduction>(sql, parmaters);
         }
     }
 }

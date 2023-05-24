@@ -1,13 +1,10 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Npgsql;
-using Selah.Domain.Internal;
+using Selah.Domain.Reflection;
 using Selah.Infrastructure.Repository.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 
@@ -32,7 +29,7 @@ namespace Selah.Infrastructure.Repository
                     return await connection.ExecuteScalarAsync<T>(sql, parameters);
 
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     _logger.LogError($"Add async failed with error {ex.StackTrace}");
                     return default(T);
@@ -40,16 +37,17 @@ namespace Selah.Infrastructure.Repository
             }
         }
 
-        public async Task<int> AddManyAsync<T>(string sql, IReadOnlyCollection<T> objectsToSave)
+        public async Task<int> AddManyAsync<T>(string sql, IReadOnlyCollection<DynamicParameters> objectsToSave)
         {
             int rowsInserted = 0;
             using (var connection = await _dbConnectionFactory.CreateConnectionAsync())
             {
                 try
                 {
-                    foreach(var obj in objectsToSave)
+                    foreach (var obj in objectsToSave)
                     {
-                        rowsInserted += await connection.ExecuteScalarAsync<int>(sql, obj);
+                        await connection.ExecuteScalarAsync(sql, obj);
+                        rowsInserted++;
                     }
                     return rowsInserted;
 

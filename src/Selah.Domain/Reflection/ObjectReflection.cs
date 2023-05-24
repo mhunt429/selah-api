@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using System;
 using System.Text;
 
 namespace Selah.Domain.Reflection
@@ -11,8 +10,6 @@ namespace Selah.Domain.Reflection
          */
         public static DynamicParameters ConvertToSnakecase<T>(T entity) where T : class
         {
-            var newObj = Activator.CreateInstance<T>();
-
             var parameters = new DynamicParameters();
             foreach (var propertyInfo in typeof(T).GetProperties())
             {

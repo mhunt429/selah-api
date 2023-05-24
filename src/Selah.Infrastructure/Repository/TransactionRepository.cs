@@ -1,10 +1,12 @@
 using Dapper;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Internal;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using Selah.Domain.Data.Models.Analytics.Dashboard;
 using Selah.Domain.Data.Models.Transactions;
 using Selah.Domain.Data.Models.Transactions.Sql;
 using Selah.Domain.Internal;
+using Selah.Domain.Reflection;
 using Selah.Infrastructure.Repository.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -122,7 +124,8 @@ namespace Selah.Infrastructure.Repository
         {
             var sql = @"INSERT INTO transaction_line_item(transaction_id, transaction_category_id, itemized_amount) 
                         VALUES(@transaction_id, @transaction_category_id, @itemized_amount)";
-            return await _baseRepository.AddManyAsync<TransactionLineItemCreate>(sql, items);
+            var parameters = items.Select(x => ObjectReflection.ConvertToSnakecase(x)).ToList();
+            return await _baseRepository.AddManyAsync<TransactionLineItemCreate>(sql, parameters);
         }
 
         public async Task<IEnumerable<RecentTransactionSql>> GetRecentTransactions(Guid userId)

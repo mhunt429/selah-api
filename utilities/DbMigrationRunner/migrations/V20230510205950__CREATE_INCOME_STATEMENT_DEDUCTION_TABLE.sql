@@ -1,4 +1,4 @@
-CREATE TABLE income_statment_deduction(
+CREATE TABLE income_statement_deduction(
      id BIGSERIAL PRIMARY KEY,
      statement_id BIGSERIAL REFERENCES income_statement(id),
      deduction_name VARCHAR(30),

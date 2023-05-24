@@ -16,6 +16,7 @@ namespace Selah.API.IntegrationTests.RepositoryTests
         private readonly AppUserRepository _userRepository;
         private readonly ICashFlowRepository _cashFlowRepository;
         private readonly Mock<ILogger<BaseRepository>> _loggerMock;
+        private long _incomeStatementId;
         private Guid _userId = Guid.Empty;
         public CashFlowRepositoryTests()
         {
@@ -34,6 +35,7 @@ namespace Selah.API.IntegrationTests.RepositoryTests
         [Fact]
         public async Task CreateIncomeStatement_Should_Return_The_New_Id()
         {
+            await CreateTestUser();
             var dataToSave = new IncomeStatementCreate
             {
                 UserId = _userId,
@@ -45,18 +47,65 @@ namespace Selah.API.IntegrationTests.RepositoryTests
             result.Should().BeGreaterThan(0);
         }
 
+        [Fact]
+        public async Task InsertIncomeStatementDeductions_Should_Return_Number_Of_Inserted_Rows()
+        {
+            await SetupData();
+            var deductions = new List<IncomeStatementDeduction>
+            {
+                new IncomeStatementDeduction
+                {
+                    StatementId = _incomeStatementId,
+                    DeductionName = "Federal Taxes",
+                    Amount = 500
+                },
+                new IncomeStatementDeduction
+                {
+                    StatementId = _incomeStatementId,
+                    DeductionName = "Medical Insurance",
+                    Amount = 500
+                }
+            };
+
+            var result = await _cashFlowRepository.InsertIncomeStatementDeductions(deductions);
+            result.Should().Be(2);
+        }
+
         public async Task InitializeAsync()
         {
-            _userId = await DatabaseHelpers.CreateUser(_userRepository);
+            await Task.CompletedTask;
         }
 
         public async Task DisposeAsync()
         {
+            await DatabaseHelpers.RunSingleDelete(_baseRepository, @"DELETE FROM 
+                income_statement_deduction
+                WHERE statement_id = @statement_id",
+                new { statement_id = _incomeStatementId });
+
             await DatabaseHelpers.RunSingleDelete(_baseRepository, @"DELETE FROM income_statement 
                 WHERE user_id = @user_id",
                 new { user_id = _userId }
             );
-            await DatabaseHelpers.DeleteUser(_baseRepository, _userId);
+            await DatabaseHelpers.DeleteTestUsers(_baseRepository);
+        }
+
+        private async Task SetupData()
+        {
+            _userId = await DatabaseHelpers.CreateUser(_userRepository);
+            var dataToSave = new IncomeStatementCreate
+            {
+                UserId = _userId,
+                StatementStartDate = DateTime.Now,
+                StatementEndDate = DateTime.Now.AddDays(14),
+                TotalPay = 500
+            };
+            _incomeStatementId = await _cashFlowRepository.CreateIncomeStatement(dataToSave);
+        }
+
+        private async Task CreateTestUser()
+        {
+            _userId = await DatabaseHelpers.CreateUser(_userRepository);
         }
     }
 }

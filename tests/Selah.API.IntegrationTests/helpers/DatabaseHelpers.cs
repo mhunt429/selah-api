@@ -8,7 +8,7 @@ namespace Selah.API.IntegrationTests.helpers
         {
             var user = new AppUserCreate
             {
-                Email = "test@selah.com",
+                Email = $"{Guid.NewGuid}@selah.com",
                 FirstName = "Test",
                 LastName = "User",
                 UserName = "test_123",
@@ -19,10 +19,10 @@ namespace Selah.API.IntegrationTests.helpers
             return userId;
         }
 
-        public static async Task DeleteUser(BaseRepository repo, Guid userId)
+        public static async Task DeleteTestUsers(BaseRepository repo)
         {
-            string sql = "DELETE FROM app_user WHERE id = @id";
-            await repo.DeleteAsync(sql, new { id = userId });
+            string sql = "DELETE FROM app_user WHERE email LIKE '%selah.com%'";
+            await repo.DeleteAsync(sql, null);
         }
 
         //Used for specific cleanup tasks;
