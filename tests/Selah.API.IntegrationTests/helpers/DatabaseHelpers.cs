@@ -8,10 +8,10 @@ namespace Selah.API.IntegrationTests.helpers
         {
             var user = new AppUserCreate
             {
-                Email = $"{Guid.NewGuid}@selah.com",
+                Email = $"{Guid.NewGuid()}@selah.com",
                 FirstName = "Test",
                 LastName = "User",
-                UserName = "test_123",
+                UserName = $"{Guid.NewGuid()}"
             };
             //The "minimal foreign key constraint is a valid user"
             user.Password = BCrypt.Net.BCrypt.HashPassword("password");

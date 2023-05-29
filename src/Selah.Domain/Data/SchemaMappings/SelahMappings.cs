@@ -54,6 +54,11 @@ namespace Selah.Domain.Data.SchemaMappings
             {
                 config.AddMap(new IncomeStatementSchemaMap());
             });
+
+            FluentMapper.Initialize(config =>
+            {
+                config.AddMap(new IncomeStatementDeductionSchemaMap());
+            });
         }
     }
 }

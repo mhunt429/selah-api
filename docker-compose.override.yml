@@ -33,6 +33,19 @@ services:
       - db:/var/lib/postgresql/data 
     networks:
       - dockerapi-dev
+  selah-db-test:
+    image: postgres:13.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - '35432:5432'
+    volumes: 
+      - db:/var/lib/postgresql/data 
+    networks:
+      - dockerapi-dev
 volumes:
   db:
     driver: local

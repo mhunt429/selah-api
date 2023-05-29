@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Logging;
-using Selah.Domain.Reflection;
 using Selah.Infrastructure.Repository.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -71,6 +70,7 @@ namespace Selah.Infrastructure.Repository
         {
             using (var connection = await _dbConnectionFactory.CreateConnectionAsync())
             {
+                DefaultTypeMap.MatchNamesWithUnderscores = true;
                 return await connection.QueryAsync<T>(sql, parameters);
             }
         }
@@ -79,6 +79,7 @@ namespace Selah.Infrastructure.Repository
         {
             using (var connection = await _dbConnectionFactory.CreateConnectionAsync())
             {
+                DefaultTypeMap.MatchNamesWithUnderscores = true;
                 return (await connection.QueryAsync<T>(sql, parameters)).FirstOrDefault();
             }
         }

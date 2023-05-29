@@ -23,7 +23,7 @@ namespace Selah.API.IntegrationTests.RepositoryTests
             var dbConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
             if (string.IsNullOrEmpty(dbConnectionString))
             {
-                dbConnectionString = "User ID=postgres;Password=postgres;Host=localhost;Port=65432;Database=postgres";
+                dbConnectionString = "User ID=postgres;Password=postgres;Host=localhost;Port=65432;Database=postgres;Include Error Detail=true;";
             }
             _loggerMock = new Mock<ILogger<BaseRepository>>();
 
@@ -50,7 +50,6 @@ namespace Selah.API.IntegrationTests.RepositoryTests
         [Fact]
         public async Task InsertIncomeStatementDeductions_Should_Return_Number_Of_Inserted_Rows()
         {
-            await SetupData();
             var deductions = new List<IncomeStatementDeduction>
             {
                 new IncomeStatementDeduction
@@ -71,26 +70,29 @@ namespace Selah.API.IntegrationTests.RepositoryTests
             result.Should().Be(2);
         }
 
+        [Fact]
+        public async Task GetDeductionsByStatement_Should_ReturnAllDeductionsForStatement()
+        {
+            //Arrange
+            await SetupStatementWithDeductions();
+
+            //Act
+            var result = await _cashFlowRepository.GetDeductionsByStatement(_incomeStatementId, _userId);
+
+            //Assert
+            result.Count().Should().Be(2);
+
+            result.ElementAt(0).Id.Should().BeGreaterThan(0);
+            result.ElementAt(0).StatementId.Should().Be(_incomeStatementId);
+            result.ElementAt(0).DeductionName.Should().Be("Federal Taxes");
+            result.ElementAt(0).Amount.Should().Be(500);
+
+            result.ElementAt(1).Id.Should().BeGreaterThan(0);
+            result.ElementAt(1).DeductionName.Should().Be("Medical Insurance");
+            result.ElementAt(1).Amount.Should().Be(500);
+        }
+
         public async Task InitializeAsync()
-        {
-            await Task.CompletedTask;
-        }
-
-        public async Task DisposeAsync()
-        {
-            await DatabaseHelpers.RunSingleDelete(_baseRepository, @"DELETE FROM 
-                income_statement_deduction
-                WHERE statement_id = @statement_id",
-                new { statement_id = _incomeStatementId });
-
-            await DatabaseHelpers.RunSingleDelete(_baseRepository, @"DELETE FROM income_statement 
-                WHERE user_id = @user_id",
-                new { user_id = _userId }
-            );
-            await DatabaseHelpers.DeleteTestUsers(_baseRepository);
-        }
-
-        private async Task SetupData()
         {
             _userId = await DatabaseHelpers.CreateUser(_userRepository);
             var dataToSave = new IncomeStatementCreate
@@ -103,9 +105,41 @@ namespace Selah.API.IntegrationTests.RepositoryTests
             _incomeStatementId = await _cashFlowRepository.CreateIncomeStatement(dataToSave);
         }
 
+        public async Task DisposeAsync()
+        {
+            await DatabaseHelpers.RunSingleDelete(_baseRepository, @"TRUNCATE TABLE income_statement_deduction CASCADE", new {});
+            await DatabaseHelpers.RunSingleDelete(_baseRepository, @"TRUNCATE TABLE income_statement CASCADE", new {});
+            await DatabaseHelpers.DeleteTestUsers(_baseRepository);
+        }
+
         private async Task CreateTestUser()
         {
             _userId = await DatabaseHelpers.CreateUser(_userRepository);
+        }
+
+        /// <summary>
+        /// Inserts test data for income statement and statement deductions
+        /// </summary>
+        /// <returns></returns>
+        private async Task SetupStatementWithDeductions()
+        {
+            var deductions = new List<IncomeStatementDeduction>
+            {
+                new IncomeStatementDeduction
+                {
+                    StatementId = _incomeStatementId,
+                    DeductionName = "Federal Taxes",
+                    Amount = 500
+                },
+                new IncomeStatementDeduction
+                {
+                    StatementId = _incomeStatementId,
+                    DeductionName = "Medical Insurance",
+                    Amount = 500
+                }
+            };
+
+            await _cashFlowRepository.InsertIncomeStatementDeductions(deductions);
         }
     }
 }

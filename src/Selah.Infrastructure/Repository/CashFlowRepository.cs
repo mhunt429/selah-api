@@ -19,7 +19,7 @@ namespace Selah.Infrastructure.Repository
             string sql = @"
                 INSERT INTO income_statement(user_id, statement_start_date, statement_end_date,total_pay) 
                 VALUES(@user_id, @statement_start_date, @statement_end_date, @total_pay) returning(id)";
-           
+
             var id = _baseRepository.AddAsync<long>(sql, ObjectReflection.ConvertToSnakecase(incomeStatement));
             return id;
         }
@@ -47,6 +47,17 @@ namespace Selah.Infrastructure.Repository
                 VALUES(@statement_id, @deduction_name, @amount)";
             var parmaters = deductions.Select(x => ObjectReflection.ConvertToSnakecase(x)).ToList();
             return await _baseRepository.AddManyAsync<IncomeStatementDeduction>(sql, parmaters);
+        }
+
+        public async Task<IEnumerable<IncomeStatementDeduction>> GetDeductionsByStatement(long id, Guid userId)
+        {
+            string sql = @"SELECT isd.id as id, isd.statement_id as statement_id, deduction_name, amount FROM income_statement_deduction isd 
+						INNER JOIN income_statement inc_st ON isd.statement_id = inc_st.id 
+						AND inc_st.id = @id
+						AND inc_st.user_id =  @user_id";
+            var parameters = new { id, user_id = userId };
+            var deductions = await _baseRepository.GetAllAsync<IncomeStatementDeduction>(sql, parameters);
+            return deductions;
         }
     }
 }
