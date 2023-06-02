@@ -16,8 +16,8 @@ namespace Selah.API.IntegrationTests.helpers
             var configurationBuilder = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                {"JwtSecret", "TestingSecret"},
-                {"JwtIssuer", "TestingIssuer"}
+                {"JWT_SECRET", "vXb29wBjmENLKHwcHzAnkJa9tNfBnKhNwZesbVCJQ54PgnOKbjoirmyUgX8A6kK1IHJtMJ+G2tdSbewEohTJO7iQnNaPvUlHxBqmQFU7rGYdcY9xfQHh7+sZw4TVKcwhV89jIyybAR4MNGhtQoy5KfYmJwtMAdff94CSZO/d+0MFxjkikO1A+gXQI7tuHXl/dzQxGKfZC30PhkDzxB4ax9z0P6NmzgT6pg4tRiRfw8LHGafiI75+w5Fk5Ks4R1lp+stL0b+4CIVKnhIUIzLiQvDmkKjNTqeEQ7S1ABbVXGjz6Im4l3uZ2d/WdnJ0a1KT5hh+qX7Fk25FITFKK0qVuA=="},
+                {"JWT_ISSUER", "TestingIssuer"}
                 // add any other configuration values here
                 })
             .Build();

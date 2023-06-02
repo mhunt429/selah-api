@@ -16,8 +16,8 @@ namespace Selah.WebAPI.Middleware
             var jwtTokenConfig = new JwtConfig
             {
                 AccessTokenExpiration = 86400,
-                Issuer = configuration["Issuer"],
-                Secret = configuration["JwtSecret"]
+                Issuer = configuration["JWT_ISSUER"],
+                Secret = configuration["JWT_SECRET"]
             };
             services.AddSingleton(jwtTokenConfig);
             services.AddAuthentication(x =>
@@ -31,9 +31,9 @@ namespace Selah.WebAPI.Middleware
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["JwtSecret"])),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["JWT_SECRET"])),
                     ValidateIssuer = true,
-                    ValidIssuer = configuration["JwtIssuer"],
+                    ValidIssuer = configuration["JWT_ISSUER"],
                     ValidateAudience = false,
 
           

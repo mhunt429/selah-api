@@ -94,7 +94,7 @@ namespace Selah.API.IntegrationTests.RepositoryTests
 
         public async Task InitializeAsync()
         {
-            _userId = await DatabaseHelpers.CreateUser(_userRepository);
+            _userId = (await DatabaseHelpers.CreateUser(_userRepository)).Id;
             var dataToSave = new IncomeStatementCreate
             {
                 UserId = _userId,
@@ -107,14 +107,13 @@ namespace Selah.API.IntegrationTests.RepositoryTests
 
         public async Task DisposeAsync()
         {
-            await DatabaseHelpers.RunSingleDelete(_baseRepository, @"TRUNCATE TABLE income_statement_deduction CASCADE", new {});
-            await DatabaseHelpers.RunSingleDelete(_baseRepository, @"TRUNCATE TABLE income_statement CASCADE", new {});
-            await DatabaseHelpers.DeleteTestUsers(_baseRepository);
+            await DatabaseHelpers.RunSingleDelete(_baseRepository, @"TRUNCATE TABLE income_statement_deduction CASCADE", new { });
+            await DatabaseHelpers.RunSingleDelete(_baseRepository, @"TRUNCATE TABLE income_statement CASCADE", new { });
         }
 
         private async Task CreateTestUser()
         {
-            _userId = await DatabaseHelpers.CreateUser(_userRepository);
+            _userId = (await DatabaseHelpers.CreateUser(_userRepository)).Id;
         }
 
         /// <summary>

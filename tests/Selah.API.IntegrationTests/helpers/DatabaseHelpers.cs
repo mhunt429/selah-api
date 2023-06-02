@@ -4,19 +4,28 @@ namespace Selah.API.IntegrationTests.helpers
 {
     public static class DatabaseHelpers
     {
-        public static async Task<Guid> CreateUser(AppUserRepository userRepo)
+        public static async Task<AppUser> CreateUser(AppUserRepository userRepo)
         {
             var user = new AppUserCreate
             {
                 Email = $"{Guid.NewGuid()}@selah.com",
                 FirstName = "Test",
                 LastName = "User",
-                UserName = $"{Guid.NewGuid()}"
+                UserName = $"{Guid.NewGuid()}",
+                Password = "password"
             };
             //The "minimal foreign key constraint is a valid user"
-            user.Password = BCrypt.Net.BCrypt.HashPassword("password");
+            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
             Guid userId = await userRepo.CreateUser(user);
-            return userId;
+            return new AppUser
+            {
+                Id = userId,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                UserName = user.UserName,
+                Password = "password"
+            };
         }
 
         public static async Task DeleteTestUsers(BaseRepository repo)

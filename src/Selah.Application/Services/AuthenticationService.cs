@@ -26,7 +26,7 @@ namespace Selah.Application.Services
         {
             var tokenHandler = new JwtSecurityTokenHandler();
 
-            var key = Encoding.UTF8.GetBytes(_configuration.GetValue<string>("JWT_SECRET"));
+            var key = Encoding.UTF8.GetBytes(_configuration["JWT_SECRET"]);
 
             var claims = new List<Claim>
             {
@@ -37,7 +37,7 @@ namespace Selah.Application.Services
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddSeconds(86400),
-                Issuer = _configuration.GetValue<string>("JWT_ISSUER"),
+                Issuer = _configuration["JWT_ISSUER"],
                 Audience = "selah-api",
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
