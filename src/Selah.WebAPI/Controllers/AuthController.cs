@@ -13,6 +13,7 @@ using AutoMapper;
 using MediatR;
 using Selah.Application.Queries.ApplicationUser;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Net.Http.Headers;
 
 namespace Selah.WebAPI.Controllers
 {
@@ -34,23 +35,12 @@ namespace Selah.WebAPI.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] GetUserQuery query)
         {
-            var user = await _mediatr.Send(query);
-            if (user == null)
+            var response = await _mediatr.Send(query);
+            if (response == null)
             {
-                return Unauthorized(new HttpResponseViewModel<AppUser>
-                {
-                    StatusCode = 401,
-
-                });
+                return Unauthorized();
             }
-            var jwtResult = _authService.GenerateJwt(user);
-
-            return Ok(new AuthenticationResponse
-            {
-                User = user,
-                AccessToken = jwtResult.AccessToken,
-                ExpirationTs = jwtResult.ExpirationTs
-            });
+            return Ok(response);
         }
     }
 }

@@ -30,8 +30,8 @@ namespace Selah.WebAPI.Extensions
             {
                 PropertyName = x.PropertyName,
                 ErrorMessage = x.ErrorMessage,
-                AttemtedValue = x.AttemptedValue.ToString()
-            }); 
+                AttemtedValue = x.AttemptedValue?.ToString()
+            });
         }
 
         public static string GetIpAddressFromRequest(this HttpRequest request)

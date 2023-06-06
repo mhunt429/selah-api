@@ -1,4 +1,7 @@
-﻿using Selah.Domain.Data.Models.ApplicationUser;
+﻿using Microsoft.Extensions.Logging;
+using Moq;
+using Selah.Domain.Data.Models.ApplicationUser;
+using Selah.Infrastructure;
 using Selah.Infrastructure.Repository;
 namespace Selah.API.IntegrationTests.helpers
 {
@@ -28,9 +31,9 @@ namespace Selah.API.IntegrationTests.helpers
             };
         }
 
-        public static async Task DeleteTestUsers(BaseRepository repo)
+        public static async Task DeleteTestUsers(BaseRepository repo, Guid id)
         {
-            string sql = "DELETE FROM app_user WHERE email LIKE '%selah.com%'";
+            string sql = $"DELETE FROM app_user WHERE id ='{id}'";
             await repo.DeleteAsync(sql, null);
         }
 
@@ -38,6 +41,21 @@ namespace Selah.API.IntegrationTests.helpers
         public static async Task RunSingleDelete(BaseRepository repo, string sql, object parameters)
         {
             await repo.DeleteAsync(sql, parameters);
+        }
+
+        //Sets up all the connection string and dependency injection for testing the database layer
+        public static BaseRepository CreateBaseRepository()
+        {
+            //DB_CONNECTION_STRING is set as an environment variable in the GitHub actions pipelines.
+            //The value below is whatever port you are using for the local postgres image
+            var dbConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+            if (string.IsNullOrEmpty(dbConnectionString))
+            {
+                dbConnectionString = "User ID=postgres;Password=postgres;Host=localhost;Port=65432;Database=postgres;Include Error Detail=true;";
+            }
+            Mock<ILogger<BaseRepository>> loggerMock = new Mock<ILogger<BaseRepository>>();
+
+            return new BaseRepository(new NpgsqlConnectionFactory(dbConnectionString), loggerMock.Object);
         }
     }
 }

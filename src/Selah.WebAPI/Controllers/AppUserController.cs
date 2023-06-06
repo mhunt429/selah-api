@@ -29,7 +29,7 @@ namespace Selah.WebAPI.Controllers
         //Sign up Endpoint
         [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> CreateUser(CreateUserCommand command)
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserCommand command)
         {
             var result = await _mediatr.Send(command);
             switch (result)

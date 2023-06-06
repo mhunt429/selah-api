@@ -1,12 +1,10 @@
 ﻿using Selah.Infrastructure.Repository;
-using Selah.Infrastructure;
 using Xunit;
 using Selah.API.IntegrationTests.helpers;
 using Selah.Infrastructure.Repository.Interfaces;
 using FluentAssertions;
 using Selah.Domain.Data.Models.CashFlow;
-using Microsoft.Extensions.Logging;
-using Moq;
+
 
 namespace Selah.API.IntegrationTests.RepositoryTests
 {
@@ -15,19 +13,12 @@ namespace Selah.API.IntegrationTests.RepositoryTests
         private readonly BaseRepository _baseRepository;
         private readonly AppUserRepository _userRepository;
         private readonly ICashFlowRepository _cashFlowRepository;
-        private readonly Mock<ILogger<BaseRepository>> _loggerMock;
+     
         private long _incomeStatementId;
         private Guid _userId = Guid.Empty;
         public CashFlowRepositoryTests()
         {
-            var dbConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
-            if (string.IsNullOrEmpty(dbConnectionString))
-            {
-                dbConnectionString = "User ID=postgres;Password=postgres;Host=localhost;Port=65432;Database=postgres;Include Error Detail=true;";
-            }
-            _loggerMock = new Mock<ILogger<BaseRepository>>();
-
-            _baseRepository = new BaseRepository(new NpgsqlConnectionFactory(dbConnectionString), _loggerMock.Object);
+            _baseRepository = DatabaseHelpers.CreateBaseRepository();
             _userRepository = new AppUserRepository(_baseRepository);
             _cashFlowRepository = new CashFlowRepository(_baseRepository);
         }
@@ -109,6 +100,7 @@ namespace Selah.API.IntegrationTests.RepositoryTests
         {
             await DatabaseHelpers.RunSingleDelete(_baseRepository, @"TRUNCATE TABLE income_statement_deduction CASCADE", new { });
             await DatabaseHelpers.RunSingleDelete(_baseRepository, @"TRUNCATE TABLE income_statement CASCADE", new { });
+            await DatabaseHelpers.DeleteTestUsers(_baseRepository, _userId);
         }
 
         private async Task CreateTestUser()

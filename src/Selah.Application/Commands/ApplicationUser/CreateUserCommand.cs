@@ -5,8 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using FluentValidation;
-using global::Selah.Infrastructure.Repository.Interfaces;
 using FluentValidation.Results;
+using Selah.Infrastructure.Repository.Interfaces;
 
 namespace Selah.Application.Commands.AppUser
 {

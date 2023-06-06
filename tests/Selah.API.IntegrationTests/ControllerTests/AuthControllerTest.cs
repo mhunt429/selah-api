@@ -6,10 +6,8 @@ using Selah.Domain.Data.Models.Authentication;
 using Newtonsoft.Json;
 using Selah.Domain.Data.Models.ApplicationUser;
 using Selah.Infrastructure.Repository;
-using Microsoft.Extensions.Logging;
-using Moq;
-using Selah.Infrastructure;
 using System.Net;
+using Selah.Application.Commands.AppUser;
 
 namespace Selah.API.IntegrationTests.ControllerTests
 {
@@ -18,21 +16,16 @@ namespace Selah.API.IntegrationTests.ControllerTests
         private SelahApiTestFactory _testFactory;
         private readonly BaseRepository _baseRepository;
         private readonly AppUserRepository _userRepository;
-        private readonly Mock<ILogger<BaseRepository>> _loggerMock;
 
-        private AppUser testUser = new AppUser { };
+
+        private AppUser _testUser = new AppUser { };
         private HttpClient _testClient;
 
         public AuthControllerTest()
         {
-            var dbConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
-            if (string.IsNullOrEmpty(dbConnectionString))
-            {
-                dbConnectionString = "User ID=postgres;Password=postgres;Host=localhost;Port=65432;Database=postgres;Include Error Detail=true;";
-            }
-            _loggerMock = new Mock<ILogger<BaseRepository>>();
-
-            _baseRepository = new BaseRepository(new NpgsqlConnectionFactory(dbConnectionString), _loggerMock.Object);
+            _testFactory = new SelahApiTestFactory();
+            _testClient = _testFactory.CreateClient();
+            _baseRepository = DatabaseHelpers.CreateBaseRepository();
             _userRepository = new AppUserRepository(_baseRepository);
         }
 
@@ -40,16 +33,11 @@ namespace Selah.API.IntegrationTests.ControllerTests
         public async Task Should_Return_Unauthorized_On_Invalid_Login()
         {
             // Arrange
-            var login = new AuthenticationRequest { EmailOrUsername = "bad_user", Password = "BadP@ssword" };
-            var requestBody = JsonConvert.SerializeObject(login, new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore
-            });
-            var httpContent = new StringContent(requestBody, Encoding.UTF8, "application/json");
-
+            var command = new AuthenticationRequest { EmailOrUsername = "bad_user", Password = "BadP@ssword" };
+            
             // Act
-            var response = await _testClient.PostAsync("api/v1/oauth/login", httpContent);
-
+            var response = await _testFactory.PostAsync<AuthenticationRequest>(command, _testClient, "api/v1/oauth/login");
+            
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
@@ -58,15 +46,10 @@ namespace Selah.API.IntegrationTests.ControllerTests
         public async Task Should_Return_Ok_On_Valid_Login()
         {
             // Arrange
-            var login = new AuthenticationRequest { EmailOrUsername = testUser.Email, Password = testUser.Password };
-            var requestBody = JsonConvert.SerializeObject(login, new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore
-            });
-            var httpContent = new StringContent(requestBody, Encoding.UTF8, "application/json");
-
+            var command = new AuthenticationRequest { EmailOrUsername = _testUser.Email, Password = _testUser.Password };
+          
             // Act
-            var response = await _testClient.PostAsync("api/v1/oauth/login", httpContent);
+            var response = await _testFactory.PostAsync<AuthenticationRequest>(command, _testClient, "api/v1/oauth/login");
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -74,13 +57,12 @@ namespace Selah.API.IntegrationTests.ControllerTests
 
         public async Task InitializeAsync()
         {
-            _testFactory = new SelahApiTestFactory();
-            _testClient = _testFactory.CreateClient();
-            testUser = await DatabaseHelpers.CreateUser(_userRepository);
+            _testUser = await DatabaseHelpers.CreateUser(_userRepository);
         }
 
         public async Task DisposeAsync()
         {
+            await DatabaseHelpers.DeleteTestUsers(_baseRepository, _testUser.Id);
             _testClient.Dispose();
             _testFactory.Dispose();
         }

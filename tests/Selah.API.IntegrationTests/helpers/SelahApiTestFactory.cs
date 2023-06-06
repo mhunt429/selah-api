@@ -6,6 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Selah.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Hosting;
+using Selah.Domain.Data.Models.Authentication;
+using Newtonsoft.Json;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.OAuth;
 
 namespace Selah.API.IntegrationTests.helpers
 {
@@ -39,6 +43,35 @@ namespace Selah.API.IntegrationTests.helpers
                 new NpgsqlConnectionFactory(dbConnectionString));
             });
             return base.CreateHost(server);
+        }
+
+        /*
+         * Generates a JWT for API endpoint testing
+         * Doing this this way prevents having to inject the entire configuration into each test
+         */
+        public async Task<AuthenticationResponse> GenerateTestJwt(HttpClient client, AuthenticationRequest request)
+        {
+            var requestBody = JsonConvert.SerializeObject(request, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            });
+            var httpContent = new StringContent(requestBody, Encoding.UTF8, "application/json");
+
+            // Act
+            var response = await client.PostAsync("api/v1/oauth/login", httpContent);
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<AuthenticationResponse>(content);
+        }
+
+        public async Task<HttpResponseMessage> PostAsync<T>(T data, HttpClient client, string servicePath)
+        {
+            var requestBody = JsonConvert.SerializeObject(data, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            });
+            var httpContent = new StringContent(requestBody, Encoding.UTF8, "application/json");
+
+            return await client.PostAsync(servicePath, httpContent);
         }
     }
 }

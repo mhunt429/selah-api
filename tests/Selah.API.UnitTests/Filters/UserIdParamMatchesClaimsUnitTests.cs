@@ -23,7 +23,7 @@ namespace Selah.Application.UnitTests.Filters
         }
 
         [Fact]
-        public Task OnAuthorization_Should_Return_ForbidResult_When_User_Id_Does_Not_Match_Route_Parameter()
+        public void OnAuthorization_Should_Return_ForbidResult_When_User_Id_Does_Not_Match_Route_Parameter()
         {
             // Arrange
             var context = new AuthorizationFilterContext(CreateActionContext(), new List<IFilterMetadata>());
@@ -39,12 +39,11 @@ namespace Selah.Application.UnitTests.Filters
             _filter.OnAuthorization(context);
 
             // Assert
-            var result = Assert.IsType<ForbidResult>(context.Result);
-            return Task.CompletedTask;
+            Assert.IsType<ForbidResult>(context.Result);
         }
 
         [Fact]
-        public Task OnAuthorization_Should_Not_Set_Result_When_User_Id_Matches_Route_Parameter()
+        public void OnAuthorization_Should_Not_Set_Result_When_User_Id_Matches_Route_Parameter()
         {
             // Arrange
             var context = new AuthorizationFilterContext(CreateActionContext(), new List<IFilterMetadata>());
@@ -61,7 +60,6 @@ namespace Selah.Application.UnitTests.Filters
 
             // Assert
             Assert.Null(context.Result);
-            return Task.CompletedTask;
         }
 
         private static ActionContext CreateActionContext()
