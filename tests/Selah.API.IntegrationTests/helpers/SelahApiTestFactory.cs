@@ -7,9 +7,9 @@ using Selah.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Selah.Domain.Data.Models.Authentication;
-using Newtonsoft.Json;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.OAuth;
+using System.Text.Json;
 
 namespace Selah.API.IntegrationTests.helpers
 {
@@ -51,27 +51,27 @@ namespace Selah.API.IntegrationTests.helpers
          */
         public async Task<AuthenticationResponse> GenerateTestJwt(HttpClient client, AuthenticationRequest request)
         {
-            var requestBody = JsonConvert.SerializeObject(request, new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore
-            });
+            var requestBody = JsonSerializer.Serialize(request);
             var httpContent = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
             // Act
-            var response = await client.PostAsync("api/v1/oauth/login", httpContent);
-            var content = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<AuthenticationResponse>(content);
+            var httpResponse = await client.PostAsync("api/v1/oauth/login", httpContent);
+            var content = await httpResponse.Content.ReadAsStringAsync();
+            var authResponse = JsonSerializer.Deserialize<AuthenticationResponse>(content);
+            return authResponse;
         }
 
         public async Task<HttpResponseMessage> PostAsync<T>(T data, HttpClient client, string servicePath)
         {
-            var requestBody = JsonConvert.SerializeObject(data, new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore
-            });
+            var requestBody = JsonSerializer.Serialize(data);
             var httpContent = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
             return await client.PostAsync(servicePath, httpContent);
+        }
+
+        public async Task<HttpResponseMessage> GetAsync<T>(HttpClient client, string servicePath)
+        {
+            return await client.GetAsync(servicePath);
         }
     }
 }

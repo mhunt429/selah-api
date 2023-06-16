@@ -6,11 +6,13 @@ using Selah.Application.Services.Interfaces;
 using MediatR;
 using Selah.Application.Queries.Analytics;
 using Selah.Domain.Data.Models.Analytics.Dashboard;
+using Selah.Application.Filters;
 
 namespace Selah.WebAPI.Controllers
 {
     [ApiController]
     [Authorize]
+    [UserIdParamMatchesClaims]
     [Route("api/v1/users/{userId}/dashboard")]
     public class DashboardController : ControllerBase
     {

@@ -22,12 +22,9 @@ namespace Selah.WebAPI.Controllers
     [Route("api/v1/oauth")]
     public class AuthController : ControllerBase
     {
-        private readonly IAuthenticationService _authService;
         private readonly IMediator _mediatr;
-        public AuthController(IAuthenticationService authService, IMediator mediatr)
+        public AuthController(IMediator mediatr)
         {
-
-            _authService = authService;
             _mediatr = mediatr;
         }
 
