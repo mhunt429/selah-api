@@ -17,10 +17,10 @@ namespace Selah.WebAPI.Controllers
         /// a household invite jump to that workflow. We can store the message in a caching layer so that when the signup happens,
         /// the message is submitted and the transaction record is created. After this, all text messages will go through
         /// </summary>
-        public void SendAccountSignUpSms()
+       /* public void SendAccountSignUpSms()
         {
 
-        }
+        }*/
 
         /// <summary>
         /// This is simple but it gets the job done if the user doesn't want to give Plaid access to
