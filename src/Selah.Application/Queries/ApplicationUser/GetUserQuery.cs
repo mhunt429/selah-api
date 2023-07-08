@@ -46,16 +46,11 @@ namespace Selah.Application.Queries.ApplicationUser
                 var user = await _appUserRepository.GetUser(query.EmailOrUsername);
                 if (user == null)
                 {
-                    Console.WriteLine(query.EmailOrUsername);
-                    Console.WriteLine(query.Password);
-                    Console.WriteLine("FUck!!!!");
                     return null;
                 }
 
                 if (!Verify(query.Password, user.Password))
                 {
-                    Console.WriteLine("oh my god!!!!");
-                    Console.WriteLine(query.Password);
                     return null;
                 }
                 var userResponse = new UserViewModel
