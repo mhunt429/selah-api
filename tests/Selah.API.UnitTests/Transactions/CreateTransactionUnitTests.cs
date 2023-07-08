@@ -17,9 +17,9 @@ public class CreateTransactionUnitTests
 
     public CreateTransactionUnitTests()
     {
-        _transactionRepoMock.Setup(x => x.GetTransactionCategoryById(It.IsAny<Guid>(), It.IsAny<long>()))
+        _transactionRepoMock.Setup(x => x.GetTransactionCategoryById(It.IsAny<int>(), It.IsAny<int>()))
             .ReturnsAsync(TransactionCategoryTestHelpers.CreateCategories(true));
-        _bankingRepoMock.Setup(x => x.GetAccountById(It.IsAny<long>())).ReturnsAsync((BankAccount)null);
+        _bankingRepoMock.Setup(x => x.GetAccountById(It.IsAny<int>())).ReturnsAsync((BankAccount)null);
     }
 
     [Fact]
@@ -54,10 +54,10 @@ public class CreateTransactionUnitTests
     [Fact]
     public async Task Can_Save_Valid_Model()
     {
-        _transactionRepoMock.Setup(x => x.GetTransactionCategoryById(It.IsAny<Guid>(), It.IsAny<long>()))
+        _transactionRepoMock.Setup(x => x.GetTransactionCategoryById(It.IsAny<int>(), It.IsAny<int>()))
             .ReturnsAsync(TransactionCategoryTestHelpers.CreateCategories());
         _transactionRepoMock.Setup(x => x.InsertTransaction(It.IsAny<TransactionCreate>())).ReturnsAsync(1);
-        _bankingRepoMock.Setup(x => x.GetAccountById(It.IsAny<long>())).ReturnsAsync(new BankAccount());
+        _bankingRepoMock.Setup(x => x.GetAccountById(It.IsAny<int>())).ReturnsAsync(new BankAccount());
 
         //Arrange
         var command = new CreateTransactionCommand

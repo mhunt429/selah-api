@@ -42,27 +42,24 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.GetFirstOrDefaultAsync<AppUser>(sql, new { email = emailOrUsername, user_name = emailOrUsername });
         }
 
-        public async Task<Guid> CreateUser(AppUserCreate createdUser)
+        public async Task<int> CreateUser(AppUserCreate createdUser)
         {
-            var userId = Guid.NewGuid();
-            var sql = @"INSERT INTO app_user(id, email, 
+            var sql = @"INSERT INTO app_user(email, 
                      user_name, 
                      password, 
                      first_name, 
                      last_name, 
                      date_created)
                      values(
-                              @id,
                               @email,
                               @user_name,
                               @password, 
                               @first_name, 
                               @last_name, 
                               @date_created
-                            )";
+                            )returning(id)";
             var parameters = new
             {
-                id = userId,
                 email = createdUser.Email,
                 user_name = createdUser.UserName,
                 password = createdUser.Password,
@@ -71,8 +68,7 @@ namespace Selah.Infrastructure.Repository
                 date_created = DateTime.UtcNow
             };
 
-            await _baseRepository.AddAsync<int>(sql, parameters);
-            return userId;
+            return await _baseRepository.AddAsync<int>(sql, parameters);
         }
 
         public async Task UpdateUser(AppUserUpdate updatedUser, Guid id)
@@ -101,7 +97,7 @@ namespace Selah.Infrastructure.Repository
             await _baseRepository.DeleteAsync(sql, new { id });
         }
 
-        public async Task UpdatePassword(Guid userId, string password)
+        public async Task UpdatePassword(int userId, string password)
         {
             var sql = @"UPDATE app_user 
                     SET password = @password

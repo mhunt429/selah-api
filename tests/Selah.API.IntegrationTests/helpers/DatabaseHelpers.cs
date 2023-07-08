@@ -19,7 +19,7 @@ namespace Selah.API.IntegrationTests.helpers
             };
             //The "minimal foreign key constraint is a valid user"
             user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
-            Guid userId = await userRepo.CreateUser(user);
+            int userId = await userRepo.CreateUser(user);
             return new AppUser
             {
                 Id = userId,
@@ -31,7 +31,7 @@ namespace Selah.API.IntegrationTests.helpers
             };
         }
 
-        public static async Task DeleteTestUsers(BaseRepository repo, Guid id)
+        public static async Task DeleteTestUsers(BaseRepository repo, int id)
         {
             string sql = $"DELETE FROM app_user WHERE id ='{id}'";
             await repo.DeleteAsync(sql, null);

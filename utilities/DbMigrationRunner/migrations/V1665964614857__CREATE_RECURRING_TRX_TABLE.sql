@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS recurring_transaction(
-    id uuid PRIMARY KEY,
-    user_id uuid REFERENCES app_user(id) ON DELETE CASCADE,
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGSERIAL REFERENCES app_user(id) ON DELETE CASCADE,
     frequency TEXT,
     notification_preference TEXT,
     upcoming_date TIMESTAMP,

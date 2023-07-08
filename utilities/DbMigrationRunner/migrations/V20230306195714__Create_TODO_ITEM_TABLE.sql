@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS todo_item(
     id BIGSERIAL PRIMARY KEY,
-    user_id uuid REFERENCES app_user(id) ON DELETE CASCADE,
+    user_id BIGSERIAL REFERENCES app_user(id) ON DELETE CASCADE,
     recurring BOOLEAN,
     last_completed TIMESTAMP,
     /*

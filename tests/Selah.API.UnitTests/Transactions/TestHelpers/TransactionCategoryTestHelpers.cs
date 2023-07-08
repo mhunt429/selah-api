@@ -14,28 +14,28 @@ public static class TransactionCategoryTestHelpers
             new()
             {
                 Id = 1,
-                UserId = userId,
+                UserId = 1,
                 CategoryName = "Test 1"
             },
 
             new()
             {
                 Id = 2,
-                UserId = userId,
+                UserId = 1,
                 CategoryName = "Test 2"
             },
 
             new()
             {
                 Id = 3,
-                UserId = userId,
+                UserId = 1,
                 CategoryName = "Test 3"
             },
 
             new()
             {
                 Id = 4,
-                UserId = userId,
+                UserId = 1,
                 CategoryName = "Test 4"
             }
         };
@@ -50,14 +50,14 @@ public static class TransactionCategoryTestHelpers
             new()
             {
                 Id = -1,
-                UserId = userId,
+                UserId = 1,
                 CategoryName = "Test 1"
             },
 
             new()
             {
                 Id = -2,
-                UserId = userId,
+                UserId = 1,
                 CategoryName = "Test 1"
             }
         };

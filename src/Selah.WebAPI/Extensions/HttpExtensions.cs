@@ -21,7 +21,7 @@ namespace Selah.WebAPI.Extensions
                 return new Guid(token.Claims.First().Value);
             }
 
-            return Guid.Empty;
+            return Guid.Empty; 
         }
 
         public static IEnumerable<ValidationError> GetValidationErrors(this ValidationResult validationResult)

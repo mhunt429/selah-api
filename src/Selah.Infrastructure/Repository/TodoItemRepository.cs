@@ -17,30 +17,30 @@ namespace Selah.Infrastructure.Repository
             _baseRepository = baseRepository;
         }
 
-        public async Task<long> CreateTodoItem(TodoItem todoCreate)
+        public async Task<int> CreateTodoItem(TodoItem todoCreate)
         {
             var sql = @"INSERT INTO todo_item 
                 (user_id, recurring, last_completed, frequency, deadline)
                 VALUES(@userId, @recurring, @lastCompleted, @frequency, @deadline)
                 RETURNING(id)";
-            return await _baseRepository.AddAsync<long>(sql, todoCreate);
+            return await _baseRepository.AddAsync<int>(sql, todoCreate);
         }
 
-        public async Task DeleteTodo(long id)
+        public async Task DeleteTodo(int id)
         {
             var sql = "DELETE FROM todo_item WHERE id = @id";
 
             await _baseRepository.DeleteAsync(sql, new { id });
         }
 
-        public async Task<TodoItem> GetTodoByUserAndId(long id, Guid userId)
+        public async Task<TodoItem> GetTodoByUserAndId(int id, int userId)
         {
             var sql = "SELECT * FROM todo_item WHERE id = @id AND user_id = @userId";
 
             return await _baseRepository.GetFirstOrDefaultAsync<TodoItem>(sql, new { id, userId });
         }
 
-        public async Task<IReadOnlyList<TodoItem>> GetTodoList(Guid userId, int limit = 25, int offset = 0)
+        public async Task<IReadOnlyList<TodoItem>> GetTodoList(int userId, int limit = 25, int offset = 0)
         {
             var sql = "SELECT * FROM todo_item WHERE user_id = @userId LIMIT @limit OFFSET @offset";
 

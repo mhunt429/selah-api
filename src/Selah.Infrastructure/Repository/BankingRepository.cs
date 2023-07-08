@@ -19,7 +19,7 @@ namespace Selah.Infrastructure.Repository
             _envVariables = envVariables;
         }
 
-        public async Task<IEnumerable<BankAccount>> GetAccounts(Guid userId, int limit = 25, int offset = 1)
+        public async Task<IEnumerable<BankAccount>> GetAccounts(int userId, int limit = 25, int offset = 1)
         {
             using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
             {
@@ -62,7 +62,7 @@ namespace Selah.Infrastructure.Repository
             }
         }
 
-        public async Task<long> ImportAccounts(List<BankAccount> accounts)
+        public async Task<int> ImportAccounts(List<BankAccount> accounts)
         {
             using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
             {
@@ -105,7 +105,7 @@ namespace Selah.Infrastructure.Repository
             }
         }
 
-        public async Task<BankAccount> GetAccountById(long id)
+        public async Task<BankAccount> GetAccountById(int id)
         {
             using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
             {

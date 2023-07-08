@@ -29,11 +29,11 @@ namespace Selah.Infrastructure.Repository
 
 
 
-        public async Task<long> CreateTransactionCategory(UserTransactionCategoryCreate category)
+        public async Task<int> CreateTransactionCategory(UserTransactionCategoryCreate category)
         {
             using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
             {
-                return await connection.ExecuteScalarAsync<long>(@"INSERT INTO 
+                return await connection.ExecuteScalarAsync<int>(@"INSERT INTO 
           user_transaction_category(user_id, category_name) 
           VALUES(@user_id, @category_name) RETURNING(id)", new
                 {
@@ -43,7 +43,7 @@ namespace Selah.Infrastructure.Repository
             }
         }
 
-        public async Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUser(Guid userId)
+        public async Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUser(int userId)
         {
             using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
             {
@@ -55,7 +55,7 @@ namespace Selah.Infrastructure.Repository
             }
         }
 
-        public async Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoryById(Guid userId, long id)
+        public async Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoryById(int userId, int id)
         {
             using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
             {
@@ -68,7 +68,7 @@ namespace Selah.Infrastructure.Repository
             }
         }
 
-        public async Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUser(Guid userId, string catgoryName)
+        public async Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUser(int userId, string catgoryName)
         {
             using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
             {
@@ -81,7 +81,7 @@ namespace Selah.Infrastructure.Repository
             }
         }
 
-        public async Task<long> InsertTransaction(TransactionCreate transaction)
+        public async Task<int> InsertTransaction(TransactionCreate transaction)
         {
             string sql = @"
                 INSERT INTO user_transaction(
@@ -104,7 +104,7 @@ namespace Selah.Infrastructure.Repository
                 pending = transaction.Pending,
                 payment_method = transaction.PaymentMethod,
             };
-            return await _baseRepository.AddAsync<long>(sql, objectToSave);
+            return await _baseRepository.AddAsync<int>(sql, objectToSave);
 
         }
 
@@ -128,7 +128,7 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.AddManyAsync<TransactionLineItemCreate>(sql, parameters);
         }
 
-        public async Task<IEnumerable<RecentTransactionSql>> GetRecentTransactions(Guid userId)
+        public async Task<IEnumerable<RecentTransactionSql>> GetRecentTransactions(int userId)
         {
             var sql = @"SELECT
                          ut.id as transaction_id,
@@ -153,7 +153,7 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.GetAllAsync<RecentTransactionSql>(sql, parameters);
         }
 
-        public async Task<IEnumerable<TransactionSummarySql>> GetTransactionSummaryByDateRange(Guid userId, DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<TransactionSummarySql>> GetTransactionSummaryByDateRange(int userId, DateTime startDate, DateTime endDate)
         {
             var sql = @"SELECT 
                         transaction_date, 

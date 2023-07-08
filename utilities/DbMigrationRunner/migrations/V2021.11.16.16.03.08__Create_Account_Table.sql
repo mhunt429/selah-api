@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS user_bank_account(
 	account_name TEXT,
 	available_balance DECIMAL,
 	current_balance DECIMAL,
-	user_id uuid references app_user(id),
+	user_id BIGSERIAL references app_user(id),
 	subtype TEXT
 );
 

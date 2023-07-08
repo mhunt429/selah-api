@@ -12,14 +12,14 @@ namespace Selah.Infrastructure.Repository.Interfaces
         /// </summary>
         /// <param name="accounts"></param>
         /// <returns></returns>
-        public Task<long> ImportAccounts(List<BankAccount> accounts);
+        public Task<int> ImportAccounts(List<BankAccount> accounts);
 
         /// <summary>
         /// Returns all accounts by user id
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public Task<IEnumerable<BankAccount>> GetAccounts(Guid userId, int limit, int offset);
+        public Task<IEnumerable<BankAccount>> GetAccounts(int userId, int limit, int offset);
 
         /// <summary>
         /// Returns a list of accounts by institution
@@ -33,6 +33,6 @@ namespace Selah.Infrastructure.Repository.Interfaces
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Task<BankAccount> GetAccountById(long id);
+        public Task<BankAccount> GetAccountById(int id);
     }
 }

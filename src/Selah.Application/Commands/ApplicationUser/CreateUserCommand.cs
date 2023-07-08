@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 using FluentValidation;
 using FluentValidation.Results;
+using Selah.Application.Services.Interfaces;
 using Selah.Infrastructure.Repository.Interfaces;
 
 namespace Selah.Application.Commands.AppUser
@@ -37,10 +38,11 @@ namespace Selah.Application.Commands.AppUser
         public class Handler : IRequestHandler<CreateUserCommand, (UserViewModel, ValidationResult)>
         {
             private readonly IAppUserRepository _appUserRepository;
-
-            public Handler(IAppUserRepository appUserRepository)
+            private readonly ISecurityService _securityService;
+            public Handler(IAppUserRepository appUserRepository, ISecurityService securityService)
             {
                 _appUserRepository = appUserRepository;
+                _securityService = securityService;
             }
 
             public async Task<(UserViewModel, ValidationResult)> Handle(CreateUserCommand request, CancellationToken cancellationToken)
@@ -53,11 +55,11 @@ namespace Selah.Application.Commands.AppUser
                     return (null, validationResult);
                 }
                 request.CreatedUser.Password = BCrypt.Net.BCrypt.HashPassword(request.CreatedUser.Password);
-                Guid userId = await _appUserRepository.CreateUser(request.CreatedUser);
+                int userId = await _appUserRepository.CreateUser(request.CreatedUser);
            
                 var user = new UserViewModel
                 {
-                    Id = userId,
+                    Id = _securityService.EncodeHashId(userId),
                     Email = request.CreatedUser.Email,
                     UserName = request.CreatedUser.UserName,
                     FirstName = request.CreatedUser.FirstName,

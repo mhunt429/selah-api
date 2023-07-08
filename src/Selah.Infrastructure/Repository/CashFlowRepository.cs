@@ -14,17 +14,17 @@ namespace Selah.Infrastructure.Repository
         {
             _baseRepository = baseRepository;
         }
-        public Task<long> CreateIncomeStatement(IncomeStatementCreate incomeStatement)
+        public async Task<int> CreateIncomeStatement(IncomeStatementCreate incomeStatement)
         {
             string sql = @"
                 INSERT INTO income_statement(user_id, statement_start_date, statement_end_date,total_pay) 
                 VALUES(@user_id, @statement_start_date, @statement_end_date, @total_pay) returning(id)";
 
-            var id = _baseRepository.AddAsync<long>(sql, ObjectReflection.ConvertToSnakecase(incomeStatement));
+            var id = await _baseRepository.AddAsync<int>(sql, ObjectReflection.ConvertToSnakecase(incomeStatement));
             return id;
         }
 
-        public async Task<IEnumerable<IncomeStatement>> GetIncomeStatementsByUser(Guid userId, int limit, int offset)
+        public async Task<IEnumerable<IncomeStatement>> GetIncomeStatementsByUser(int userId, int limit, int offset)
         {
             string sql = @"SELECT * 
                 FROM 
@@ -49,7 +49,7 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.AddManyAsync<IncomeStatementDeduction>(sql, parmaters);
         }
 
-        public async Task<IEnumerable<IncomeStatementDeduction>> GetDeductionsByStatement(long id, Guid userId)
+        public async Task<IEnumerable<IncomeStatementDeduction>> GetDeductionsByStatement(int id, int userId)
         {
             string sql = @"SELECT isd.id as id, isd.statement_id as statement_id, deduction_name, amount FROM income_statement_deduction isd 
 						INNER JOIN income_statement inc_st ON isd.statement_id = inc_st.id 

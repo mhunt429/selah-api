@@ -1,6 +1,6 @@
 CREATE TABLE user_institution(
 	id BIGSERIAL PRIMARY KEY,
-	user_id uuid REFERENCES app_user(id),
+	user_id BIGSERIAL REFERENCES app_user(id),
 	institution_id TEXT,
 	institution_name TEXT,
 	encrypted_access_token TEXT

@@ -4,9 +4,9 @@ namespace Selah.Domain.Data.Models.TodoItem
 {
     public class TodoItem
     {
-        public long Id { get; set; }
+        public int Id { get; set; }
 
-        public Guid UserId { get; set; }
+        public int UserId { get; set; }
 
         public bool Recurring { get; set; }
 

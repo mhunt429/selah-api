@@ -1,13 +1,13 @@
 ﻿CREATE or REPLACE function get_transaction_line_items_by_transaction (
-  transaction_id_param uuid
+  transaction_id_param int
 ) 
 	returns table (
-		id uuid,
-		transaction_id uuid,
-		transaction_category_id uuid,
+		id int,
+		transaction_id int,
+		transaction_category_id int,
 		itemized_amount decimal,
-		account_id uuid,
-		user_id uuid,
+		account_id int,
+		user_id int,
 		transaction_amount decimal,
 		transaction_date timestamp with time zone ,
 		merchant_name TEXT,

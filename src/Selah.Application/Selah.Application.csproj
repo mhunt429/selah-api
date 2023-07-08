@@ -10,6 +10,7 @@
     <PackageReference Include="FluentValidation" Version="11.2.2" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.2.2" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.2.2" />
+    <PackageReference Include="Hashids.net" Version="1.7.0" />
     <PackageReference Include="MediatR" Version="11.0.0" />
   </ItemGroup>
 

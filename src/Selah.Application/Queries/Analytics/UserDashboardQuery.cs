@@ -13,13 +13,14 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Selah.Application.Services.Interfaces;
 
 namespace Selah.Application.Queries.Analytics
 {
     public class UserDashboardQuery : IRequest<DashboardSummary>
     {
         [DisplayName("userId")]
-        public Guid UserId { get; set; }
+        public string UserId { get; set; }
 
         public sealed class Validator : AbstractValidator<UserDashboardQuery>
         {
@@ -32,17 +33,20 @@ namespace Selah.Application.Queries.Analytics
         public class Handler : IRequestHandler<UserDashboardQuery, DashboardSummary>
         {
             private readonly ITransactionRepository _transactionRepository;
-            public Handler(ITransactionRepository transactionRepository)
+            private readonly ISecurityService _securityService;
+            public Handler(ITransactionRepository transactionRepository, ISecurityService securityService)
             {
                 _transactionRepository = transactionRepository;
+                _securityService = securityService;
             }
 
             public async Task<DashboardSummary> Handle(UserDashboardQuery query, CancellationToken cancellationToken)
             {
-                var transactionSummaryTuple = await GetLastAndCurrentMonthTrxSummary(query.UserId);
+                int id = _securityService.DecodeHashId(query.UserId);
+                var transactionSummaryTuple = await GetLastAndCurrentMonthTrxSummary(id);
                 return new DashboardSummary
                 {
-                    RecentTransactions = await GetRecentTransactions(query.UserId),
+                    RecentTransactions = await GetRecentTransactions(id),
                     LastMonthSpending = transactionSummaryTuple.Item1.ToList(),
                     CurrentMonthSpending = transactionSummaryTuple.Item2.ToList(),
                     UpcomingTransactions = new List<RecurringTransaction>(),
@@ -51,7 +55,7 @@ namespace Selah.Application.Queries.Analytics
                 };
             }
 
-            private async Task<List<RecentTransaction>> GetRecentTransactions(Guid userId)
+            private async Task<List<RecentTransaction>> GetRecentTransactions(int userId)
             {
                 IEnumerable<RecentTransactionSql> recentTransactionSql = await _transactionRepository.GetRecentTransactions(userId);
                 var recentTransactions = new List<RecentTransaction>();
@@ -77,7 +81,7 @@ namespace Selah.Application.Queries.Analytics
             /// </summary>
             /// <returns></returns>
             //TODO probably a good idea to move this to a separate handler/endpoint
-            private async Task<(IEnumerable<TransactionSummarySql>, IEnumerable<TransactionSummarySql>)> GetLastAndCurrentMonthTrxSummary(Guid userId)
+            private async Task<(IEnumerable<TransactionSummarySql>, IEnumerable<TransactionSummarySql>)> GetLastAndCurrentMonthTrxSummary(int userId)
             {
                 var currentTimeUtc = DateTime.UtcNow;
 

@@ -14,8 +14,8 @@ namespace Selah.API.IntegrationTests.RepositoryTests
         private readonly AppUserRepository _userRepository;
         private readonly ICashFlowRepository _cashFlowRepository;
      
-        private long _incomeStatementId;
-        private Guid _userId = Guid.Empty;
+        private int _incomeStatementId;
+        private int _userId = 0;
         public CashFlowRepositoryTests()
         {
             _baseRepository = DatabaseHelpers.CreateBaseRepository();

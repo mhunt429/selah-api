@@ -6,12 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Selah.Application.Services.Interfaces;
 
 namespace Selah.Application.Queries.Banking
 {
     public class GetAllBankAccountsQuery: IRequest<IEnumerable<BankAccount>>
     {
-        public Guid UserId { get; set; }
+        public string UserId { get; set; }
 
         //Pagination Support
         [FromQuery]
@@ -22,15 +23,17 @@ namespace Selah.Application.Queries.Banking
         public class Handler : IRequestHandler<GetAllBankAccountsQuery, IEnumerable<BankAccount>>
         {
             private readonly IBankingRepository _bankingRepository;
-
-            public Handler(IBankingRepository bankingRepository)
+            private readonly ISecurityService _securityService;
+            public Handler(IBankingRepository bankingRepository, ISecurityService securityService)
             {
                 _bankingRepository = bankingRepository;
+                _securityService = securityService;
             }
 
             public async Task<IEnumerable<BankAccount>> Handle(GetAllBankAccountsQuery query, CancellationToken cancellationToken)
             {
-               return await _bankingRepository.GetAccounts(query.UserId, query.Limit, query.Offset);
+                int id = _securityService.DecodeHashId(query.UserId);
+               return await _bankingRepository.GetAccounts(id, query.Limit, query.Offset);
             }
         }
     }

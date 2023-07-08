@@ -8,9 +8,8 @@ namespace Selah.WebAPI.DependencyInjection.Extensions
     {
         public static IServiceCollection RegisterApplicationServices(this IServiceCollection services)
         {
-            services.AddScoped<IAuthenticationService, AuthenticationService>();
-         
             services.AddScoped<ISecurityService, SecurityService>();
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
             return services;
         }
     }

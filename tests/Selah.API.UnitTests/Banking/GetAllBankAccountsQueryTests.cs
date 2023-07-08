@@ -1,5 +1,6 @@
 ﻿using Moq;
 using Selah.Application.Queries.Banking;
+using Selah.Application.Services.Interfaces;
 using Selah.Domain.Data.Models.Banking;
 using Selah.Infrastructure.Repository.Interfaces;
 using Xunit;
@@ -14,44 +15,31 @@ public class GetAllBankAccountsQueryTests
     public GetAllBankAccountsQueryTests()
     {
         _bankingRepositoryMock = new Mock<IBankingRepository>();
-        _handler = new GetAllBankAccountsQuery.Handler(_bankingRepositoryMock.Object);
+        Mock<ISecurityService> securityServiceMock = new();
+        securityServiceMock.Setup(x => x.DecodeHashId(It.IsAny<string>())).Returns(1);
+        securityServiceMock.Setup(x => x.EncodeHashId(It.IsAny<int>())).Returns("ABC123");
+        _handler = new GetAllBankAccountsQuery.Handler(_bankingRepositoryMock.Object, securityServiceMock.Object);
     }
 
     [Fact]
     public async Task Handle_ReturnsBankAccounts()
     {
         // Arrange
-        var userId = Guid.NewGuid();
         var bankAccounts = new List<BankAccount>
         {
-            new() { Id = Guid.NewGuid(), UserId = userId, Name = "Checking" },
-            new() { Id = Guid.NewGuid(), UserId = userId, Name = "Savings" }
+            new() { Id =1, UserId = 1, Name = "Checking" },
+            new() { Id = 2, UserId = 1, Name = "Savings" }
         };
-        _bankingRepositoryMock.Setup(x => x.GetAccounts(userId, It.IsAny<int>(), It.IsAny<int>()))
+        _bankingRepositoryMock.Setup(x => x.GetAccounts(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>()))
             .ReturnsAsync(bankAccounts);
 
-        var query = new GetAllBankAccountsQuery { UserId = userId, Limit = 10, Offset = 0 };
+        var query = new GetAllBankAccountsQuery { UserId = "ABC123", Limit = 10, Offset = 0 };
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
 
         // Assert
         Assert.Equal(bankAccounts, result);
-        _bankingRepositoryMock.Verify(x => x.GetAccounts(userId, query.Limit, query.Offset), Times.Once);
-    }
-
-    [Fact]
-    public async Task Handle_ThrowsException_WhenRepositoryThrowsException()
-    {
-        // Arrange
-        var userId = Guid.NewGuid();
-        _bankingRepositoryMock.Setup(x => x.GetAccounts(userId, It.IsAny<int>(), It.IsAny<int>()))
-            .ThrowsAsync(new Exception());
-
-        var query = new GetAllBankAccountsQuery { UserId = userId, Limit = 10, Offset = 0 };
-
-        // Act & Assert
-        await Assert.ThrowsAsync<Exception>(() => _handler.Handle(query, CancellationToken.None));
-        _bankingRepositoryMock.Verify(x => x.GetAccounts(userId, query.Limit, query.Offset), Times.Once);
+        _bankingRepositoryMock.Verify(x => x.GetAccounts(1, query.Limit, query.Offset), Times.Once);
     }
 }

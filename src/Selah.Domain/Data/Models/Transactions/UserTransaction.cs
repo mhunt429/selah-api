@@ -6,12 +6,12 @@ namespace Selah.Domain.Data.Models.Transactions
 {
     public class UserTransaction
     {
-        public long Id { get; set; }
+        public int Id { get; set; }
 
         [Required]
-        public Guid UserId { get; set; }
+        public int UserId { get; set; }
 
-        public Guid AccountId { get; set; }
+        public int AccountId { get; set; }
 
         [Required]
         public decimal TransactionAmount { get; set; }
@@ -31,9 +31,9 @@ namespace Selah.Domain.Data.Models.Transactions
     }
     public class TransactionCreate
     {
-        public Guid UserId { get; set; }
+        public int UserId { get; set; }
 
-        public long AccountId { get; set; }
+        public int AccountId { get; set; }
 
         public decimal TransactionAmount { get; set; }
 
@@ -52,13 +52,13 @@ namespace Selah.Domain.Data.Models.Transactions
 
     public class LineItem
     {
-        public long TransactionCategoryId { get; set; }
+        public int TransactionCategoryId { get; set; }
 
         public decimal ItemizedAmount { get; set; }
 
         public bool DefaultCategory { get; set; }
         
-        public Guid UserId { get; set; }
+        public int UserId { get; set; }
     }
 }
 

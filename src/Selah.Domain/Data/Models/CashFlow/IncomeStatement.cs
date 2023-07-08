@@ -6,8 +6,8 @@ namespace Selah.Domain.Data.Models.CashFlow
 {
     public class IncomeStatement
     {
-        public long Id { get; set; }
-        public Guid UserId { get; set; }
+        public int Id { get; set; }
+        public int UserId { get; set; }
         public DateTime StatementStartDate { get; set; }
         public DateTime StatementEndDate { get; set; }
 
@@ -28,7 +28,7 @@ namespace Selah.Domain.Data.Models.CashFlow
     {
         public DateTime StatementStartDate { get; set; }
         public DateTime StatementEndDate { get; set; } = DateTime.Now;
-        public Guid UserId { get; set; }
+        public int UserId { get; set; }
 
         public IReadOnlyCollection<IncomeStatementDeduction> Deductions { get; set; }
 

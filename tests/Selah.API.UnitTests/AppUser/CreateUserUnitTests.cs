@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Moq;
 using Selah.Application.Commands.AppUser;
+using Selah.Application.Services.Interfaces;
 using Selah.Domain.Data.Models.ApplicationUser;
 using Selah.Infrastructure.Repository.Interfaces;
 using Xunit;
@@ -9,7 +10,8 @@ namespace Selah.API.UnitTests.AppUser;
 
 public class CreateUserUnitTests
 {
-    public Mock<IAppUserRepository> _mockUserRepository = new();
+    private readonly Mock<IAppUserRepository> _mockUserRepository = new Mock<IAppUserRepository>();
+    private readonly Mock<ISecurityService> _mockSecurityService = new Mock<ISecurityService>();
 
     [Fact]
     public async Task ReturnValidationErrorWhenFieldsEmpty()
@@ -78,9 +80,9 @@ public class CreateUserUnitTests
         _mockUserRepository.Setup(x => x.GetUser(It.IsAny<string>()))
             .ReturnsAsync(null as Domain.Data.Models.ApplicationUser.AppUser);
 
-        _mockUserRepository.Setup(x => x.CreateUser(command.CreatedUser)).ReturnsAsync(Guid.NewGuid);
+        _mockUserRepository.Setup(x => x.CreateUser(command.CreatedUser)).ReturnsAsync(1);
         var validator = new CreateUserCommand.Validator(_mockUserRepository.Object);
-        var handler = new CreateUserCommand.Handler(_mockUserRepository.Object);
+        var handler = new CreateUserCommand.Handler(_mockUserRepository.Object, _mockSecurityService.Object);
 
         //Act
         var validationResult = await validator.ValidateAsync(command);

@@ -4,7 +4,7 @@ namespace Selah.Domain.Data.Models.Banking
 {
   public record BankAccount
   {
-    public Guid Id { get; set; }
+    public int Id { get; set; }
     
     public string ExternalAccountId { get; set; }
     
@@ -16,10 +16,10 @@ namespace Selah.Domain.Data.Models.Banking
     
     public decimal? CurrentBalance { get; set; }
     
-    public Guid UserId { get; set; }
+    public int UserId { get; set; }
     
     public string Subtype { get; set; }
     
-    public Guid InstitutionId { get; set; }// Foreign reference to a user institution primary key
+    public int InstitutionId { get; set; }// Foreign reference to a user institution primary key
   }
 }

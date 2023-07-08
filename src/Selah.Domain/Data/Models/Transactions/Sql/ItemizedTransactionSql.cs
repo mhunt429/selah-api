@@ -9,15 +9,15 @@ namespace Selah.Domain.Data.Models.Transactions.Sql
     public class ItemizedTransactionSql
     {
         //Transaction Line Item
-        public Guid Id { get; set; }
-        public Guid TransactionId { get; set; }
-        public Guid TransactionCategoryId { get; set; }
+        public int Id { get; set; }
+        public int TransactionId { get; set; }
+        public int TransactionCategoryId { get; set; }
         public decimal ItemizedAmount { get; set; }
 
         //Transaction Fields
 
-        public Guid AccountId { get; set; }
-        public Guid UserId { get; set; }
+        public int AccountId { get; set; }
+        public int UserId { get; set; }
         public decimal TransactionAmount { get; set; }
         public DateTime TransactionDate { get; set; }
         public string MerchantName { get; set; }

@@ -9,9 +9,9 @@ namespace Selah.Infrastructure.Repository.Interfaces
 {
     public interface ITransactionRepository
     {
-        public Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUser(Guid userId);
+        public Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUser(int userId);
 
-        public Task<long> InsertTransaction(TransactionCreate transaction);
+        public Task<int> InsertTransaction(TransactionCreate transaction);
 
         /// <summary>
         /// Split transactions is the business case for this query
@@ -29,7 +29,7 @@ namespace Selah.Infrastructure.Repository.Interfaces
         /// <param name="limit"></param>
         /// <param name="offset"></param>
         /// <returns></returns>
-        public Task<IEnumerable<RecentTransactionSql>> GetRecentTransactions(Guid userId);
+        public Task<IEnumerable<RecentTransactionSql>> GetRecentTransactions(int userId);
 
         /// <summary>
         /// Returns a list of transaction date, total amount, and count of transactions within a given date range
@@ -38,7 +38,7 @@ namespace Selah.Infrastructure.Repository.Interfaces
         /// <param name="startDate"></param>
         /// <param name="endDate"></param>
         /// <returns></returns>
-        public Task<IEnumerable<TransactionSummarySql>> GetTransactionSummaryByDateRange(Guid userId, DateTime startDate, DateTime endDate);
+        public Task<IEnumerable<TransactionSummarySql>> GetTransactionSummaryByDateRange(int userId, DateTime startDate, DateTime endDate);
 
         /// <summary>
         /// returns a transactio is by user and name
@@ -46,8 +46,8 @@ namespace Selah.Infrastructure.Repository.Interfaces
         /// <param name="userId">Id of the user</param>
         /// <param name="catgoryName">name of the category</param>
         /// <returns></returns>
-        public Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUser(Guid userId, string catgoryName);
+        public Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUser(int userId, string catgoryName);
 
-        public Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoryById(Guid userId, long id);
+        public Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoryById(int userId, int id);
     }
 }

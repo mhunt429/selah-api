@@ -6,10 +6,10 @@ using Amazon;
 using Amazon.KeyManagementService;
 using Amazon.KeyManagementService.Model;
 using Amazon.Runtime;
+using HashidsNet;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Selah.Application.Services.Interfaces;
-using Selah.Domain.Internal;
 
 namespace Selah.Application.Services
 {
@@ -20,14 +20,18 @@ namespace Selah.Application.Services
         private readonly ILogger _logger;
         private readonly string _secretKey;
         private readonly RegionEndpoint _region = RegionEndpoint.USEast1;
+        private readonly IConfiguration _configuration;
+        private readonly Hashids _hashId;
 
-        public SecurityService(ILogger<SecurityService> logger, IOptions<EnvVariablesConfig> awsClientConfig)
+        public SecurityService(ILogger<SecurityService> logger, IConfiguration configuration)
         {
             _logger = logger;
-            var awsClientConfig1 = awsClientConfig;
-            _accessKey = awsClientConfig1.Value.AwsAccessKey.Trim();
-            _secretKey = awsClientConfig1.Value.AwsSecretKey.Trim();
-            _kmsKey = awsClientConfig1.Value.KmsEncryptionKeyId.Trim();
+            _configuration = configuration;
+            var awsClientConfig = _configuration.GetSection("AWS_CONFIG");
+            _accessKey = awsClientConfig["ACCESS_KEY"];
+            _secretKey = awsClientConfig["SECRET"];
+            _kmsKey = awsClientConfig["KMS_KEY"];
+            _hashId = new Hashids(_configuration["HASH_ID_SALT"], minHashLength: 24);
         }
 
         public async Task<string> Encrypt(string input)
@@ -49,8 +53,8 @@ namespace Selah.Application.Services
                 var stringToStream = new MemoryStream(textBytes, 0, textBytes.Length);
 
                 using (var kmsClient =
-                    new AmazonKeyManagementServiceClient(new BasicAWSCredentials(_accessKey, _secretKey),
-                        _region))
+                       new AmazonKeyManagementServiceClient(new BasicAWSCredentials(_accessKey, _secretKey),
+                           _region))
                 {
                     var response = await kmsClient.EncryptAsync(new EncryptRequest
                     {
@@ -83,13 +87,13 @@ namespace Selah.Application.Services
 
             try
             {
-
                 _logger.LogDebug($"Decrypting with {_accessKey} and {_kmsKey}");
 
                 var decryptedString = "";
                 using (var kmsClient =
-                    new AmazonKeyManagementServiceClient(new BasicAWSCredentials(_accessKey.Trim(), _secretKey.Trim()),
-                        _region))
+                       new AmazonKeyManagementServiceClient(
+                           new BasicAWSCredentials(_accessKey.Trim(), _secretKey.Trim()),
+                           _region))
                 {
                     var fromBase64 = Convert.FromBase64String(input);
                     var stringToStream = new MemoryStream(fromBase64, 0, fromBase64.Length);
@@ -121,6 +125,17 @@ namespace Selah.Application.Services
                     $"An error occured attempting to decrypt \nType: {ex.GetType()}\nSource: {ex.Source}\nMessage: {ex.Message}\nzStack: {ex.StackTrace}");
                 return null;
             }
+        }
+
+        public int DecodeHashId(string hashId)
+        {
+            int[] decodedId = _hashId.Decode((hashId));
+            return decodedId.Length > 0 ? decodedId[0] : 0;
+        }
+
+        public string EncodeHashId(int id)
+        {
+            return _hashId.Encode(id);
         }
     }
 }

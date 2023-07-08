@@ -12,8 +12,8 @@ namespace Selah.Infrastructure.Repository.Interfaces
     public Task<AppUser> GetUser(Guid id);
     public Task<AppUser> GetUser(string emailOrUsername);
     public Task UpdateUser(AppUserUpdate updatedUser, Guid id);
-    public Task<Guid> CreateUser(AppUserCreate createdUser);
+    public Task<int> CreateUser(AppUserCreate createdUser);
     public Task DeleteUser(Guid id);
-    public Task UpdatePassword(Guid userId, string password);
+    public Task UpdatePassword(int userId, string password);
   }
 }

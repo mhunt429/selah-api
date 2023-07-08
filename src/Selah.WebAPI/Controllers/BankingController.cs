@@ -3,12 +3,14 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Selah.Application.Filters;
 using Selah.Application.Queries.Banking;
 
 namespace Selah.WebAPI.Controllers
 {
     [ApiController]
     [Authorize]
+    [UserIdParamMatchesClaims]
     [Route("api/v1/users/{userId}/banking")]
     public class BankingController : ControllerBase
     {
@@ -19,12 +21,8 @@ namespace Selah.WebAPI.Controllers
         }
 
         [HttpGet("accounts")]
-        public async Task<IActionResult> GetAccounts([FromRoute] Guid userId, [FromQuery(Name = "limit")] int limit, [FromQuery(Name = "offset")] int offset)
+        public async Task<IActionResult> GetAccounts([FromRoute] string userId, [FromQuery(Name = "limit")] int limit, [FromQuery(Name = "offset")] int offset)
         {
-            if (userId == Guid.Empty)
-            {
-                return Unauthorized();
-            }
             var query = new GetAllBankAccountsQuery { UserId =  userId, Limit  = limit, Offset = offset };
             var response = await _mediator.Send(query);
             return Ok(response);

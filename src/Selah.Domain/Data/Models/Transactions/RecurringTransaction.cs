@@ -14,7 +14,7 @@ namespace Selah.Domain.Data.Models.Transactions
         public Frequency Frequency { get; set; }
         public decimal Amount { get; set; }
 
-        public Guid CategoryId { get; set; }
+        public int CategoryId { get; set; }
 
         /// <summary>
         ///If true, send notication 1 week, 3 days, 2 days and 1 day based on preference 

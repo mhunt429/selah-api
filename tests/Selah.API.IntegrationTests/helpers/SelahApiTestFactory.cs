@@ -10,6 +10,8 @@ using Selah.Domain.Data.Models.Authentication;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using System.Text.Json;
+using Selah.Application.Services;
+using Selah.Application.Services.Interfaces;
 
 namespace Selah.API.IntegrationTests.helpers
 {
@@ -21,7 +23,11 @@ namespace Selah.API.IntegrationTests.helpers
             .AddInMemoryCollection(new Dictionary<string, string>
                 {
                 {"JWT_SECRET", "vXb29wBjmENLKHwcHzAnkJa9tNfBnKhNwZesbVCJQ54PgnOKbjoirmyUgX8A6kK1IHJtMJ+G2tdSbewEohTJO7iQnNaPvUlHxBqmQFU7rGYdcY9xfQHh7+sZw4TVKcwhV89jIyybAR4MNGhtQoy5KfYmJwtMAdff94CSZO/d+0MFxjkikO1A+gXQI7tuHXl/dzQxGKfZC30PhkDzxB4ax9z0P6NmzgT6pg4tRiRfw8LHGafiI75+w5Fk5Ks4R1lp+stL0b+4CIVKnhIUIzLiQvDmkKjNTqeEQ7S1ABbVXGjz6Im4l3uZ2d/WdnJ0a1KT5hh+qX7Fk25FITFKK0qVuA=="},
-                {"JWT_ISSUER", "TestingIssuer"}
+                {"JWT_ISSUER", "TestingIssuer"},
+                {"AWS_CONFIG__ACCESS_KEY", "Key"},
+                {"AWS_CONFIG__SECRET", "Secret"},
+                {"AWS_CONFIG__KMS_KEY", "KMS_KEY"},
+                {"HASH_ID_SALT", "Secret"}
                 // add any other configuration values here
                 })
             .Build();
@@ -41,6 +47,8 @@ namespace Selah.API.IntegrationTests.helpers
                 services.RemoveAll(typeof(IDbConnectionFactory));
                 services.AddSingleton<IDbConnectionFactory>(_ =>
                 new NpgsqlConnectionFactory(dbConnectionString));
+
+                services.AddScoped<ISecurityService, SecurityService>();
             });
             return base.CreateHost(server);
         }
@@ -72,6 +80,11 @@ namespace Selah.API.IntegrationTests.helpers
         public async Task<HttpResponseMessage> GetAsync<T>(HttpClient client, string servicePath)
         {
             return await client.GetAsync(servicePath);
+        }
+
+        public string GetEncodedToken(int id, ISecurityService securityService)
+        {
+            return securityService.EncodeHashId(id);
         }
     }
 }

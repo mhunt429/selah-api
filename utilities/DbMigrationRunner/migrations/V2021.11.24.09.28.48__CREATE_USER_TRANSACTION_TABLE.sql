@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS user_transaction(
 	id BIGSERIAL PRIMARY KEY,
 	account_id BIGSERIAL REFERENCES user_bank_account(id),
-	user_id uuid  REFERENCES app_user(id),
+	user_id BIGSERIAL  REFERENCES app_user(id),
 	transaction_amount DECIMAL,
 	transaction_date TIMESTAMP WITH TIME ZONE,
 	merchant_name TEXT,
