@@ -20,8 +20,6 @@ namespace Selah.API.IntegrationTests.ControllerTests
         private SelahApiTestFactory _testFactory;
         private readonly BaseRepository _baseRepository;
         private readonly AppUserRepository _userRepository;
-        private readonly ISecurityService _securityService;
-       private  Mock<ILogger<SecurityService>> _securityServiceLogger = new Mock<ILogger<SecurityService>>();
         private AppUser _testUser = new AppUser { };
         private HttpClient _testClient;
         private string jwt;
@@ -45,8 +43,6 @@ namespace Selah.API.IntegrationTests.ControllerTests
                     // add any other configuration values here
                 })
                 .Build();
-
-            _securityService = new SecurityService(_securityServiceLogger.Object, configurationBuilder);
         }
 
         [Fact]
@@ -68,7 +64,7 @@ namespace Selah.API.IntegrationTests.ControllerTests
         public async Task ValidTokenAndUserId_RequestReturns200()
         {
             _testClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
-            var hashId = _testFactory.GetEncodedToken(_testUser.Id, _securityService);
+            var hashId = _testFactory.GetEncodedToken(_testUser.Id);
             var response = await _testFactory.GetAsync<CreateUserCommand>(_testClient, $"api/v1/users/{hashId}/dashboard/summary");
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }

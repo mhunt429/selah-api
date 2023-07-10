@@ -21,9 +21,9 @@ namespace Selah.Application.Services
         private readonly string _secretKey;
         private readonly RegionEndpoint _region = RegionEndpoint.USEast1;
         private readonly IConfiguration _configuration;
-        private readonly Hashids _hashId;
+        private readonly IHashids _hashIds;
 
-        public SecurityService(ILogger<SecurityService> logger, IConfiguration configuration)
+        public SecurityService(ILogger<SecurityService> logger, IConfiguration configuration, IHashids hashids)
         {
             _logger = logger;
             _configuration = configuration;
@@ -31,7 +31,7 @@ namespace Selah.Application.Services
             _accessKey = awsClientConfig["ACCESS_KEY"];
             _secretKey = awsClientConfig["SECRET"];
             _kmsKey = awsClientConfig["KMS_KEY"];
-            _hashId = new Hashids(_configuration["HASH_ID_SALT"], minHashLength: 24);
+            _hashIds = hashids;
         }
 
         public async Task<string> Encrypt(string input)
@@ -129,13 +129,13 @@ namespace Selah.Application.Services
 
         public int DecodeHashId(string hashId)
         {
-            int[] decodedId = _hashId.Decode((hashId));
+            int[] decodedId = _hashIds.Decode((hashId));
             return decodedId.Length > 0 ? decodedId[0] : 0;
         }
 
         public string EncodeHashId(int id)
         {
-            return _hashId.Encode(id);
+            return _hashIds.Encode(id);
         }
     }
 }

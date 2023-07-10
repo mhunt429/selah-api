@@ -10,6 +10,7 @@ using Selah.Domain.Data.Models.Authentication;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using System.Text.Json;
+using HashidsNet;
 using Selah.Application.Services;
 using Selah.Application.Services.Interfaces;
 
@@ -48,6 +49,7 @@ namespace Selah.API.IntegrationTests.helpers
                 services.AddSingleton<IDbConnectionFactory>(_ =>
                 new NpgsqlConnectionFactory(dbConnectionString));
 
+                services.AddSingleton<IHashids>(_ => new Hashids("SECRET", minHashLength: 24));
                 services.AddScoped<ISecurityService, SecurityService>();
             });
             return base.CreateHost(server);
@@ -82,9 +84,10 @@ namespace Selah.API.IntegrationTests.helpers
             return await client.GetAsync(servicePath);
         }
 
-        public string GetEncodedToken(int id, ISecurityService securityService)
+        public string GetEncodedToken(int id)
         {
-            return securityService.EncodeHashId(id);
+            IHashids hashids = Services.GetRequiredService<IHashids>();
+           return hashids.Encode(id);
         }
     }
 }
