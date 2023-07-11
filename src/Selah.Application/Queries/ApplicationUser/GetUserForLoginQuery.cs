@@ -12,7 +12,7 @@ using static BCrypt.Net.BCrypt;
 
 namespace Selah.Application.Queries.ApplicationUser
 {
-    public class GetUserQuery : IRequest<AuthenticationResponse>
+    public class GetUserForLoginQuery : IRequest<AuthenticationResponse>
     {
         [DisplayName("emailOrUsername")]
         public string EmailOrUsername { get; set; }
@@ -20,7 +20,7 @@ namespace Selah.Application.Queries.ApplicationUser
         [DisplayName("password")]
         public string Password { get; set; }
 
-        public sealed class Validator : AbstractValidator<GetUserQuery>
+        public sealed class Validator : AbstractValidator<GetUserForLoginQuery>
         {
             public Validator()
             {
@@ -29,7 +29,7 @@ namespace Selah.Application.Queries.ApplicationUser
             }
         }
 
-        public class Handler : IRequestHandler<GetUserQuery, AuthenticationResponse>
+        public class Handler : IRequestHandler<GetUserForLoginQuery, AuthenticationResponse>
         {
             private readonly IAppUserRepository _appUserRepository;
             private readonly IAuthenticationService _authService;
@@ -41,7 +41,7 @@ namespace Selah.Application.Queries.ApplicationUser
                 _securityService = securityService;
             }
 
-            public async Task<AuthenticationResponse> Handle(GetUserQuery query, CancellationToken cancellationToken)
+            public async Task<AuthenticationResponse> Handle(GetUserForLoginQuery query, CancellationToken cancellationToken)
             {
                 var user = await _appUserRepository.GetUser(query.EmailOrUsername);
                 if (user == null)

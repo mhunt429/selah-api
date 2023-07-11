@@ -23,7 +23,7 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.GetAllAsync<AppUser>(sql, null);
         }
 
-        public async Task<AppUser> GetUser(Guid id)
+        public async Task<AppUser> GetUser(int id)
         {
             var sql = @"SELECT id, email, user_name, password, 
                         first_name, last_name, date_created
@@ -88,7 +88,7 @@ namespace Selah.Infrastructure.Repository
                 id
             };
 
-            await _baseRepository.UpdateAsync(sql, parameters);
+          var test =  await _baseRepository.UpdateAsync(sql, parameters);
         }
 
         public async Task DeleteUser(Guid id)

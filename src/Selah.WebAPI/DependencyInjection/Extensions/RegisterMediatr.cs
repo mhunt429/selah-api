@@ -10,7 +10,7 @@ namespace Selah.WebAPI.DependencyInjection.Extensions
     {
         public static void RegisterQueries(this IServiceCollection services)
         {
-            services.AddMediatR(typeof(GetUserQuery).GetTypeInfo().Assembly);
+            services.AddMediatR(typeof(GetUserForLoginQuery).GetTypeInfo().Assembly);
             services.AddMediatR(typeof(UserDashboardQuery).GetTypeInfo().Assembly);
 
         }

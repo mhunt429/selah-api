@@ -1,19 +1,11 @@
-using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
-using Selah.Domain.Data.Models;
-using Selah.Domain.Data.Models.Authentication;
-using Selah.Domain.Data.Models.ApplicationUser;
-using Selah.Application.Services.Interfaces;
-using AutoMapper;
 using MediatR;
 using Selah.Application.Queries.ApplicationUser;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Net.Http.Headers;
+using Microsoft.AspNetCore.Http;
+using Selah.WebAPI.Extensions;
+
 
 namespace Selah.WebAPI.Controllers
 {
@@ -23,6 +15,7 @@ namespace Selah.WebAPI.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IMediator _mediatr;
+
         public AuthController(IMediator mediatr)
         {
             _mediatr = mediatr;
@@ -30,14 +23,24 @@ namespace Selah.WebAPI.Controllers
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody] GetUserQuery query)
+        public async Task<IActionResult> Login([FromBody] GetUserForLoginQuery forLoginQuery)
         {
-            var response = await _mediatr.Send(query);
+            var response = await _mediatr.Send(forLoginQuery);
             if (response == null)
             {
                 return Unauthorized();
             }
+
             return Ok(response);
+        }
+
+        [HttpGet("current-user")]
+        public async Task<IActionResult> GetUserFromClaims()
+        {
+            var userId = HttpContext.Request.GetUserIdFromRequest();
+            GetUserByIdQuery query = new GetUserByIdQuery { Id = userId };
+            var result = await _mediatr.Send(query);
+            return result != null ? Ok(result) : NotFound();
         }
     }
 }

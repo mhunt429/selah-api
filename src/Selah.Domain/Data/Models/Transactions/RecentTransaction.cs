@@ -7,7 +7,7 @@ namespace Selah.Domain.Data.Models.Transactions
         /// <summary>
         /// The Id of the transaction
         /// </summary>
-        public int TransactionId { get; set; }
+        public String TransactionId { get; set; }
 
         /// <summary>
         /// The date the transaction occured on or was entered via manual entry

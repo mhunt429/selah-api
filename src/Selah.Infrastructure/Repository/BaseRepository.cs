@@ -59,11 +59,12 @@ namespace Selah.Infrastructure.Repository
             }
         }
 
-        public async Task DeleteAsync(string sql, object parameters)
+        public async Task<bool> DeleteAsync(string sql, object parameters)
         {
             using (var connection = await _dbConnectionFactory.CreateConnectionAsync())
             {
-                await connection.ExecuteAsync(sql, parameters);
+                var rowsDeleted = await connection.ExecuteAsync(sql, parameters);
+                return rowsDeleted > 0;
             }
         }
         public async Task<IEnumerable<T>> GetAllAsync<T>(string sql, object parameters)
@@ -84,11 +85,12 @@ namespace Selah.Infrastructure.Repository
             }
         }
 
-        public async Task UpdateAsync(string sql, object parameters)
+        public async Task<bool> UpdateAsync(string sql, object parameters)
         {
             using (var connection = await _dbConnectionFactory.CreateConnectionAsync())
             {
-                await connection.ExecuteAsync(sql, parameters);
+                var rowsUpdated =  await connection.ExecuteAsync(sql, parameters);
+                return rowsUpdated > 0;
             }
         }
     }

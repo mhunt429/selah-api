@@ -14,10 +14,10 @@ namespace Selah.Infrastructure.Repository.Interfaces
 
         public Task<T> AddAsync<T>(string sql, object parameters);
 
-        public Task UpdateAsync(string sql, object parameters);
+        public Task<bool> UpdateAsync(string sql, object parameters);
 
-        public Task DeleteAsync(string sql, object parameters);
-
+        public Task<bool> DeleteAsync(string sql, object parameters);
+        
         public Task<int> AddManyAsync<T>(string sql, IReadOnlyCollection<DynamicParameters> objectsToSave);
     }
 }

@@ -51,7 +51,7 @@ namespace Selah.WebAPI
 
                 options.DefaultPolicy = defaultAuthorizationPolicyBuilder.Build();
             });
-
+            services.RegisterHashIds(_config);
             services.RegisterDbRepositories();
             services.RegisterApplicationServices();
             services.RegisterValidators();
