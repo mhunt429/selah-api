@@ -94,6 +94,17 @@ namespace Selah.Application.Queries.Analytics
                     await _transactionRepository.GetTransactionSummaryByDateRange(userId, startOfCurrentMonth,
                         currentTimeUtc);
 
+                if (!lastMonthTrxSummary.Any())
+                {
+                    lastMonthTrxSummary =
+                        await _transactionRepository.GetEmptyTransactionSummary(startOfLastMonth, endOfLastMonth);
+                }
+                
+                if (!currentMonthSummary.Any())
+                {
+                    currentMonthSummary =
+                        await _transactionRepository.GetEmptyTransactionSummary(startOfCurrentMonth, currentTimeUtc);
+                }
                 return (lastMonthTrxSummary, currentMonthSummary);
             }
         }

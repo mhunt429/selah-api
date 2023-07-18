@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using FluentAssertions;
+using FluentValidation;
 using Moq;
 using Selah.Application.Queries.Analytics;
 using Selah.Application.Services.Interfaces;
@@ -13,6 +14,7 @@ public class UserDashboardQueryUnitTests
 {
     private readonly Mock<ITransactionRepository> _transactionRepositoryMock;
     private readonly Mock<ISecurityService> _securityServiceMock;
+
     public UserDashboardQueryUnitTests()
     {
         _transactionRepositoryMock = new Mock<ITransactionRepository>();
@@ -33,16 +35,44 @@ public class UserDashboardQueryUnitTests
                 x.GetTransactionSummaryByDateRange(1, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
             .ReturnsAsync(new List<TransactionSummarySql>());
 
+        _transactionRepositoryMock.Setup(x =>
+                x.GetEmptyTransactionSummary(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .ReturnsAsync(new List<TransactionSummarySql>
+            {
+                new()
+                {
+                    TransactionDate = DateTime.UtcNow,
+                    TotalAmount = 0,
+                    Count = 0
+                }
+            });
+
         // Act
         var result = await handler.Handle(query, CancellationToken.None);
 
+        _transactionRepositoryMock.Verify(x => x.GetEmptyTransactionSummary(It.IsAny<DateTime>(), It.IsAny<DateTime>()),
+            Times.Exactly(2));
         // Assert
         Assert.NotNull(result);
         Assert.NotNull(result.RecentTransactions);
-        Assert.NotNull(result.LastMonthSpending);
-        Assert.NotNull(result.CurrentMonthSpending);
+        Assert.NotEmpty(result.LastMonthSpending);
+        Assert.NotEmpty(result.CurrentMonthSpending);
         Assert.NotNull(result.UpcomingTransactions);
         Assert.NotNull(result.PortfolioSummary);
         Assert.NotNull(result.NetWorthSummary);
+
+        foreach (var item in result.LastMonthSpending)
+        {
+            item.Count.Should().Be(0);
+            item.TotalAmount.Should().Be(0);
+            item.TransactionDate.Should().BeAfter(DateTime.MinValue);
+        }
+
+        foreach (var item in result.CurrentMonthSpending)
+        {
+            item.Count.Should().Be(0);
+            item.TotalAmount.Should().Be(0);
+            item.TransactionDate.Should().BeAfter(DateTime.MinValue);
+        }
     }
 }

@@ -27,8 +27,6 @@ namespace Selah.Infrastructure.Repository
         }
 
 
-
-
         public async Task<int> CreateTransactionCategory(UserTransactionCategoryCreate category)
         {
             using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
@@ -68,7 +66,8 @@ namespace Selah.Infrastructure.Repository
             }
         }
 
-        public async Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUser(int userId, string catgoryName)
+        public async Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUser(int userId,
+            string catgoryName)
         {
             using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
             {
@@ -105,7 +104,6 @@ namespace Selah.Infrastructure.Repository
                 payment_method = transaction.PaymentMethod,
             };
             return await _baseRepository.AddAsync<int>(sql, objectToSave);
-
         }
 
         public async Task<IEnumerable<ItemizedTransactionSql>> GetItemizedTransactionAsync(Guid transactionId)
@@ -153,7 +151,8 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.GetAllAsync<RecentTransactionSql>(sql, parameters);
         }
 
-        public async Task<IEnumerable<TransactionSummarySql>> GetTransactionSummaryByDateRange(int userId, DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<TransactionSummarySql>> GetTransactionSummaryByDateRange(int userId,
+            DateTime startDate, DateTime endDate)
         {
             var sql = @"SELECT 
                         transaction_date, 
@@ -166,6 +165,22 @@ namespace Selah.Infrastructure.Repository
                     GROUP BY transaction_date";
 
             var parameters = new { userId, startDate, endDate };
+            return await _baseRepository.GetAllAsync<TransactionSummarySql>(sql, parameters);
+        }
+
+        /// <summary>
+        /// For analytics purposes we want to show the user zero amounts so we do a generate series to get all dates
+        /// within a given date range. The keeps us from having to add conditional logic for zero amounts. 
+        /// </summary>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<TransactionSummarySql>> GetEmptyTransactionSummary(DateTime startDate,
+            DateTime endDate)
+        {
+            var sql =
+                @"select generate_series(@start_date, @end_date, '1 day'::interval) AS transaction_date, 0.00 AS daily_total, 0 AS count";
+            var parameters = new { start_date = startDate, end_date = endDate };
             return await _baseRepository.GetAllAsync<TransactionSummarySql>(sql, parameters);
         }
     }
