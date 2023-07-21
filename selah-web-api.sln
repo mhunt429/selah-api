@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D17644E8
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Selah.API.IntegrationTests", "tests\Selah.API.IntegrationTests\Selah.API.IntegrationTests.csproj", "{9C8E65B9-4163-4C4A-96B2-25E12E2B83C9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Selah.Application.UnitTests", "tests\Selah.API.UnitTests\Selah.Application.UnitTests.csproj", "{523FA233-A3C7-4E72-9D79-15F999546A39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Selah.API.UnitTests", "tests\Selah.API.UnitTests\Selah.API.UnitTests.csproj", "{523FA233-A3C7-4E72-9D79-15F999546A39}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{1E704CEA-6953-48FA-857E-394B5E359315}"
 EndProject

@@ -4,6 +4,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <RootNamespace>Selah.Application.UnitTests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -30,6 +31,10 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\Selah.Application\Selah.Application.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Application\" />
     </ItemGroup>
 
 </Project>

@@ -15,14 +15,6 @@ namespace Selah.Infrastructure.Repository
             _baseRepository = baseRepository;
         }
 
-        public async Task<IEnumerable<AppUser>> GetUsers(int limit, int offset)
-        {
-            var sql = @"SELECT id, email, user_name, password, 
-       first_name, last_name, date_created FROM app_user ORDER BY last_name, first_name, date_created";
-
-            return await _baseRepository.GetAllAsync<AppUser>(sql, null);
-        }
-
         public async Task<AppUser> GetUser(int id)
         {
             var sql = @"SELECT id, email, user_name, password, 
@@ -71,7 +63,7 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.AddAsync<int>(sql, parameters);
         }
 
-        public async Task UpdateUser(AppUserUpdate updatedUser, Guid id)
+        public async Task<bool> UpdateUser(AppUserUpdate updatedUser, int id)
         {
             var sql = @"UPDATE app_user 
                     SET email = @email,
@@ -88,16 +80,16 @@ namespace Selah.Infrastructure.Repository
                 id
             };
 
-          var test =  await _baseRepository.UpdateAsync(sql, parameters);
+         return  await _baseRepository.UpdateAsync(sql, parameters);
         }
 
-        public async Task DeleteUser(Guid id)
+        public async Task<bool> DeleteUser(int id)
         {
             var sql = "DELETE FROM app_user WHERE id = @id";
-            await _baseRepository.DeleteAsync(sql, new { id });
+            return await _baseRepository.DeleteAsync(sql, new { id });
         }
 
-        public async Task UpdatePassword(int userId, string password)
+        public async Task<bool> UpdatePassword(int userId, string password)
         {
             var sql = @"UPDATE app_user 
                     SET password = @password
@@ -109,7 +101,7 @@ namespace Selah.Infrastructure.Repository
                 password
             };
 
-            await _baseRepository.UpdateAsync(sql, parameters);
+            return await _baseRepository.UpdateAsync(sql, parameters);
         }
     }
 }
