@@ -17,67 +17,62 @@ namespace Selah.Infrastructure.Repository
 {
     public class TransactionRepository : ITransactionRepository
     {
-        private readonly IOptions<EnvVariablesConfig> _envVariables;
         private readonly IBaseRepository _baseRepository;
 
-        public TransactionRepository(IOptions<EnvVariablesConfig> envVariables, IBaseRepository baseRepository)
+        public TransactionRepository(IBaseRepository baseRepository)
         {
-            _envVariables = envVariables;
             _baseRepository = baseRepository;
         }
 
 
         public async Task<int> CreateTransactionCategory(UserTransactionCategoryCreate category)
         {
-            using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
+            string sql = @"INSERT INTO 
+            user_transaction_category(user_id, category_name) 
+            VALUES(@user_id, @category_name) RETURNING(id)";
+
+            var parameters = new
             {
-                return await connection.ExecuteScalarAsync<int>(@"INSERT INTO 
-          user_transaction_category(user_id, category_name) 
-          VALUES(@user_id, @category_name) RETURNING(id)", new
-                {
-                    user_id = category.UserId,
-                    category_name = category.CategoryName
-                });
-            }
+                user_id = category.UserId,
+                category_name = category.CategoryName
+            };
+            return await _baseRepository.AddAsync<int>(sql, parameters);
         }
 
         public async Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUser(int userId)
         {
-            using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
+            string sql = @"SELECT id, user_id, category_name 
+            FROM user_transaction_category WHERE user_id = @user_id";
+            var parameters = new
             {
-                return await connection.QueryAsync<UserTransactionCategory>(@"SELECT id, user_id, category_name 
-            FROM user_transaction_category WHERE user_id = @user_id", new
-                {
-                    user_id = userId
-                });
-            }
+                user_id = userId
+            };
+            return await _baseRepository.GetAllAsync<UserTransactionCategory>(sql, parameters);
         }
 
         public async Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoryById(int userId, int id)
         {
-            using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
+            string sql = @"SELECT id, user_id, category_name 
+            FROM user_transaction_category WHERE user_id = @user_id AND id = id";
+            var parameters = new
             {
-                return await connection.QueryAsync<UserTransactionCategory>(@"SELECT id, user_id, category_name 
-            FROM user_transaction_category WHERE user_id = @user_id AND id = id", new
-                {
-                    user_id = userId,
-                    id
-                });
-            }
+                user_id = userId,
+                id
+            };
+            return await _baseRepository.GetAllAsync<UserTransactionCategory>(sql, parameters);
         }
 
-        public async Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUser(int userId,
+        public async Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUserAndName(int userId,
             string catgoryName)
         {
-            using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
+            string sql = @"SELECT id, user_id, category_name 
+            FROM user_transaction_category WHERE user_id = @user_id AND name = @name";
+            var parameters = new
             {
-                return await connection.QueryAsync<UserTransactionCategory>(@"SELECT id, user_id, category_name 
-            FROM user_transaction_category WHERE user_id = @user_id AND name = @name", new
-                {
-                    user_id = userId,
-                    category_name = catgoryName
-                });
-            }
+                user_id = userId,
+                category_name = catgoryName
+            };
+            return await _baseRepository.GetAllAsync<UserTransactionCategory>(sql, parameters);
         }
 
         public async Task<int> InsertTransaction(TransactionCreate transaction)
@@ -106,7 +101,7 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.AddAsync<int>(sql, objectToSave);
         }
 
-        public async Task<IEnumerable<ItemizedTransactionSql>> GetItemizedTransactionAsync(Guid transactionId)
+        public async Task<IEnumerable<ItemizedTransactionSql>> GetItemizedTransactionAsync(int  transactionId)
         {
             var sql = "select * from get_transaction_line_items_by_transaction(@transaction_id)";
 

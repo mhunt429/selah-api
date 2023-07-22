@@ -12,18 +12,16 @@ namespace Selah.Infrastructure.Repository
 {
     public class BankingRepository : IBankingRepository
     {
-        private readonly IOptions<EnvVariablesConfig> _envVariables;
+        private readonly IBaseRepository _baseRepository;
 
-        public BankingRepository(IOptions<EnvVariablesConfig> envVariables)
+        public BankingRepository(IBaseRepository baseRepository)
         {
-            _envVariables = envVariables;
+            _baseRepository = baseRepository;
         }
 
         public async Task<IEnumerable<BankAccount>> GetAccounts(int userId, int limit = 25, int offset = 1)
         {
-            using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
-            {
-                var accounts = await connection.QueryAsync<BankAccount>(@"SELECT 
+            string sql = @"SELECT 
                     id, 
                     external_account_id, 
                     account_mask,  
@@ -36,16 +34,19 @@ namespace Selah.Infrastructure.Repository
                     FROM user_bank_account
                     WHERE user_id = @user_id
                     ORDER BY account_name
-                    LIMIT @limit OFFSET @offset", new { user_id = userId, limit, offset });
-                return accounts;
-            }
+                    LIMIT @limit OFFSET @offset";
+
+            var parameters = new
+            {
+                user_id = userId, limit, offset
+            };
+
+            return await _baseRepository.GetAllAsync<BankAccount>(sql, parameters);
         }
 
-        public async Task<IEnumerable<BankAccount>> GetAccountsByInstitutionId(Guid institutionId)
+        public async Task<IEnumerable<BankAccount>> GetAccountsByInstitutionId(int institutionId)
         {
-            using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
-            {
-                var accounts = await connection.QueryAsync<BankAccount>(@"SELECT 
+            string sql = @"SELECT 
                     id, 
                     external_account_id, 
                     account_mask,  
@@ -56,60 +57,18 @@ namespace Selah.Infrastructure.Repository
                     subtype,
                     institution_id 
                     FROM user_bank_account
-                    WHERE institution_id = @institution_id",
-                  new { institution_id = institutionId });
-                return accounts;
-            }
-        }
+                    WHERE institution_id = @institution_id";
 
-        public async Task<int> ImportAccounts(List<BankAccount> accounts)
-        {
-            using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
+            var parameters = new
             {
-                var insertedRows = 0;
-
-                foreach (var account in accounts)
-                {
-                    var row = await connection.ExecuteAsync(@"INSERT INTO user_bank_account(
-                    external_account_id, 
-                    account_mask, 
-                    account_name, 
-                    available_balance,
-                    current_balance,
-                    user_id,
-                    subtype,
-                    institution_id) values(
-                               @external_account_id, 
-                    @account_mask, 
-                    @account_name, 
-                    @available_balance,
-                    @current_balance,
-                    @user_id,
-                    @subtype,
-                    @institution_id             
-                    )", new
-                    {
-                        external_account_id = account.ExternalAccountId,
-                        account_mask = account.Mask,
-                        account_name = account.Name,
-                        available_balance = account.AvailableBalance,
-                        current_balance = account.CurrentBalance,
-                        user_id = account.UserId,
-                        subtype = account.Subtype,
-                        institution_id = account.InstitutionId
-                    });
-                    insertedRows += row;
-                }
-
-                return insertedRows;
-            }
+                institution_id = institutionId
+            };
+            return await _baseRepository.GetAllAsync<BankAccount>(sql, parameters);
         }
 
         public async Task<BankAccount> GetAccountById(int id)
         {
-            using (var connection = new NpgsqlConnection(_envVariables.Value.DbConnectionString))
-            {
-                var account = await connection.QueryFirstAsync<BankAccount>(@"SELECT 
+            string sql = @"SELECT 
                     id, 
                     external_account_id, 
                     account_mask,  
@@ -120,10 +79,8 @@ namespace Selah.Infrastructure.Repository
                     subtype,
                     institution_id 
                     FROM user_bank_account
-                    WHERE id = @id",
-                  new { id });
-                return account;
-            }
+                    WHERE id = @id";
+            return await _baseRepository.GetFirstOrDefaultAsync<BankAccount>(sql, new { id });
         }
     }
 }

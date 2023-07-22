@@ -26,11 +26,11 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.AddAsync<int>(sql, todoCreate);
         }
 
-        public async Task DeleteTodo(int id)
+        public async Task<bool> DeleteTodo(int id)
         {
             var sql = "DELETE FROM todo_item WHERE id = @id";
 
-            await _baseRepository.DeleteAsync(sql, new { id });
+            return await _baseRepository.DeleteAsync(sql, new { id });
         }
 
         public async Task<TodoItem> GetTodoByUserAndId(int id, int userId)
@@ -48,7 +48,7 @@ namespace Selah.Infrastructure.Repository
             return (await _baseRepository.GetAllAsync<TodoItem>(sql, new { userId, limit, offset })).ToList();
         }
 
-        public async Task Update(TodoItem todoItem)
+        public async Task<bool> Update(TodoItem todoItem)
         {
             var sql = @"UPDATE todo_item
             SET    
@@ -65,7 +65,7 @@ namespace Selah.Infrastructure.Repository
                 deadline = todoItem.Deadline 
             };
 
-            await _baseRepository.UpdateAsync(sql, parameters);
+            return await _baseRepository.UpdateAsync(sql, parameters);
         }
     }
 }

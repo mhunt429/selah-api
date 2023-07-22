@@ -8,13 +8,6 @@ namespace Selah.Infrastructure.Repository.Interfaces
     public interface IBankingRepository
     {
         /// <summary>
-        /// Inserts all bank accounts on institution link
-        /// </summary>
-        /// <param name="accounts"></param>
-        /// <returns></returns>
-        public Task<int> ImportAccounts(List<BankAccount> accounts);
-
-        /// <summary>
         /// Returns all accounts by user id
         /// </summary>
         /// <param name="userId"></param>
@@ -26,7 +19,7 @@ namespace Selah.Infrastructure.Repository.Interfaces
         /// </summary>
         /// <param name="institutionId"></param>
         /// <returns></returns>
-        public Task<IEnumerable<BankAccount>> GetAccountsByInstitutionId(Guid institutionId);
+        public Task<IEnumerable<BankAccount>> GetAccountsByInstitutionId(int institutionId);
 
         /// <summary>
         /// Returns a bank account by Id
