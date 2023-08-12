@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Selah.Domain.Data.SchemaMappings;
 using Selah.Infrastructure.Repository;
 using Selah.Infrastructure.Repository.Interfaces;
 

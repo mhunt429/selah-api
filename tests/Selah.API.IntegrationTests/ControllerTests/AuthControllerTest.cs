@@ -1,13 +1,10 @@
-﻿using System.Text;
-using Xunit;
+﻿using Xunit;
 using FluentAssertions;
 using Selah.API.IntegrationTests.helpers;
 using Selah.Domain.Data.Models.Authentication;
-using Newtonsoft.Json;
 using Selah.Domain.Data.Models.ApplicationUser;
 using Selah.Infrastructure.Repository;
 using System.Net;
-using Selah.Application.Commands.AppUser;
 
 namespace Selah.API.IntegrationTests.ControllerTests
 {

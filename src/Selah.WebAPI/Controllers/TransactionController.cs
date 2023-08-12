@@ -4,13 +4,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Selah.Application.Commands.Transactions;
 using Selah.Application.Filters;
+using Selah.Application.Queries;
 
 namespace Selah.WebAPI.Controllers
 {
     [ApiController]
     [Authorize]
     [UserIdParamMatchesClaims]
-    [Route("api/v1/{userId}/transactions")]
+    [Route("api/v1/users/{userId}/transactions")]
     public class TransactionController : ControllerBase
     {
 
@@ -25,6 +26,13 @@ namespace Selah.WebAPI.Controllers
         public async Task<IActionResult> CreateTransaction([FromBody] CreateTransactionCommand command)
         {
             var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
+        [HttpGet("categories/totals")]
+        public async Task<IActionResult> GetTransactionTotalsByCategory([FromRoute]TransactionTotalsByCategoryQuery query)
+        {
+            var result = await _mediator.Send(query);
             return Ok(result);
         }
     }

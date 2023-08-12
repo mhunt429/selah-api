@@ -1,11 +1,6 @@
-using Dapper;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Internal;
-using Microsoft.Extensions.Options;
-using Npgsql;
 using Selah.Domain.Data.Models.Analytics.Dashboard;
 using Selah.Domain.Data.Models.Transactions;
 using Selah.Domain.Data.Models.Transactions.Sql;
-using Selah.Domain.Internal;
 using Selah.Domain.Reflection;
 using Selah.Infrastructure.Repository.Interfaces;
 using System;
@@ -177,6 +172,22 @@ namespace Selah.Infrastructure.Repository
                 @"select generate_series(@start_date, @end_date, '1 day'::interval) AS transaction_date, 0.00 AS daily_total, 0 AS count";
             var parameters = new { start_date = startDate, end_date = endDate };
             return await _baseRepository.GetAllAsync<TransactionSummarySql>(sql, parameters);
+        }
+
+        public async Task<IEnumerable<TransactionAmountByCategorySql>> GetTransactionTotalsByCategory(int userId)
+        {
+            string sql = @"SELECT utc.id, SUM(tli.itemized_amount),
+             utc.category_name
+            from transaction_line_item tli
+            INNER join user_transaction_category utc
+            on 
+                tli.transaction_category_id = utc.id
+            WHERE tli.transaction_id IN     
+                  (SELECT id FROM user_transaction WHERE user_id = @user_id)
+            GROUP BY (utc.id, category_name)";
+            var parameters = new { user_id = userId };
+
+            return await _baseRepository.GetAllAsync<TransactionAmountByCategorySql>(sql, parameters);
         }
     }
 }

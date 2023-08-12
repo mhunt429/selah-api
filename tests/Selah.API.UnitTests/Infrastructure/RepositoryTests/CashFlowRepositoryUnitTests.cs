@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using Dapper;
 using FluentAssertions;
 using Moq;

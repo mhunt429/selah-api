@@ -29,7 +29,4 @@
  <ItemGroup>
    <Reference Include="Microsoft.AspNetCore.Mvc.Core" />
  </ItemGroup>
- <ItemGroup>
-   <Folder Include="Data\Models\Transactions\Queries\" />
- </ItemGroup>
 </Project>

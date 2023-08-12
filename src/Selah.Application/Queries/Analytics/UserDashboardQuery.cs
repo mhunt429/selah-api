@@ -1,16 +1,12 @@
-﻿using Amazon.KeyManagementService.Model;
-using FluentValidation;
-using MediatR;
+﻿using MediatR;
 using Selah.Domain.Data.Models.Analytics.Dashboard;
 using Selah.Domain.Data.Models.Transactions;
 using Selah.Domain.Data.Models.Transactions.Sql;
 using Selah.Infrastructure.Repository.Interfaces;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +16,8 @@ namespace Selah.Application.Queries.Analytics
 {
     public class UserDashboardQuery : IRequest<DashboardSummary>
     {
-        [FromRoute] [DisplayName("userId")] public string UserId { get; set; }
+        [FromRoute] [DisplayName("userId")] 
+        public string UserId { get; set; }
 
         public class Handler : IRequestHandler<UserDashboardQuery, DashboardSummary>
         {

@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Selah.Domain.Data.Models.Banking;
 using Selah.Infrastructure.Repository.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;

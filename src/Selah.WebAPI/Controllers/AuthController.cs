@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using Selah.Application.Queries.ApplicationUser;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Selah.WebAPI.Extensions;
 
 

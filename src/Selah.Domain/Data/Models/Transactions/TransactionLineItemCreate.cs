@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Selah.Domain.Data.Models.Transactions
+﻿namespace Selah.Domain.Data.Models.Transactions
 {
     public class TransactionLineItemCreate
     {

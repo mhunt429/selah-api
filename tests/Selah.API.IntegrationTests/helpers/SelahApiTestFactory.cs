@@ -8,7 +8,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Selah.Domain.Data.Models.Authentication;
 using System.Text;
-using Microsoft.AspNetCore.Authentication.OAuth;
 using System.Text.Json;
 using HashidsNet;
 using Selah.Application.Services;

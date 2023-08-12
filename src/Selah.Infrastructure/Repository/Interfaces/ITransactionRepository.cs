@@ -56,5 +56,12 @@ namespace Selah.Infrastructure.Repository.Interfaces
             DateTime endDate);
 
         Task<int> CreateTransactionCategory(UserTransactionCategoryCreate category);
+
+        /// <summary>
+        /// Gets the total for transaction amounts by categories filtered by a user id
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<TransactionAmountByCategorySql>> GetTransactionTotalsByCategory(int userId);
     }
 }

@@ -1,7 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Selah.Application.Services.Interfaces;
 using Selah.Domain.Data.Models.ApplicationUser;
 using Selah.Infrastructure.Repository.Interfaces;

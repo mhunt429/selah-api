@@ -1,5 +1,3 @@
-using System;
-
 namespace Selah.Domain.Data.Models.Banking
 {
   public record BankAccount

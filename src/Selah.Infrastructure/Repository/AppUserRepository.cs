@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Selah.Domain.Data.Models.ApplicationUser;
 using Selah.Infrastructure.Repository.Interfaces;

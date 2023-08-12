@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Selah.Application.Commands.AppUser;
-using Selah.Application.Services.Interfaces;
 using Selah.Domain.Data.Models.ApplicationUser;
 using Selah.WebAPI.Extensions;
 using ValidationResult = FluentValidation.Results.ValidationResult;

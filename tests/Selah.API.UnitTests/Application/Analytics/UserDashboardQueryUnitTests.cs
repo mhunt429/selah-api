@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using FluentValidation;
 using Moq;
 using Selah.Application.Queries.Analytics;
 using Selah.Application.Services.Interfaces;
@@ -19,14 +18,6 @@ public class UserDashboardQueryUnitTests
     {
         _transactionRepositoryMock = new Mock<ITransactionRepository>();
         _securityServiceMock = new Mock<ISecurityService>();
-    }
-
-    [Fact]
-    public async Task Handle_ShouldReturnDashboardSummary_WhenValidQuery()
-    {
-        // Arrange
-        var query = new UserDashboardQuery { UserId = "ABC123" };
-        var handler = new UserDashboardQuery.Handler(_transactionRepositoryMock.Object, _securityServiceMock.Object);
 
         _transactionRepositoryMock.Setup(x => x.GetRecentTransactions(1))
             .ReturnsAsync(new List<RecentTransactionSql>());
@@ -46,6 +37,14 @@ public class UserDashboardQueryUnitTests
                     Count = 0
                 }
             });
+    }
+
+    [Fact]
+    public async Task Handle_ShouldReturnDashboardSummary_WhenValidQuery()
+    {
+        // Arrange
+        var query = new UserDashboardQuery { UserId = "ABC123" };
+        var handler = new UserDashboardQuery.Handler(_transactionRepositoryMock.Object, _securityServiceMock.Object);
 
         // Act
         var result = await handler.Handle(query, CancellationToken.None);

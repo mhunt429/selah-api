@@ -1,11 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Dapper;
-using Microsoft.Extensions.Options;
-using Npgsql;
 using Selah.Domain.Data.Models.Banking;
-using Selah.Domain.Internal;
 using Selah.Infrastructure.Repository.Interfaces;
 
 namespace Selah.Infrastructure.Repository

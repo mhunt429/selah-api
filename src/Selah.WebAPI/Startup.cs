@@ -9,7 +9,6 @@ using Microsoft.OpenApi.Models;
 using Selah.WebAPI.Middleware;
 using Selah.WebAPI.DependencyInjection.Extensions;
 using Selah.Infrastructure;
-using System;
 
 namespace Selah.WebAPI
 {

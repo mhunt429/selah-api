@@ -1,8 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Selah.Application.Services.Interfaces;
 using MediatR;
 using Selah.Application.Queries.Analytics;
 using Selah.Domain.Data.Models.Analytics.Dashboard;
