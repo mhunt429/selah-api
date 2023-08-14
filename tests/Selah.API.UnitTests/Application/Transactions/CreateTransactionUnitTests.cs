@@ -19,7 +19,7 @@ public class CreateTransactionUnitTests
     {
         _transactionRepoMock.Setup(x => x.GetTransactionCategoryById(It.IsAny<int>(), It.IsAny<int>()))
             .ReturnsAsync(TransactionCategoryTestHelpers.CreateCategories(true));
-        _bankingRepoMock.Setup(x => x.GetAccountById(It.IsAny<int>())).ReturnsAsync((BankAccount)null);
+        _bankingRepoMock.Setup(x => x.GetAccountById(It.IsAny<int>())).ReturnsAsync((BankAccountSql)null);
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public class CreateTransactionUnitTests
         _transactionRepoMock.Setup(x => x.GetTransactionCategoryById(It.IsAny<int>(), It.IsAny<int>()))
             .ReturnsAsync(TransactionCategoryTestHelpers.CreateCategories());
         _transactionRepoMock.Setup(x => x.InsertTransaction(It.IsAny<TransactionCreate>())).ReturnsAsync(1);
-        _bankingRepoMock.Setup(x => x.GetAccountById(It.IsAny<int>())).ReturnsAsync(new BankAccount());
+        _bankingRepoMock.Setup(x => x.GetAccountById(It.IsAny<int>())).ReturnsAsync(new BankAccountSql());
 
         //Arrange
         var command = new CreateTransactionCommand

@@ -3,17 +3,14 @@ using Selah.Domain.Data.Models.Banking;
 
 namespace Selah.Domain.Data.SchemaMappings.FinancialAccounts
 {
-    public class BankAccountSchemaMap : EntityMap<BankAccount>
+    public class BankAccountSchemaMap : EntityMap<BankAccountSql>
     {
         public BankAccountSchemaMap()
         {
             Map(b => b.Id)
               .ToColumn("id");
 
-            Map(b => b.ExternalAccountId)
-              .ToColumn("external_account_id");
-
-            Map(b => b.Mask)
+            Map(b => b.AccountMask)
               .ToColumn("account_mask");
 
             Map(b => b.Name)

@@ -14,11 +14,10 @@ namespace Selah.Infrastructure.Repository
             _baseRepository = baseRepository;
         }
 
-        public async Task<IEnumerable<BankAccount>> GetAccounts(int userId, int limit = 25, int offset = 1)
+        public async Task<IEnumerable<BankAccountSql>> GetAccounts(int userId, int limit = 25, int offset = 1)
         {
             string sql = @"SELECT 
                     id, 
-                    external_account_id, 
                     account_mask,  
                     account_name, 
                     available_balance,
@@ -36,14 +35,13 @@ namespace Selah.Infrastructure.Repository
                 user_id = userId, limit, offset
             };
 
-            return await _baseRepository.GetAllAsync<BankAccount>(sql, parameters);
+            return await _baseRepository.GetAllAsync<BankAccountSql>(sql, parameters);
         }
 
-        public async Task<IEnumerable<BankAccount>> GetAccountsByInstitutionId(int institutionId)
+        public async Task<IEnumerable<BankAccountSql>> GetAccountsByInstitutionId(int institutionId)
         {
             string sql = @"SELECT 
                     id, 
-                    external_account_id, 
                     account_mask,  
                     account_name, 
                     available_balance,
@@ -58,10 +56,10 @@ namespace Selah.Infrastructure.Repository
             {
                 institution_id = institutionId
             };
-            return await _baseRepository.GetAllAsync<BankAccount>(sql, parameters);
+            return await _baseRepository.GetAllAsync<BankAccountSql>(sql, parameters);
         }
 
-        public async Task<BankAccount> GetAccountById(int id)
+        public async Task<BankAccountSql> GetAccountById(int id)
         {
             string sql = @"SELECT 
                     id, 
@@ -75,7 +73,7 @@ namespace Selah.Infrastructure.Repository
                     institution_id 
                     FROM user_bank_account
                     WHERE id = @id";
-            return await _baseRepository.GetFirstOrDefaultAsync<BankAccount>(sql, new { id });
+            return await _baseRepository.GetFirstOrDefaultAsync<BankAccountSql>(sql, new { id });
         }
     }
 }

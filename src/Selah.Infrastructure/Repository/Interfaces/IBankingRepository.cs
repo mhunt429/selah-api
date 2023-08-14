@@ -11,20 +11,20 @@ namespace Selah.Infrastructure.Repository.Interfaces
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public Task<IEnumerable<BankAccount>> GetAccounts(int userId, int limit, int offset);
+        public Task<IEnumerable<BankAccountSql>> GetAccounts(int userId, int limit, int offset);
 
         /// <summary>
         /// Returns a list of accounts by institution
         /// </summary>
         /// <param name="institutionId"></param>
         /// <returns></returns>
-        public Task<IEnumerable<BankAccount>> GetAccountsByInstitutionId(int institutionId);
+        public Task<IEnumerable<BankAccountSql>> GetAccountsByInstitutionId(int institutionId);
 
         /// <summary>
         /// Returns a bank account by Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Task<BankAccount> GetAccountById(int id);
+        public Task<BankAccountSql> GetAccountById(int id);
     }
 }

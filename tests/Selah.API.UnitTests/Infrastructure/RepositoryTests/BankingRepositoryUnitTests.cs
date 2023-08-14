@@ -15,12 +15,12 @@ public class BankingRepositoryUnitTests
     public BankingRepositoryUnitTests()
     {
         _baseRepository.Setup(x =>
-                x.GetFirstOrDefaultAsync<BankAccount>(It.IsAny<string>(), It.IsAny<object>()))
-            .ReturnsAsync(new BankAccount());
+                x.GetFirstOrDefaultAsync<BankAccountSql>(It.IsAny<string>(), It.IsAny<object>()))
+            .ReturnsAsync(new BankAccountSql());
 
         _baseRepository.Setup(x =>
-                x.GetAllAsync<BankAccount>(It.IsAny<string>(), It.IsAny<object>()))
-            .ReturnsAsync(new List<BankAccount> { { new BankAccount { Id = 1 } } });
+                x.GetAllAsync<BankAccountSql>(It.IsAny<string>(), It.IsAny<object>()))
+            .ReturnsAsync(new List<BankAccountSql> { { new BankAccountSql { Id = 1 } } });
 
         _bankingRepository = new BankingRepository(_baseRepository.Object);
     }
