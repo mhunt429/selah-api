@@ -34,7 +34,6 @@ namespace Selah.API.IntegrationTests.ControllerTests
             //Arrange
             CreateUserCommand command = new CreateUserCommand
             {
-                CreatedUser = new AppUserCreate { }
             };
 
             //Act
@@ -50,14 +49,11 @@ namespace Selah.API.IntegrationTests.ControllerTests
             //Arrange
             CreateUserCommand command = new CreateUserCommand
             {
-                CreatedUser = new AppUserCreate
-                {
-                    Email = $"{Guid.NewGuid()}@selah.com",
-                    FirstName = "Test",
-                    LastName = "User",
-                    UserName = $"{Guid.NewGuid()}",
-                    Password = "password"
-                }
+                Email = $"{Guid.NewGuid()}@selah.com",
+                FirstName = "Test",
+                LastName = "User",
+                UserName = $"{Guid.NewGuid()}",
+                Password = "password"
             };
 
             //Act

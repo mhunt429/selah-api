@@ -1,9 +1,11 @@
+using System;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Selah.Application.Commands.AppUser;
 using Selah.Domain.Data.Models.ApplicationUser;
+using Selah.Domain.Data.Models.Authentication;
 using Selah.WebAPI.Extensions;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 
@@ -30,7 +32,7 @@ namespace Selah.WebAPI.Controllers
             var result = await _mediatr.Send(command);
             switch (result)
             {
-                case (UserViewModel user, null):
+                case (AuthenticationResponse user, null):
                     return Ok(user);
                 case (null, ValidationResult validationResult):
                     return BadRequest(validationResult.GetValidationErrors());

@@ -3,6 +3,7 @@ using Moq;
 using Selah.Application.Commands.AppUser;
 using Selah.Application.Services.Interfaces;
 using Selah.Domain.Data.Models.ApplicationUser;
+using Selah.Domain.Data.Models.Authentication;
 using Selah.Infrastructure.Repository.Interfaces;
 using Xunit;
 
@@ -12,20 +13,29 @@ public class CreateUserUnitTests
 {
     private readonly Mock<IAppUserRepository> _mockUserRepository = new Mock<IAppUserRepository>();
     private readonly Mock<ISecurityService> _mockSecurityService = new Mock<ISecurityService>();
+    private readonly Mock<IAuthenticationService> _mockAuthService = new Mock<IAuthenticationService>();
 
+    public CreateUserUnitTests()
+    {
+        _mockAuthService.Setup(x => x.GenerateJwt(It.IsAny<UserViewModel>())).Returns(new JwtResponse
+        {
+            AccessToken = "token",
+            ExpirationTs = DateTime.Now.AddSeconds(86400)
+        });
+
+        _mockSecurityService.Setup(x => x.EncodeHashId(It.IsAny<int>())).Returns("abc123");
+    }
+    
     [Fact]
     public async Task ReturnValidationErrorWhenFieldsEmpty()
     {
         //Arrange
         var command = new CreateUserCommand
         {
-            CreatedUser = new AppUserCreate
-            {
-                Email = "",
-                Password = "",
-                FirstName = "",
-                LastName = ""
-            }
+            Email = "",
+            Password = "",
+            FirstName = "",
+            LastName = ""
         };
         var validator = new CreateUserCommand.Validator(_mockUserRepository.Object);
         //Act
@@ -44,13 +54,10 @@ public class CreateUserUnitTests
         //Arrange
         var command = new CreateUserCommand
         {
-            CreatedUser = new AppUserCreate
-            {
-                Email = "test@selah.com",
-                Password = "secret",
-                FirstName = "Test",
-                LastName = "User"
-            }
+            Email = "test@selah.com",
+            Password = "secret",
+            FirstName = "Test",
+            LastName = "User"
         };
         _mockUserRepository.Setup(x => x.GetUser(It.IsAny<string>()))
             .ReturnsAsync(new Domain.Data.Models.ApplicationUser.AppUser());
@@ -68,21 +75,26 @@ public class CreateUserUnitTests
         //Arrange
         var command = new CreateUserCommand
         {
-            CreatedUser = new AppUserCreate
-            {
-                Email = "test@selah.com",
-                Password = "secret",
-                FirstName = "Test",
-                LastName = "User"
-            }
+            Email = "test@selah.com",
+            Password = "secret",
+            FirstName = "Test",
+            LastName = "User"
+        };
+
+        var user = new AppUserCreate
+        {
+            Email = "test@selah.com",
+            Password = "secret",
+            FirstName = "Test",
+            LastName = "User"
         };
 
         _mockUserRepository.Setup(x => x.GetUser(It.IsAny<string>()))
             .ReturnsAsync(null as Domain.Data.Models.ApplicationUser.AppUser);
 
-        _mockUserRepository.Setup(x => x.CreateUser(command.CreatedUser)).ReturnsAsync(1);
+        _mockUserRepository.Setup(x => x.CreateUser(user)).ReturnsAsync(1);
         var validator = new CreateUserCommand.Validator(_mockUserRepository.Object);
-        var handler = new CreateUserCommand.Handler(_mockUserRepository.Object, _mockSecurityService.Object);
+        var handler = new CreateUserCommand.Handler(_mockUserRepository.Object, _mockSecurityService.Object, _mockAuthService.Object);
 
         //Act
         var validationResult = await validator.ValidateAsync(command);
@@ -91,8 +103,12 @@ public class CreateUserUnitTests
         //Assert
         validationResult.IsValid.Should().BeTrue();
         result.Item2.Should().BeNull();
-        result.Item1.Email.Should().Be("test@selah.com");
-        result.Item1.FirstName.Should().Be("Test");
-        result.Item1.LastName.Should().Be("User");
+        result.Item1.User.Should().NotBeNull();
+        result.Item1.User.Email.Should().Be("test@selah.com");
+        result.Item1.User.FirstName.Should().Be("Test");
+        result.Item1.User.LastName.Should().Be("User");
+
+        result.Item1.AccessToken.Should().Be("token");
+        result.Item1.ExpirationTs.Should().BeAfter(DateTime.MinValue);
     }
 }

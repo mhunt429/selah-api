@@ -21,7 +21,7 @@ services:
     networks:
       - dockerapi-dev
   selah-db:
-    image: postgres:13.1-alpine
+    image: postgres:14.1-alpine
     restart: always
     environment:
       - POSTGRES_USER=postgres
@@ -34,7 +34,7 @@ services:
     networks:
       - dockerapi-dev
   selah-db-test:
-    image: postgres:13.1-alpine
+    image: postgres:14.1-alpine
     restart: always
     environment:
       - POSTGRES_USER=postgres
