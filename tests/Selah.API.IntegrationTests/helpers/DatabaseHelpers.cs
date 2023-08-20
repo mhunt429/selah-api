@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using Moq;
+using NSubstitute;
 using Selah.Domain.Data.Models.ApplicationUser;
 using Selah.Infrastructure;
 using Selah.Infrastructure.Repository;
@@ -53,9 +53,10 @@ namespace Selah.API.IntegrationTests.helpers
             {
                 dbConnectionString = "User ID=postgres;Password=postgres;Host=localhost;Port=65432;Database=postgres;Include Error Detail=true;";
             }
-            Mock<ILogger<BaseRepository>> loggerMock = new Mock<ILogger<BaseRepository>>();
 
-            return new BaseRepository(new NpgsqlConnectionFactory(dbConnectionString), loggerMock.Object);
+            ILogger<BaseRepository> loggerMock = Substitute.For<ILogger<BaseRepository>>();
+
+            return new BaseRepository(new NpgsqlConnectionFactory(dbConnectionString), loggerMock);
         }
     }
 }

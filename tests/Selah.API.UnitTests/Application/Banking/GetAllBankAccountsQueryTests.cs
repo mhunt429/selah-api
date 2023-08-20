@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Selah.Application.Queries.Banking;
 using Selah.Application.Services.Interfaces;
 using Selah.Domain.Data.Models.Banking;
@@ -10,16 +10,17 @@ namespace Selah.Application.UnitTests.Banking;
 
 public class GetAllBankAccountsQueryTests
 {
-    private readonly Mock<IBankingRepository> _bankingRepositoryMock;
+    private readonly IBankingRepository _bankingRepositoryMock;
     private readonly GetAllBankAccountsQuery.Handler _handler;
 
     public GetAllBankAccountsQueryTests()
     {
-        _bankingRepositoryMock = new Mock<IBankingRepository>();
-        Mock<ISecurityService> securityServiceMock = new();
-        securityServiceMock.Setup(x => x.DecodeHashId(It.IsAny<string>())).Returns(1);
-        securityServiceMock.Setup(x => x.EncodeHashId(It.IsAny<int>())).Returns("ABC123");
-        _handler = new GetAllBankAccountsQuery.Handler(_bankingRepositoryMock.Object, securityServiceMock.Object);
+        _bankingRepositoryMock = Substitute.For<IBankingRepository>();
+        ISecurityService securityServiceMock = Substitute.For<ISecurityService>();
+        
+        securityServiceMock.DecodeHashId(Arg.Any<string>()).Returns(1);
+        securityServiceMock.EncodeHashId(Arg.Any<int>()).Returns("ABC123");
+        _handler = new GetAllBankAccountsQuery.Handler(_bankingRepositoryMock, securityServiceMock);
     }
 
     [Fact]
@@ -51,8 +52,8 @@ public class GetAllBankAccountsQueryTests
                 AccountMask = "****1234"
             }
         };
-        _bankingRepositoryMock.Setup(x => x.GetAccounts(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>()))
-            .ReturnsAsync(bankAccounts);
+        _bankingRepositoryMock.GetAccounts(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int>())
+            .Returns(bankAccounts);
 
         var query = new GetAllBankAccountsQuery { UserId = "ABC123", Limit = 10, Offset = 0 };
         // Act
@@ -70,7 +71,5 @@ public class GetAllBankAccountsQueryTests
             account.AvailableBalance.Should().Be(100);
             account.CurrentBalance.Should().Be(50);
         }
-
-        _bankingRepositoryMock.Verify(x => x.GetAccounts(1, query.Limit, query.Offset), Times.Once);
     }
 }

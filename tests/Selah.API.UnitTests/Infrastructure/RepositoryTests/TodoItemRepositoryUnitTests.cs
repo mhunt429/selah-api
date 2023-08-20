@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Selah.Domain.Data.Models.TodoItem;
 using Selah.Infrastructure.Repository;
 using Selah.Infrastructure.Repository.Interfaces;
@@ -9,30 +9,26 @@ namespace Selah.Application.UnitTests.Infrastructure.RepositoryTests;
 
 public class TodoItemRepositoryUnitTests
 {
-    private readonly Mock<IBaseRepository> _baseRepository;
+    private readonly IBaseRepository _baseRepository;
     private readonly ITodoItemRepository _todoItemRepository;
 
     public TodoItemRepositoryUnitTests()
     {
-        _baseRepository = new Mock<IBaseRepository>();
+        _baseRepository = Substitute.For<IBaseRepository>();
 
-        _baseRepository.Setup(x =>
-                x.GetFirstOrDefaultAsync<TodoItem>(It.IsAny<string>(), It.IsAny<object>()))
-            .ReturnsAsync(new TodoItem());
+        _baseRepository.GetFirstOrDefaultAsync<TodoItem>(Arg.Any<string>(), Arg.Any<object>())
+            .Returns(new TodoItem());
 
-        _baseRepository.Setup(x =>
-                x.AddAsync<int>(It.IsAny<string>(), It.IsAny<object>()))
-            .ReturnsAsync(1);
+        _baseRepository.AddAsync<int>(Arg.Any<string>(), Arg.Any<object>())
+            .Returns(1);
 
-        _baseRepository.Setup(x =>
-                x.UpdateAsync(It.IsAny<string>(), It.IsAny<object>()))
-            .ReturnsAsync(true);
+        _baseRepository.UpdateAsync(Arg.Any<string>(), Arg.Any<object>())
+            .Returns(true);
 
-        _baseRepository.Setup(x =>
-                x.DeleteAsync(It.IsAny<string>(), It.IsAny<object>()))
-            .ReturnsAsync(true);
+        _baseRepository.DeleteAsync(Arg.Any<string>(), Arg.Any<object>())
+            .Returns(true);
 
-        _todoItemRepository = new TodoItemRepository(_baseRepository.Object);
+        _todoItemRepository = new TodoItemRepository(_baseRepository);
     }
 
     [Fact]

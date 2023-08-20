@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
-using Moq;
+using NSubstitute;
 using Selah.Application.Filters;
 using Xunit;
 
@@ -16,8 +16,6 @@ namespace Selah.Application.UnitTests.Filters;
 public class UserIdParamMatchesClaimsTests
 {
     private readonly UserIdParamMatchesClaims _filter;
-    private Mock<AuthorizationFilterContext> _context = new();
-
     public UserIdParamMatchesClaimsTests()
     {
         _filter = new UserIdParamMatchesClaims();

@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Selah.Domain.Data.Models.Banking;
 using Selah.Infrastructure.Repository;
 using Selah.Infrastructure.Repository.Interfaces;
@@ -9,20 +9,20 @@ namespace Selah.Application.UnitTests.Infrastructure.RepositoryTests;
 
 public class BankingRepositoryUnitTests
 {
-    private readonly Mock<IBaseRepository> _baseRepository = new Mock<IBaseRepository>();
+    private readonly IBaseRepository _baseRepository;
     private IBankingRepository _bankingRepository;
 
     public BankingRepositoryUnitTests()
     {
-        _baseRepository.Setup(x =>
-                x.GetFirstOrDefaultAsync<BankAccountSql>(It.IsAny<string>(), It.IsAny<object>()))
-            .ReturnsAsync(new BankAccountSql());
+        _baseRepository = Substitute.For<IBaseRepository>();
 
-        _baseRepository.Setup(x =>
-                x.GetAllAsync<BankAccountSql>(It.IsAny<string>(), It.IsAny<object>()))
-            .ReturnsAsync(new List<BankAccountSql> { { new BankAccountSql { Id = 1 } } });
+        _baseRepository.GetFirstOrDefaultAsync<BankAccountSql>(Arg.Any<string>(), Arg.Any<object>())
+            .Returns(new BankAccountSql());
 
-        _bankingRepository = new BankingRepository(_baseRepository.Object);
+        _baseRepository.GetAllAsync<BankAccountSql>(Arg.Any<string>(), Arg.Any<object>())
+            .Returns(new List<BankAccountSql> {  new BankAccountSql { Id = 1 }  });
+
+        _bankingRepository = new BankingRepository(_baseRepository);
     }
 
     [Fact]

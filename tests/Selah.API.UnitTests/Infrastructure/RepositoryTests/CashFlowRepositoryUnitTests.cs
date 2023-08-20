@@ -1,6 +1,6 @@
 using Dapper;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Selah.Domain.Data.Models.CashFlow;
 using Selah.Infrastructure.Repository;
 using Selah.Infrastructure.Repository.Interfaces;
@@ -10,20 +10,20 @@ namespace Selah.Application.UnitTests.Infrastructure.RepositoryTests;
 
 public class CashFlowRepositoryUnitTests
 {
-    private readonly Mock<IBaseRepository> _baseRepository;
+    private readonly IBaseRepository _baseRepository;
     private readonly ICashFlowRepository _cashFlowRepository;
 
     public CashFlowRepositoryUnitTests()
     {
-        _baseRepository = new Mock<IBaseRepository>();
-        _baseRepository.Setup(x => x.AddAsync<int>(It.IsAny<string>(), It.IsAny<Object>()))
-            .ReturnsAsync(1);
-        _baseRepository.Setup(x => x.GetAllAsync<IncomeStatement>(It.IsAny<string>(),
-            It.IsAny<Object>())).ReturnsAsync(new List<IncomeStatement>());
-        _baseRepository.Setup(x => x.AddManyAsync<IncomeStatementDeduction>(It.IsAny<string>(),
-            It.IsAny<List<DynamicParameters>>())).ReturnsAsync(2);
+        _baseRepository = Substitute.For<IBaseRepository>();
+        _baseRepository.AddAsync<int>(Arg.Any<string>(), Arg.Any<Object>())
+            .Returns(1);
+        _baseRepository.GetAllAsync<IncomeStatement>(Arg.Any<string>(),
+            Arg.Any<Object>()).Returns(new List<IncomeStatement>());
+        _baseRepository.AddManyAsync<IncomeStatementDeduction>(Arg.Any<string>(),
+            Arg.Any<List<DynamicParameters>>()).Returns(2);
 
-        _cashFlowRepository = new CashFlowRepository(_baseRepository.Object);
+        _cashFlowRepository = new CashFlowRepository(_baseRepository);
     }
 
     [Fact]

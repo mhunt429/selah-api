@@ -1,6 +1,6 @@
 using Dapper;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Selah.Domain.Data.Models.Transactions;
 using Selah.Domain.Data.Models.Transactions.Sql;
 using Selah.Infrastructure.Repository;
@@ -11,27 +11,23 @@ namespace Selah.Application.UnitTests.Infrastructure.RepositoryTests;
 
 public class TransactionRepositoryUnitTests
 {
-    private readonly Mock<IBaseRepository> _baseRepository;
+    private readonly IBaseRepository _baseRepository;
     private readonly ITransactionRepository _transactionRepository;
 
     public TransactionRepositoryUnitTests()
     {
-        _baseRepository = new Mock<IBaseRepository>();
-        _baseRepository.Setup(x =>
-                x.AddAsync<int>(It.IsAny<string>(), It.IsAny<object>()))
-            .ReturnsAsync(1);
-        _baseRepository.Setup(x =>
-                x.UpdateAsync(It.IsAny<string>(), It.IsAny<object>()))
-            .ReturnsAsync(true);
-
-        _baseRepository.Setup(x =>
-                x.DeleteAsync(It.IsAny<string>(), It.IsAny<object>()))
-            .ReturnsAsync(true);
-        _baseRepository.Setup(x => x.AddManyAsync<TransactionLineItemCreate>(It.IsAny<string>(),
-            It.IsAny<List<DynamicParameters>>())).ReturnsAsync(2);
+        _baseRepository = Substitute.For<IBaseRepository>();
+        _baseRepository.AddAsync<int>(Arg.Any<string>(), Arg.Any<object>())
+            .Returns(1);
+        _baseRepository.UpdateAsync(Arg.Any<string>(), Arg.Any<object>())
+            .Returns(true);
+        _baseRepository.DeleteAsync(Arg.Any<string>(), Arg.Any<object>())
+            .Returns(true);
+        _baseRepository.AddManyAsync<TransactionLineItemCreate>(Arg.Any<string>(),
+            Arg.Any<List<DynamicParameters>>()).Returns(2);
 
 
-        _transactionRepository = new TransactionRepository(_baseRepository.Object);
+        _transactionRepository = new TransactionRepository(_baseRepository);
     }
 
     [Fact]
@@ -44,8 +40,8 @@ public class TransactionRepositoryUnitTests
     [Fact]
     public async Task GetTransactionCategoriesByUser_ShouldReturnEmptyList()
     {
-        _baseRepository.Setup(x => x.GetAllAsync<UserTransactionCategory>(It.IsAny<string>(),
-            It.IsAny<object>())).ReturnsAsync(new List<UserTransactionCategory>());
+        _baseRepository.GetAllAsync<UserTransactionCategory>(Arg.Any<string>(),
+            Arg.Any<object>()).Returns(new List<UserTransactionCategory>());
 
         var result = await _transactionRepository.GetTransactionCategoriesByUser(1);
         result.Should().NotBeNull();
@@ -55,8 +51,8 @@ public class TransactionRepositoryUnitTests
     [Fact]
     public async Task GetTransactionCategoryById_ShouldReturnEmptyList()
     {
-        _baseRepository.Setup(x => x.GetAllAsync<UserTransactionCategory>(It.IsAny<string>(),
-            It.IsAny<object>())).ReturnsAsync(new List<UserTransactionCategory>());
+        _baseRepository.GetAllAsync<UserTransactionCategory>(Arg.Any<string>(),
+            Arg.Any<object>()).Returns(new List<UserTransactionCategory>());
 
         var result = await _transactionRepository.GetTransactionCategoryById(1, 1);
         result.Should().NotBeNull();
@@ -66,8 +62,8 @@ public class TransactionRepositoryUnitTests
     [Fact]
     public async Task GetTransactionCategoriesByUserAndName_ShouldReturnEmptyList()
     {
-        _baseRepository.Setup(x => x.GetAllAsync<UserTransactionCategory>(It.IsAny<string>(),
-            It.IsAny<object>())).ReturnsAsync(new List<UserTransactionCategory>());
+        _baseRepository.GetAllAsync<UserTransactionCategory>(Arg.Any<string>(),
+            Arg.Any<object>()).Returns(new List<UserTransactionCategory>());
 
         var result = await _transactionRepository.GetTransactionCategoriesByUserAndName(1, "test category");
         result.Should().NotBeNull();
@@ -84,8 +80,8 @@ public class TransactionRepositoryUnitTests
     [Fact]
     public async Task GetItemizedTransactionAsync_ShouldReturnEmptyList()
     {
-        _baseRepository.Setup(x => x.GetAllAsync<ItemizedTransactionSql>(It.IsAny<string>(),
-            It.IsAny<object>())).ReturnsAsync(new List<ItemizedTransactionSql>());
+        _baseRepository.GetAllAsync<ItemizedTransactionSql>(Arg.Any<string>(),
+            Arg.Any<object>()).Returns(new List<ItemizedTransactionSql>());
 
         var result = await _transactionRepository.GetItemizedTransactionAsync(1);
         result.Should().NotBeNull();
@@ -102,8 +98,8 @@ public class TransactionRepositoryUnitTests
     [Fact]
     public async Task GetRecentTransactions_ShouldReturnEmptyList()
     {
-        _baseRepository.Setup(x => x.GetAllAsync<RecentTransactionSql>(It.IsAny<string>(),
-            It.IsAny<object>())).ReturnsAsync(new List<RecentTransactionSql>());
+        _baseRepository.GetAllAsync<RecentTransactionSql>(Arg.Any<string>(),
+            Arg.Any<object>()).Returns(new List<RecentTransactionSql>());
 
         var result = await _transactionRepository.GetRecentTransactions(1);
         result.Should().NotBeNull();
@@ -113,8 +109,8 @@ public class TransactionRepositoryUnitTests
     [Fact]
     public async Task GetTransactionSummaryByDateRange_ShouldReturnEmptyList()
     {
-        _baseRepository.Setup(x => x.GetAllAsync<RecentTransactionSql>(It.IsAny<string>(),
-            It.IsAny<object>())).ReturnsAsync(new List<RecentTransactionSql>());
+        _baseRepository.GetAllAsync<RecentTransactionSql>(Arg.Any<string>(),
+            Arg.Any<object>()).Returns(new List<RecentTransactionSql>());
 
         var result = await _transactionRepository.GetRecentTransactions(1);
         result.Should().NotBeNull();
@@ -124,8 +120,8 @@ public class TransactionRepositoryUnitTests
     [Fact]
     public async Task GetTransactionTotalsByCategory_ShouldReturnNonEmptyList()
     {
-        _baseRepository.Setup(x => x.GetAllAsync<TransactionAmountByCategorySql>(It.IsAny<string>(),
-            It.IsAny<object>())).ReturnsAsync(new List<TransactionAmountByCategorySql>()
+        _baseRepository.GetAllAsync<TransactionAmountByCategorySql>(Arg.Any<string>(),
+            Arg.Any<object>()).Returns(new List<TransactionAmountByCategorySql>()
         {
             new()
             {

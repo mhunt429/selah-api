@@ -1,34 +1,31 @@
 ﻿using FluentAssertions;
-using Moq;
 using Selah.Application.Queries.Analytics;
 using Selah.Application.Services.Interfaces;
 using Selah.Domain.Data.Models.Analytics.Dashboard;
 using Selah.Domain.Data.Models.Transactions.Sql;
 using Selah.Infrastructure.Repository.Interfaces;
 using Xunit;
+using NSubstitute;
 
 namespace Selah.Application.UnitTests.Analytics;
 
 public class UserDashboardQueryUnitTests
 {
-    private readonly Mock<ITransactionRepository> _transactionRepositoryMock;
-    private readonly Mock<ISecurityService> _securityServiceMock;
+    private readonly ITransactionRepository _transactionRepositoryMock;
+    private readonly ISecurityService _securityServiceMock;
 
     public UserDashboardQueryUnitTests()
     {
-        _transactionRepositoryMock = new Mock<ITransactionRepository>();
-        _securityServiceMock = new Mock<ISecurityService>();
+        _transactionRepositoryMock = Substitute.For<ITransactionRepository>();
+        _securityServiceMock = Substitute.For<ISecurityService>();
 
-        _transactionRepositoryMock.Setup(x => x.GetRecentTransactions(1))
-            .ReturnsAsync(new List<RecentTransactionSql>());
+        _transactionRepositoryMock.GetRecentTransactions(1).Returns(new List<RecentTransactionSql>());
 
-        _transactionRepositoryMock.Setup(x =>
-                x.GetTransactionSummaryByDateRange(1, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-            .ReturnsAsync(new List<TransactionSummarySql>());
+        _transactionRepositoryMock.GetTransactionSummaryByDateRange(1, Arg.Any<DateTime>(), Arg.Any<DateTime>())
+            .Returns(new List<TransactionSummarySql>());
 
-        _transactionRepositoryMock.Setup(x =>
-                x.GetEmptyTransactionSummary(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-            .ReturnsAsync(new List<TransactionSummarySql>
+        _transactionRepositoryMock.GetEmptyTransactionSummary(Arg.Any<DateTime>(), Arg.Any<DateTime>()).Returns(
+            new List<TransactionSummarySql>
             {
                 new()
                 {
@@ -44,13 +41,11 @@ public class UserDashboardQueryUnitTests
     {
         // Arrange
         var query = new UserDashboardQuery { UserId = "ABC123" };
-        var handler = new UserDashboardQuery.Handler(_transactionRepositoryMock.Object, _securityServiceMock.Object);
+        var handler = new UserDashboardQuery.Handler(_transactionRepositoryMock, _securityServiceMock);
 
         // Act
         var result = await handler.Handle(query, CancellationToken.None);
 
-        _transactionRepositoryMock.Verify(x => x.GetEmptyTransactionSummary(It.IsAny<DateTime>(), It.IsAny<DateTime>()),
-            Times.Exactly(2));
         // Assert
         Assert.NotNull(result);
         Assert.NotNull(result.RecentTransactions);

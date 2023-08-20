@@ -1,30 +1,33 @@
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using Moq;
 using Selah.Application.Queries.ApplicationUser;
 using Selah.Application.Services.Interfaces;
 using Selah.Domain.Data.Models.ApplicationUser;
 using Selah.Domain.Data.Models.Authentication;
 using Selah.Infrastructure.Repository.Interfaces;
 using Xunit;
+using NSubstitute;
 
 namespace Selah.Application.UnitTests.AppUser;
 
 public class GetUserForLoginQueryUnitTests
 {
-    private Mock<IAppUserRepository> _appUserRepoMock = new Mock<IAppUserRepository>();
-    private readonly Mock<IAuthenticationService> _authServiceMock = new Mock<IAuthenticationService>();
-    private readonly Mock<ISecurityService> _securityServiceMock = new Mock<ISecurityService>();
+    private IAppUserRepository _appUserRepoMock;
+    private readonly IAuthenticationService _authServiceMock;
+    private readonly ISecurityService _securityServiceMock;
 
     public GetUserForLoginQueryUnitTests()
     {
-        _authServiceMock.Setup(x => x.GenerateJwt(It.IsAny<UserViewModel>())).Returns(new JwtResponse
+        _appUserRepoMock = Substitute.For<IAppUserRepository>();
+        _authServiceMock = Substitute.For<IAuthenticationService>();
+        _securityServiceMock = Substitute.For<ISecurityService>();
+        _authServiceMock.GenerateJwt(Arg.Any<UserViewModel>()).Returns(new JwtResponse
         {
             AccessToken = "token",
             ExpirationTs = DateTime.Now.AddSeconds(86400)
         });
 
-        _securityServiceMock.Setup(x => x.EncodeHashId(It.IsAny<int>())).Returns("abc123");
+        _securityServiceMock.EncodeHashId(Arg.Any<int>()).Returns("abc123");
     }
 
     [Theory]
@@ -61,7 +64,7 @@ public class GetUserForLoginQueryUnitTests
     public async Task GetUserForLoginQueryUnitTests_Handler_Returns_User_With_Token()
     {
         //Arrange
-        _appUserRepoMock.Setup(x => x.GetUser(It.IsAny<string>())).ReturnsAsync(
+        _appUserRepoMock.GetUser(Arg.Any<string>()).Returns(
             new Domain.Data.Models.ApplicationUser.AppUser
             {
                 Id = 1,
@@ -74,8 +77,8 @@ public class GetUserForLoginQueryUnitTests
                 DateCreated = DateTime.Now
             });
         var query = new GetUserForLoginQuery { EmailOrUsername = "testing", Password = "super-secret123" };
-        var handler = new GetUserForLoginQuery.Handler(_appUserRepoMock.Object, _authServiceMock.Object,
-            _securityServiceMock.Object);
+        var handler = new GetUserForLoginQuery.Handler(_appUserRepoMock, _authServiceMock,
+            _securityServiceMock);
 
         //Act
         var result = await handler.Handle(query, CancellationToken.None);
@@ -93,16 +96,18 @@ public class GetUserForLoginQueryUnitTests
         result.AccessToken.Should().Be("token");
         result.ExpirationTs.Should().BeAfter(DateTime.MinValue);
     }
-    
+
     [Fact]
     public async Task GetUserForLoginQueryUnitTests_Handler_NullWhenIdIsNotFound()
     {
         //Arrange
-        _appUserRepoMock.Setup(x => x.GetUser(It.IsAny<string>())).ReturnsAsync(
-        null as Domain.Data.Models.ApplicationUser.AppUser);
+        _appUserRepoMock.GetUser(Arg.Any<string>()).Returns(
+            null as Domain.Data.Models.ApplicationUser.AppUser);
+        
         var query = new GetUserForLoginQuery { EmailOrUsername = "testing", Password = "super-secret123" };
-        var handler = new GetUserForLoginQuery.Handler(_appUserRepoMock.Object, _authServiceMock.Object,
-            _securityServiceMock.Object);
+        
+        var handler = new GetUserForLoginQuery.Handler(_appUserRepoMock, _authServiceMock,
+            _securityServiceMock);
 
         //Act
         var result = await handler.Handle(query, CancellationToken.None);
@@ -110,12 +115,12 @@ public class GetUserForLoginQueryUnitTests
         //Assert
         result.Should().BeNull();
     }
-    
+
     [Fact]
     public async Task GetUserForLoginQueryUnitTests_Handler_NullWhenPasswordIsInvalid()
     {
         //Arrange
-        _appUserRepoMock.Setup(x => x.GetUser(It.IsAny<string>())).ReturnsAsync(
+        _appUserRepoMock.GetUser(Arg.Any<string>()).Returns(
             new Domain.Data.Models.ApplicationUser.AppUser
             {
                 Id = 1,
@@ -128,8 +133,8 @@ public class GetUserForLoginQueryUnitTests
                 DateCreated = DateTime.Now
             });
         var query = new GetUserForLoginQuery { EmailOrUsername = "testing", Password = "bad password" };
-        var handler = new GetUserForLoginQuery.Handler(_appUserRepoMock.Object, _authServiceMock.Object,
-            _securityServiceMock.Object);
+        var handler = new GetUserForLoginQuery.Handler(_appUserRepoMock, _authServiceMock,
+            _securityServiceMock);
 
         //Act
         var result = await handler.Handle(query, CancellationToken.None);
@@ -137,5 +142,4 @@ public class GetUserForLoginQueryUnitTests
         //Assert
         result.Should().BeNull();
     }
-    
 }

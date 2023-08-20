@@ -1,31 +1,35 @@
 ﻿using FluentAssertions;
-using Moq;
 using Selah.Application.Commands.AppUser;
 using Selah.Application.Services.Interfaces;
 using Selah.Domain.Data.Models.ApplicationUser;
 using Selah.Domain.Data.Models.Authentication;
 using Selah.Infrastructure.Repository.Interfaces;
 using Xunit;
+using NSubstitute;
 
 namespace Selah.API.UnitTests.AppUser;
 
 public class CreateUserUnitTests
 {
-    private readonly Mock<IAppUserRepository> _mockUserRepository = new Mock<IAppUserRepository>();
-    private readonly Mock<ISecurityService> _mockSecurityService = new Mock<ISecurityService>();
-    private readonly Mock<IAuthenticationService> _mockAuthService = new Mock<IAuthenticationService>();
+    private readonly IAppUserRepository _mockUserRepository;
+    private readonly ISecurityService _mockSecurityService;
+    private readonly IAuthenticationService _mockAuthService;
 
     public CreateUserUnitTests()
     {
-        _mockAuthService.Setup(x => x.GenerateJwt(It.IsAny<UserViewModel>())).Returns(new JwtResponse
+        _mockUserRepository = Substitute.For<IAppUserRepository>();
+        _mockSecurityService = Substitute.For<ISecurityService>();
+        _mockAuthService = Substitute.For<IAuthenticationService>();
+
+        _mockAuthService.GenerateJwt(Arg.Any<UserViewModel>()).Returns(new JwtResponse
         {
             AccessToken = "token",
             ExpirationTs = DateTime.Now.AddSeconds(86400)
         });
 
-        _mockSecurityService.Setup(x => x.EncodeHashId(It.IsAny<int>())).Returns("abc123");
+        _mockSecurityService.EncodeHashId(Arg.Any<int>()).Returns("abc123");
     }
-    
+
     [Fact]
     public async Task ReturnValidationErrorWhenFieldsEmpty()
     {
@@ -37,7 +41,7 @@ public class CreateUserUnitTests
             FirstName = "",
             LastName = ""
         };
-        var validator = new CreateUserCommand.Validator(_mockUserRepository.Object);
+        var validator = new CreateUserCommand.Validator(_mockUserRepository);
         //Act
         var result = await validator.ValidateAsync(command);
 
@@ -59,9 +63,10 @@ public class CreateUserUnitTests
             FirstName = "Test",
             LastName = "User"
         };
-        _mockUserRepository.Setup(x => x.GetUser(It.IsAny<string>()))
-            .ReturnsAsync(new Domain.Data.Models.ApplicationUser.AppUser());
-        var validator = new CreateUserCommand.Validator(_mockUserRepository.Object);
+        _mockUserRepository.GetUser(Arg.Any<string>())
+            .Returns(new Domain.Data.Models.ApplicationUser.AppUser());
+
+        var validator = new CreateUserCommand.Validator(_mockUserRepository);
         //Act
         var result = await validator.ValidateAsync(command);
 
@@ -88,13 +93,12 @@ public class CreateUserUnitTests
             FirstName = "Test",
             LastName = "User"
         };
+        _mockUserRepository.GetUser(Arg.Any<string>()).Returns(null as Domain.Data.Models.ApplicationUser.AppUser);
+        _mockUserRepository.CreateUser(user).Returns(1);
 
-        _mockUserRepository.Setup(x => x.GetUser(It.IsAny<string>()))
-            .ReturnsAsync(null as Domain.Data.Models.ApplicationUser.AppUser);
-
-        _mockUserRepository.Setup(x => x.CreateUser(user)).ReturnsAsync(1);
-        var validator = new CreateUserCommand.Validator(_mockUserRepository.Object);
-        var handler = new CreateUserCommand.Handler(_mockUserRepository.Object, _mockSecurityService.Object, _mockAuthService.Object);
+        var validator = new CreateUserCommand.Validator(_mockUserRepository);
+        var handler = new CreateUserCommand.Handler(_mockUserRepository, _mockSecurityService,
+            _mockAuthService);
 
         //Act
         var validationResult = await validator.ValidateAsync(command);

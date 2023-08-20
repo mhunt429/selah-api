@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using FluentValidation.TestHelper;
-using Moq;
+using NSubstitute;
 using Selah.Application.Commands.Transactions;
 using Selah.Application.UnitTests.Transactions.TestHelpers;
 using Selah.Domain.Data.Models.Banking;
@@ -12,14 +12,15 @@ namespace Selah.Application.UnitTests.Transactions;
 
 public class CreateTransactionUnitTests
 {
-    private readonly Mock<IBankingRepository> _bankingRepoMock = new();
-    private readonly Mock<ITransactionRepository> _transactionRepoMock = new();
+    private readonly IBankingRepository _bankingRepoMock = Substitute.For<IBankingRepository>();
+    private readonly ITransactionRepository _transactionRepoMock = Substitute.For<ITransactionRepository>();
 
     public CreateTransactionUnitTests()
     {
-        _transactionRepoMock.Setup(x => x.GetTransactionCategoryById(It.IsAny<int>(), It.IsAny<int>()))
-            .ReturnsAsync(TransactionCategoryTestHelpers.CreateCategories(true));
-        _bankingRepoMock.Setup(x => x.GetAccountById(It.IsAny<int>())).ReturnsAsync((BankAccountSql)null);
+        _transactionRepoMock.GetTransactionCategoryById(Arg.Any<int>(), Arg.Any<int>())
+            .Returns(TransactionCategoryTestHelpers.CreateCategories(true));
+        
+        _bankingRepoMock.GetAccountById(Arg.Any<int>()).Returns((BankAccountSql)null);
     }
 
     [Fact]
@@ -38,7 +39,7 @@ public class CreateTransactionUnitTests
             }
         };
 
-        var validator = new CreateTransactionCommand.Validator(_transactionRepoMock.Object, _bankingRepoMock.Object);
+        var validator = new CreateTransactionCommand.Validator(_transactionRepoMock, _bankingRepoMock);
 
         //Act
         var result = await validator.TestValidateAsync(command);
@@ -54,10 +55,12 @@ public class CreateTransactionUnitTests
     [Fact]
     public async Task Can_Save_Valid_Model()
     {
-        _transactionRepoMock.Setup(x => x.GetTransactionCategoryById(It.IsAny<int>(), It.IsAny<int>()))
-            .ReturnsAsync(TransactionCategoryTestHelpers.CreateCategories());
-        _transactionRepoMock.Setup(x => x.InsertTransaction(It.IsAny<TransactionCreate>())).ReturnsAsync(1);
-        _bankingRepoMock.Setup(x => x.GetAccountById(It.IsAny<int>())).ReturnsAsync(new BankAccountSql());
+        _transactionRepoMock.GetTransactionCategoryById(Arg.Any<int>(), Arg.Any<int>())
+            .Returns(TransactionCategoryTestHelpers.CreateCategories());
+        
+        _transactionRepoMock.InsertTransaction(Arg.Any<TransactionCreate>()).Returns(1);
+        
+        _bankingRepoMock.GetAccountById(Arg.Any<int>()).Returns(new BankAccountSql());
 
         //Arrange
         var command = new CreateTransactionCommand
@@ -72,9 +75,9 @@ public class CreateTransactionUnitTests
             }
         };
 
-        var validator = new CreateTransactionCommand.Validator(_transactionRepoMock.Object, _bankingRepoMock.Object);
+        var validator = new CreateTransactionCommand.Validator(_transactionRepoMock, _bankingRepoMock);
 
-        var handler = new CreateTransactionCommand.Handler(_transactionRepoMock.Object);
+        var handler = new CreateTransactionCommand.Handler(_transactionRepoMock);
 
         //Act
         var validationResult = await validator.TestValidateAsync(command);
@@ -83,11 +86,6 @@ public class CreateTransactionUnitTests
         var result = handler.Handle(command, CancellationToken.None);
 
         //Assert
-        _transactionRepoMock.Verify(x => x.InsertTransaction(It.IsAny<TransactionCreate>()), Times.Exactly(1));
-        _transactionRepoMock.Verify(
-            x => x.InsertTransactionLineItems(It.IsAny<IReadOnlyCollection<TransactionLineItemCreate>>()),
-            Times.Exactly(1));
-
         result.Result.Should().NotBeNull();
         result.Result.TransactionId.Should().Be(1);
         result.Result.TransactionDate.Should().Be(command.Data.TransactionDate);

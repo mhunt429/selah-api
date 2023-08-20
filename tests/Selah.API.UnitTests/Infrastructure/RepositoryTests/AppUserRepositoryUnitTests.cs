@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Selah.Domain.Data.Models.ApplicationUser;
 using Selah.Infrastructure.Repository;
 using Selah.Infrastructure.Repository.Interfaces;
@@ -11,31 +11,27 @@ using AppUser = Selah.Domain.Data.Models.ApplicationUser.AppUser;
 
 public class AppUserRepositoryUnitTests
 {
-    private readonly Mock<IBaseRepository> _baseRepository;
+    private readonly IBaseRepository _baseRepository;
     private IAppUserRepository _userRepository;
 
     public AppUserRepositoryUnitTests()
     {
         //Initializes base repository
-        _baseRepository = new Mock<IBaseRepository>();
+        _baseRepository = Substitute.For<IBaseRepository>();
 
-        _baseRepository.Setup(x =>
-                x.GetFirstOrDefaultAsync<AppUser>(It.IsAny<string>(), It.IsAny<object>()))
-            .ReturnsAsync(new AppUser());
+        _baseRepository.GetFirstOrDefaultAsync<AppUser>(Arg.Any<string>(), Arg.Any<object>())
+            .Returns(new AppUser());
 
-        _baseRepository.Setup(x =>
-                x.AddAsync<int>(It.IsAny<string>(), It.IsAny<object>()))
-            .ReturnsAsync(1);
+        _baseRepository.AddAsync<int>(Arg.Any<string>(), Arg.Any<object>())
+            .Returns(1);
 
-        _baseRepository.Setup(x =>
-                x.UpdateAsync(It.IsAny<string>(), It.IsAny<object>()))
-            .ReturnsAsync(true);
+        _baseRepository.UpdateAsync(Arg.Any<string>(), Arg.Any<object>())
+            .Returns(true);
 
-        _baseRepository.Setup(x =>
-                x.DeleteAsync(It.IsAny<string>(), It.IsAny<object>()))
-            .ReturnsAsync(true);
+        _baseRepository.DeleteAsync(Arg.Any<string>(), Arg.Any<object>())
+            .Returns(true);
 
-        _userRepository = new AppUserRepository(_baseRepository.Object);
+        _userRepository = new AppUserRepository(_baseRepository);
     }
 
     [Fact]

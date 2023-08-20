@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Selah.Application.Queries;
 using Selah.Application.Services.Interfaces;
 using Selah.Domain.Data.Models.Transactions.Sql;
@@ -10,15 +10,15 @@ namespace Selah.Application.UnitTests.Transactions;
 
 public class TransactionTotalsByCategoryQueryUnitTests
 {
-    private readonly Mock<ITransactionRepository> _transactionRepositoryMock;
-    private readonly Mock<ISecurityService> _securityServiceMock;
+    private readonly ITransactionRepository _transactionRepositoryMock;
+    private readonly ISecurityService _securityServiceMock;
 
     public TransactionTotalsByCategoryQueryUnitTests()
     {
-        _transactionRepositoryMock = new Mock<ITransactionRepository>();
-        _securityServiceMock = new Mock<ISecurityService>();
+        _transactionRepositoryMock = Substitute.For<ITransactionRepository>();
+        _securityServiceMock = Substitute.For<ISecurityService>();
 
-        _transactionRepositoryMock.Setup(x => x.GetTransactionTotalsByCategory(It.IsAny<int>())).ReturnsAsync(
+        _transactionRepositoryMock.GetTransactionTotalsByCategory(Arg.Any<int>()).Returns(
             new List<TransactionAmountByCategorySql>()
             {
                 new()
@@ -35,7 +35,7 @@ public class TransactionTotalsByCategoryQueryUnitTests
                 }
             });
 
-        _securityServiceMock.Setup(x => x.EncodeHashId(It.IsAny<int>())).Returns("hashed id");
+        _securityServiceMock.EncodeHashId(Arg.Any<int>()).Returns("hashed id");
     }
 
     [Fact]
@@ -43,8 +43,8 @@ public class TransactionTotalsByCategoryQueryUnitTests
     {
         //Arrange
         var handler =
-            new TransactionTotalsByCategoryQuery.Handler(_transactionRepositoryMock.Object,
-                _securityServiceMock.Object);
+            new TransactionTotalsByCategoryQuery.Handler(_transactionRepositoryMock,
+                _securityServiceMock);
         var query = new TransactionTotalsByCategoryQuery { UserId = "1234" };
 
         //Act
