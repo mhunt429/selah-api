@@ -96,7 +96,7 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.AddAsync<int>(sql, objectToSave);
         }
 
-        public async Task<IEnumerable<ItemizedTransactionSql>> GetItemizedTransactionAsync(int  transactionId)
+        public async Task<IEnumerable<ItemizedTransactionSql>> GetItemizedTransactionAsync(int transactionId)
         {
             var sql = "select * from get_transaction_line_items_by_transaction(@transaction_id)";
 
@@ -188,6 +188,38 @@ namespace Selah.Infrastructure.Repository
             var parameters = new { user_id = userId };
 
             return await _baseRepository.GetAllAsync<TransactionAmountByCategorySql>(sql, parameters);
+        }
+
+        public async Task<TransactionCategoryDetailSql> GetTransactionCategoryDetails(int userId, int categoryId,
+            DateTime startDate, DateTime endDate)
+        {
+            string sql = @"
+                SELECT utc.id, 
+                       utc.category_name,  
+                       COUNT(1) as total,
+                        COALESCE(SUM(itemized_amount), 0) as transactions,
+                FROM transaction_line_item
+                INNER JOIN 
+                    user_transaction_category utc on transaction_line_item.transaction_category_id = utc.id
+                WHERE 
+                    transaction_category_id = @category_id
+                  AND user_id = @user_id
+                AND transaction_id IN
+                (SELECT id 
+                 FROM user_transaction
+                Where 
+                    user_id = @user_id
+                  AND transaction_date BETWEEN  @start_date AND @end_date)
+            ";
+            var parameters = new
+            {
+                user_id = userId,
+                category_id = categoryId,
+                start_date = startDate,
+                end_date = endDate
+            };
+
+            return await _baseRepository.GetFirstOrDefaultAsync<TransactionCategoryDetailSql>(sql, parameters);
         }
     }
 }

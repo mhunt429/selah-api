@@ -40,4 +40,25 @@ namespace Selah.Domain.Data.Models.Banking
     
     public string InstitutionId { get; set; }// Foreign reference to a user institution primary key
   }
+  
+  //Use case is when a user creates a transaction, we can update the balance directly through this
+  public class BalanceUpdateSql
+  {
+    public int AccountId { get; set; }
+    
+    public decimal AvailableBalance { get; set; }
+    
+    public decimal CurrentBalance { get; set; }
+  }
+  
+  //Allows a user to update the balances without sending over the entire payload 
+  //We can update this when the user creates a transaction say for a credit card or does an ACH draft
+  public class BalanceUpdate
+  {
+    public string AccountId { get; set; }
+    
+    public decimal AvailableBalance { get; set; }
+    
+    public decimal CurrentBalance { get; set; }
+  }
 }

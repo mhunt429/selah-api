@@ -63,5 +63,8 @@ namespace Selah.Infrastructure.Repository.Interfaces
         /// <param name="userId"></param>
         /// <returns></returns>
         Task<IEnumerable<TransactionAmountByCategorySql>> GetTransactionTotalsByCategory(int userId);
+
+        Task<TransactionCategoryDetailSql> GetTransactionCategoryDetails(int userId, int categoryId, DateTime startDate,
+            DateTime endDate);
     }
 }
