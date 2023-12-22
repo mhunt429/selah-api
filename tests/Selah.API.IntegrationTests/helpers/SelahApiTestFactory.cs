@@ -42,7 +42,7 @@ namespace Selah.API.IntegrationTests.helpers
                 //Github actions sets the field above so for local integration tests, just use the value found in the docker compose settings
                 if (string.IsNullOrEmpty(dbConnectionString))
                 {
-                    dbConnectionString = "User ID=postgres;Password=postgres;Host=localhost;Port=65432;Database=postgres";
+                    dbConnectionString = "User ID=postgres;Password=postgres;Host=localhost;Port=55432;Database=postgres";
                 }
                 services.RemoveAll(typeof(IDbConnectionFactory));
                 services.AddSingleton<IDbConnectionFactory>(_ =>
@@ -86,7 +86,7 @@ namespace Selah.API.IntegrationTests.helpers
         public string GetEncodedToken(int id)
         {
             IHashids hashids = Services.GetRequiredService<IHashids>();
-           return hashids.Encode(id);
+            return hashids.Encode(id);
         }
     }
 }

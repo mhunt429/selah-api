@@ -9,6 +9,7 @@ using Microsoft.OpenApi.Models;
 using Selah.WebAPI.Middleware;
 using Selah.WebAPI.DependencyInjection.Extensions;
 using Selah.Infrastructure;
+using Selah.WebAPI.DependencyInjection;
 
 namespace Selah.WebAPI
 {
@@ -50,6 +51,7 @@ namespace Selah.WebAPI
 
                 options.DefaultPolicy = defaultAuthorizationPolicyBuilder.Build();
             });
+            services.RegisterHttpClients(_config);
             services.RegisterHashIds(_config);
             services.RegisterDbRepositories();
             services.RegisterApplicationServices();

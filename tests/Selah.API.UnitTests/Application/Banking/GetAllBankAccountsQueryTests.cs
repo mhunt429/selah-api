@@ -33,7 +33,7 @@ public class GetAllBankAccountsQueryTests
             {
                 Id = 1,
                 UserId = 1,
-                Name = "Checking",
+                AccountName = "Checking",
                 AvailableBalance = 100,
                 CurrentBalance = 50,
                 Subtype = "Checking",
@@ -44,7 +44,7 @@ public class GetAllBankAccountsQueryTests
             {
                 Id = 2,
                 UserId = 1,
-                Name = "Savings",
+                AccountName = "Savings",
                 AvailableBalance = 100,
                 CurrentBalance = 50,
                 Subtype = "Savings",

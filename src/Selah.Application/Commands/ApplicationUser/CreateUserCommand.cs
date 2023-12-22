@@ -65,10 +65,10 @@ namespace Selah.Application.Commands.AppUser
                     return (null, validationResult);
                 }
 
-                request.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
                 int userId = await _appUserRepository.CreateUser(new AppUserCreate
                 {
                     Email = request.Email,
+                    Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
                     UserName = request.UserName,
                     FirstName = request.FirstName,
                     LastName = request.LastName,

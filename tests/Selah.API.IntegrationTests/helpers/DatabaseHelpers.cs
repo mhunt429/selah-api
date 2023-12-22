@@ -51,7 +51,7 @@ namespace Selah.API.IntegrationTests.helpers
             var dbConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
             if (string.IsNullOrEmpty(dbConnectionString))
             {
-                dbConnectionString = "User ID=postgres;Password=postgres;Host=localhost;Port=65432;Database=postgres;Include Error Detail=true;";
+                dbConnectionString = "User ID=postgres;Password=postgres;Host=localhost;Port=55432;Database=postgres;Include Error Detail=true;";
             }
 
             ILogger<BaseRepository> loggerMock = Substitute.For<ILogger<BaseRepository>>();

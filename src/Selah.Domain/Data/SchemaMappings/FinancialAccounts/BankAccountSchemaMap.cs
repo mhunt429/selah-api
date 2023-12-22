@@ -13,7 +13,7 @@ namespace Selah.Domain.Data.SchemaMappings.FinancialAccounts
             Map(b => b.AccountMask)
               .ToColumn("account_mask");
 
-            Map(b => b.Name)
+            Map(b => b.AccountName)
               .ToColumn("account_name");
 
             Map(b => b.AvailableBalance)

@@ -43,7 +43,7 @@ namespace Selah.Application.Queries.Banking
                     {
                         Id = _securityService.EncodeHashId(account.Id),
                         AccountMask = account.AccountMask,
-                        Name = account.Name,
+                        Name = account.AccountName,
                         AvailableBalance = account.AvailableBalance,
                         CurrentBalance = account.CurrentBalance,
                         UserId = query.UserId,

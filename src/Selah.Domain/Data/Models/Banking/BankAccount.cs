@@ -9,7 +9,7 @@ namespace Selah.Domain.Data.Models.Banking
 
     public string AccountMask { get; set; }
     
-    public string Name { get; set; }
+    public string AccountName { get; set; }
     
     public decimal? AvailableBalance { get; set; }
     
