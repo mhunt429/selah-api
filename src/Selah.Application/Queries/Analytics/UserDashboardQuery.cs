@@ -16,8 +16,7 @@ namespace Selah.Application.Queries.Analytics
 {
     public class UserDashboardQuery : IRequest<DashboardSummary>
     {
-        [FromRoute] [DisplayName("userId")] 
-        public string UserId { get; set; }
+        [FromRoute] [DisplayName("userId")] public string UserId { get; set; }
 
         public class Handler : IRequestHandler<UserDashboardQuery, DashboardSummary>
         {
@@ -91,17 +90,6 @@ namespace Selah.Application.Queries.Analytics
                     await _transactionRepository.GetTransactionSummaryByDateRange(userId, startOfCurrentMonth,
                         currentTimeUtc);
 
-                if (!lastMonthTrxSummary.Any())
-                {
-                    lastMonthTrxSummary =
-                        await _transactionRepository.GetEmptyTransactionSummary(startOfLastMonth, endOfLastMonth);
-                }
-                
-                if (!currentMonthSummary.Any())
-                {
-                    currentMonthSummary =
-                        await _transactionRepository.GetEmptyTransactionSummary(startOfCurrentMonth, currentTimeUtc);
-                }
                 return (lastMonthTrxSummary, currentMonthSummary);
             }
         }

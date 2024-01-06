@@ -13,9 +13,10 @@ namespace Selah.API.IntegrationTests.RepositoryTests
         private readonly BaseRepository _baseRepository;
         private readonly AppUserRepository _userRepository;
         private readonly ICashFlowRepository _cashFlowRepository;
-     
+
         private int _incomeStatementId;
         private int _userId = 0;
+
         public CashFlowRepositoryTests()
         {
             _baseRepository = DatabaseHelpers.CreateBaseRepository();
@@ -98,8 +99,9 @@ namespace Selah.API.IntegrationTests.RepositoryTests
 
         public async Task DisposeAsync()
         {
-            await DatabaseHelpers.RunSingleDelete(_baseRepository, @"TRUNCATE TABLE income_statement_deduction CASCADE", new { });
-            await DatabaseHelpers.RunSingleDelete(_baseRepository, @"TRUNCATE TABLE income_statement CASCADE", new { });
+            await DatabaseHelpers.RunSingleDelete(_baseRepository, @"DELETE FROM income_statement_deduction",
+                new { });
+            await DatabaseHelpers.RunSingleDelete(_baseRepository, @"DELETE FROM income_statement", new { });
             await DatabaseHelpers.DeleteTestUsers(_baseRepository, _userId);
         }
 

@@ -23,17 +23,6 @@ public class UserDashboardQueryUnitTests
 
         _transactionRepositoryMock.GetTransactionSummaryByDateRange(1, Arg.Any<DateTime>(), Arg.Any<DateTime>())
             .Returns(new List<TransactionSummarySql>());
-
-        _transactionRepositoryMock.GetEmptyTransactionSummary(Arg.Any<DateTime>(), Arg.Any<DateTime>()).Returns(
-            new List<TransactionSummarySql>
-            {
-                new()
-                {
-                    TransactionDate = DateTime.UtcNow,
-                    TotalAmount = 0,
-                    Count = 0
-                }
-            });
     }
 
     [Fact]
@@ -49,8 +38,8 @@ public class UserDashboardQueryUnitTests
         // Assert
         Assert.NotNull(result);
         Assert.NotNull(result.RecentTransactions);
-        Assert.NotEmpty(result.LastMonthSpending);
-        Assert.NotEmpty(result.CurrentMonthSpending);
+        Assert.Empty(result.LastMonthSpending);
+        Assert.Empty(result.CurrentMonthSpending);
         Assert.NotNull(result.UpcomingTransactions);
         Assert.NotNull(result.PortfolioSummary);
         Assert.NotNull(result.NetWorthSummary);

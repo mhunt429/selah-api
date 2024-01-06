@@ -52,8 +52,6 @@ namespace Selah.Infrastructure.Repository.Interfaces
 
         Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoryById(int userId, int id);
 
-        Task<IEnumerable<TransactionSummarySql>> GetEmptyTransactionSummary(DateTime startDate,
-            DateTime endDate);
 
         Task<int> CreateTransactionCategory(UserTransactionCategoryCreate category);
 

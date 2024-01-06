@@ -36,19 +36,20 @@ namespace Selah.Infrastructure.Repository
         public async Task<int> CreateUser(AppUserCreate createdUser)
         {
             var sql = @"INSERT INTO app_user(email, 
-                     user_name, 
-                     password, 
-                     first_name, 
-                     last_name, 
-                     date_created)
-                     values(
-                              @email,
-                              @user_name,
-                              @password, 
-                              @first_name, 
-                              @last_name, 
-                              @date_created
-                            )returning(id)";
+                 user_name, 
+                 password, 
+                 first_name, 
+                 last_name, 
+                 date_created)
+                 VALUES(
+                          @email,
+                          @user_name,
+                          @password, 
+                          @first_name, 
+                          @last_name, 
+                          @date_created
+                        );
+                SELECT LAST_INSERT_ID();";
             var parameters = new
             {
                 email = createdUser.Email,

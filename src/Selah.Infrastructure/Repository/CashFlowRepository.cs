@@ -16,8 +16,12 @@ namespace Selah.Infrastructure.Repository
         public async Task<int> CreateIncomeStatement(IncomeStatementCreate incomeStatement)
         {
             string sql = @"
-                INSERT INTO income_statement(user_id, statement_start_date, statement_end_date,total_pay) 
-                VALUES(@user_id, @statement_start_date, @statement_end_date, @total_pay) returning(id)";
+    INSERT INTO income_statement(user_id, statement_start_date, statement_end_date, total_pay)
+    VALUES(@user_id, @statement_start_date, @statement_end_date, @total_pay);
+
+    SELECT LAST_INSERT_ID() AS id;
+";
+
 
             var id = await _baseRepository.AddAsync<int>(sql, ObjectReflection.ConvertToSnakecase(incomeStatement));
             return id;

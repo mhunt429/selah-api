@@ -22,9 +22,9 @@ namespace Selah.Infrastructure.Repository
 
         public async Task<int> CreateTransactionCategory(UserTransactionCategoryCreate category)
         {
-            string sql = @"INSERT INTO 
-            user_transaction_category(user_id, category_name) 
-            VALUES(@user_id, @category_name) RETURNING(id)";
+            string sql = @"INSERT INTO user_transaction_category(user_id, category_name) 
+               VALUES(@user_id, @category_name);
+               SELECT LAST_INSERT_ID();";
 
             var parameters = new
             {
@@ -73,15 +73,15 @@ namespace Selah.Infrastructure.Repository
         public async Task<int> InsertTransaction(TransactionCreate transaction)
         {
             string sql = @"
-                INSERT INTO user_transaction(
-                    account_id, user_id, transaction_amount,
-                    transaction_date, merchant_name, transaction_name, pending, payment_method
-                )
-                VALUES (
-                    @account_id, @user_id, @transaction_amount,
-                    @transaction_date, @merchant_name, @transaction_name, @pending, @payment_method
-                )
-                RETURNING id";
+    INSERT INTO user_transaction(
+        account_id, user_id, transaction_amount,
+        transaction_date, merchant_name, transaction_name, pending, payment_method
+    )
+    VALUES (
+        @account_id, @user_id, @transaction_amount,
+        @transaction_date, @merchant_name, @transaction_name, @pending, @payment_method
+    );
+    SELECT LAST_INSERT_ID();";
             var objectToSave = new
             {
                 account_id = transaction.AccountId,
@@ -158,33 +158,19 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.GetAllAsync<TransactionSummarySql>(sql, parameters);
         }
 
-        /// <summary>
-        /// For analytics purposes we want to show the user zero amounts so we do a generate series to get all dates
-        /// within a given date range. The keeps us from having to add conditional logic for zero amounts. 
-        /// </summary>
-        /// <param name="startDate"></param>
-        /// <param name="endDate"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<TransactionSummarySql>> GetEmptyTransactionSummary(DateTime startDate,
-            DateTime endDate)
-        {
-            var sql =
-                @"select generate_series(@start_date, @end_date, '1 day'::interval) AS transaction_date, 0.00 AS daily_total, 0 AS count";
-            var parameters = new { start_date = startDate, end_date = endDate };
-            return await _baseRepository.GetAllAsync<TransactionSummarySql>(sql, parameters);
-        }
+      
 
         public async Task<IEnumerable<TransactionAmountByCategorySql>> GetTransactionTotalsByCategory(int userId)
         {
-            string sql = @"SELECT utc.id, SUM(tli.itemized_amount),
-             utc.category_name
-            from transaction_line_item tli
-            INNER join user_transaction_category utc
-            on 
-                tli.transaction_category_id = utc.id
-            WHERE tli.transaction_id IN     
-                  (SELECT id FROM user_transaction WHERE user_id = @user_id)
-            GROUP BY (utc.id, category_name)";
+            string sql = @"
+    SELECT utc.id, SUM(tli.itemized_amount) AS total_itemized_amount,
+           utc.category_name
+    FROM transaction_line_item tli
+    INNER JOIN user_transaction_category utc ON tli.transaction_category_id = utc.id
+    WHERE tli.transaction_id IN (SELECT id FROM user_transaction WHERE user_id = @user_id)
+    GROUP BY utc.id, utc.category_name;
+";
+
             var parameters = new { user_id = userId };
 
             return await _baseRepository.GetAllAsync<TransactionAmountByCategorySql>(sql, parameters);
