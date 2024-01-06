@@ -27,7 +27,7 @@ namespace Selah.WebAPI
         {
 
             services.AddSingleton<IDbConnectionFactory>(_ =>
-            new NpgsqlConnectionFactory(_config.GetValue<string>("DB_CONNECTION_STRING")));
+            new MySqlConnectionFactory(_config.GetValue<string>("DB_CONNECTION_STRING")));
 
             //Register JWT middleware
             services.ConfigureJwt(_config);

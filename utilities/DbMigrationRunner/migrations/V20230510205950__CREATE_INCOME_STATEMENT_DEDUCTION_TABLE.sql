@@ -1,9 +1,11 @@
-CREATE TABLE income_statement_deduction(
-     id BIGSERIAL PRIMARY KEY,
-     statement_id BIGSERIAL REFERENCES income_statement(id),
-     deduction_name VARCHAR(30),
-     amount DECIMAL
-)
+CREATE TABLE income_statement_deduction
+(
+    id             BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    statement_id   BIGINT UNSIGNED,
+    deduction_name VARCHAR(30),
+    amount         DECIMAL,
+    FOREIGN KEY (statement_id) REFERENCES income_statement (id)
+);
 
 /*
 ROLLBACK

@@ -11,7 +11,7 @@ namespace Selah.Application.UnitTests.Infrastructure.RepositoryTests;
 public class BaseRepositoryUnitTests
 {
     private readonly IDbConnectionFactory _dbConnectionFactory =
-        new NpgsqlConnectionFactory("My Test Connection String");
+        new MySqlConnectionFactory("My Test Connection String");
 
     private readonly ILogger<BaseRepository> _mockLogger = Substitute.For<ILogger<BaseRepository>>();
     

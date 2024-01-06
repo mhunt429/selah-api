@@ -42,11 +42,11 @@ namespace Selah.API.IntegrationTests.helpers
                 //Github actions sets the field above so for local integration tests, just use the value found in the docker compose settings
                 if (string.IsNullOrEmpty(dbConnectionString))
                 {
-                    dbConnectionString = "User ID=postgres;Password=postgres;Host=localhost;Port=55432;Database=postgres";
+                    dbConnectionString = "User ID=mysqluser;Password=mysqlpassword;Host=localhost;Port=3306;Database=selah_db";
                 }
                 services.RemoveAll(typeof(IDbConnectionFactory));
                 services.AddSingleton<IDbConnectionFactory>(_ =>
-                new NpgsqlConnectionFactory(dbConnectionString));
+                new MySqlConnectionFactory(dbConnectionString));
 
                 services.AddSingleton<IHashids>(_ => new Hashids("SECRET", minHashLength: 24));
                 services.AddScoped<ISecurityService, SecurityService>();

@@ -20,7 +20,9 @@
       <PackageReference Include="DapperExtensions" Version="1.7.0" />
       <PackageReference Include="FluentValidation" Version="11.2.2" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
       <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
       <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
       <PackageReference Include="Npgsql" Version="6.0.7" />
       <PackageReference Include="Serilog" Version="2.12.0" />

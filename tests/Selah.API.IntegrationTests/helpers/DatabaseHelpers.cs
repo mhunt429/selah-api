@@ -56,7 +56,7 @@ namespace Selah.API.IntegrationTests.helpers
 
             ILogger<BaseRepository> loggerMock = Substitute.For<ILogger<BaseRepository>>();
 
-            return new BaseRepository(new NpgsqlConnectionFactory(dbConnectionString), loggerMock);
+            return new BaseRepository(new MySqlConnectionFactory(dbConnectionString), loggerMock);
         }
     }
 }

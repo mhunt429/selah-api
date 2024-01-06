@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using System.Data;
+using MySqlConnector;
 using Npgsql;
 
 
@@ -9,18 +10,18 @@ namespace Selah.Infrastructure
     {
         public Task<IDbConnection> CreateConnectionAsync();
     }
-    public class NpgsqlConnectionFactory : IDbConnectionFactory
+    public class MySqlConnectionFactory : IDbConnectionFactory
     {
         private readonly string _connectionString;
 
-        public NpgsqlConnectionFactory(string connectionString)
+        public MySqlConnectionFactory(string connectionString)
         {
             _connectionString = connectionString;
         }
 
         public async Task<IDbConnection> CreateConnectionAsync()
         {
-            var connection = new NpgsqlConnection(_connectionString);
+            var connection = new MySqlConnection(_connectionString);
             await connection.OpenAsync();
             return connection;
         }

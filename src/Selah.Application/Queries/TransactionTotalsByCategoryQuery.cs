@@ -13,14 +13,13 @@ namespace Selah.Application.Queries;
 
 public class TransactionTotalsByCategoryQuery : IRequest<IEnumerable<TransactionAmountByCategory>>
 {
-    [FromRoute] [DisplayName("userId")] 
-    public string UserId { get; set; }
+    [FromRoute] [DisplayName("userId")] public string UserId { get; set; }
 
     public class Handler : IRequestHandler<TransactionTotalsByCategoryQuery, IEnumerable<TransactionAmountByCategory>>
     {
         private readonly ITransactionRepository _transactionRepository;
         private readonly ISecurityService _securityService;
-  
+
 
         public Handler(ITransactionRepository transactionRepository, ISecurityService securityService)
         {
@@ -28,11 +27,13 @@ public class TransactionTotalsByCategoryQuery : IRequest<IEnumerable<Transaction
             _securityService = securityService;
         }
 
-        public async Task<IEnumerable<TransactionAmountByCategory>> Handle(TransactionTotalsByCategoryQuery query, CancellationToken cancellationToken)
+        public async Task<IEnumerable<TransactionAmountByCategory>> Handle(TransactionTotalsByCategoryQuery query,
+            CancellationToken cancellationToken)
         {
             int userId = _securityService.DecodeHashId(query.UserId);
             List<TransactionAmountByCategory> transactionAmountByCategories = new List<TransactionAmountByCategory>();
-            var transactionCategoryAmountSql = (await _transactionRepository.GetTransactionTotalsByCategory(userId)).ToList();
+            var transactionCategoryAmountSql =
+                (await _transactionRepository.GetTransactionTotalsByCategory(userId)).ToList();
             if (!transactionCategoryAmountSql.Any())
             {
                 return transactionAmountByCategories;
@@ -47,7 +48,7 @@ public class TransactionTotalsByCategoryQuery : IRequest<IEnumerable<Transaction
                     Total = category.Total
                 });
             }
-            
+
             return transactionAmountByCategories;
         }
     }

@@ -1,56 +1,60 @@
 name: Selah-API CI/CD
-"on":
+
+on:
   push:
     branches:
       - main
   pull_request:
     branches:
       - main
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     services:
-      # Label used to access the service container
-      postgres:
-        # Docker Hub image
-        image: postgres
-        # Provide the password for postgres
+      mysql:
+        image: mysql:latest
         env:
-          POSTGRES_PASSWORD: postgres
-        # Set health checks to wait until postgres has started
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: testdb
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "mysqladmin ping"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
         ports:
-          # Maps tcp port 5432 on service container to the host
-          - 5432:5432
+          - 3306:3306
+
     steps:
       - uses: actions/checkout@v3
-      - name: Setup .NET
 
+      - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 6.0.x
 
       - name: Restore Schema Migration dependencies
         run: dotnet restore ./utilities/DbMigrationRunner
+
       - name: Build Migration Project
         run: dotnet build ./utilities/DbMigrationRunner --no-restore
+
       - name: Run Schema Migrations
         env:
-          DB_CONNECTION_STRING: User ID=postgres;Password=postgres;Host=localhost;Port=5432;Database=postgres
+          DB_CONNECTION_STRING: Server=localhost;Port=3306;Database=testdb;User=root;Password=root
         run: dotnet run --project ./
         working-directory: ./utilities/DbMigrationRunner
+
       - name: Restore dependencies
         run: dotnet restore selah-web-api.sln
+
       - name: Build
         run: dotnet build selah-web-api.sln --no-restore
 
       - name: Run Tests
         env:
-          DB_CONNECTION_STRING: User ID=postgres;Password=postgres;Host=localhost;Port=5432;Database=postgres
+          DB_CONNECTION_STRING: Server=localhost;Port=3306;Database=testdb;User=root;Password=root
         run: dotnet test selah-web-api.sln --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
 
       - name: Code Coverage Report
@@ -64,11 +68,9 @@ jobs:
           hide_complexity: true
           indicators: true
           output: both
-          #thresholds: '60 80'
 
       - name: Add Coverage PR Comment
         uses: marocchino/sticky-pull-request-comment@v2
-        #if: github.event_name == 'pull_request'
         with:
           recreate: true
           path: code-coverage-results.md

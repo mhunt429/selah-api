@@ -18,19 +18,21 @@ namespace Selah.Application.Services
     public class AuthenticationService : IAuthenticationService
     {
         private readonly IConfiguration _configuration;
+
         public AuthenticationService(IConfiguration configuration)
         {
             _configuration = configuration;
         }
+
         public JwtResponse GenerateJwt(UserViewModel user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
 
-            var key = Encoding.UTF8.GetBytes(_configuration["JWT_SECRET"]);
+            byte[] key = Encoding.UTF8.GetBytes(_configuration["JWT_SECRET"]);
 
             var claims = new List<Claim>
             {
-                new ( JwtRegisteredClaimNames.Sub, user.Id.ToString())
+                new(JwtRegisteredClaimNames.Sub, user.Id.ToString())
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -39,7 +41,8 @@ namespace Selah.Application.Services
                 Expires = DateTime.UtcNow.AddSeconds(86400),
                 Issuer = _configuration["JWT_ISSUER"],
                 Audience = "selah-api",
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature)
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
