@@ -6,7 +6,7 @@ namespace Selah.Domain.Data.Models.Transactions
   {
     public int Id { get; set; }
     public int UserId { get; set; }
-    public string CategoryName { get; set; }
+    public string Name { get; set; }
   }
 
   public class UserTransactionCategoryCreate
@@ -15,11 +15,11 @@ namespace Selah.Domain.Data.Models.Transactions
     public int UserId { get; set; }
     
     [Required]
-    public string CategoryName { get; set; }
+    public string Name { get; set; }
   }
 
   public class UserTransactionCategoryUpdate
   {
-    public string CategoryName { get; set; }
+    public string Name { get; set; }
   }
 }

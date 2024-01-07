@@ -22,21 +22,21 @@ namespace Selah.Infrastructure.Repository
 
         public async Task<int> CreateTransactionCategory(UserTransactionCategoryCreate category)
         {
-            string sql = @"INSERT INTO user_transaction_category(user_id, category_name) 
-               VALUES(@user_id, @category_name);
+            string sql = @"INSERT INTO user_transaction_category(user_id, name) 
+               VALUES(@user_id, @name);
                SELECT LAST_INSERT_ID();";
 
             var parameters = new
             {
                 user_id = category.UserId,
-                category_name = category.CategoryName
+                name = category.Name
             };
             return await _baseRepository.AddAsync<int>(sql, parameters);
         }
 
         public async Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUser(int userId)
         {
-            string sql = @"SELECT id, user_id, category_name 
+            string sql = @"SELECT id, user_id, name 
             FROM user_transaction_category WHERE user_id = @user_id";
             var parameters = new
             {
@@ -47,7 +47,7 @@ namespace Selah.Infrastructure.Repository
 
         public async Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoryById(int userId, int id)
         {
-            string sql = @"SELECT id, user_id, category_name 
+            string sql = @"SELECT id, user_id, name 
             FROM user_transaction_category WHERE user_id = @user_id AND id = id";
             var parameters = new
             {
@@ -60,12 +60,12 @@ namespace Selah.Infrastructure.Repository
         public async Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUserAndName(int userId,
             string catgoryName)
         {
-            string sql = @"SELECT id, user_id, category_name 
+            string sql = @"SELECT id, user_id, name 
             FROM user_transaction_category WHERE user_id = @user_id AND name = @name";
             var parameters = new
             {
                 user_id = userId,
-                category_name = catgoryName
+                name = catgoryName
             };
             return await _baseRepository.GetAllAsync<UserTransactionCategory>(sql, parameters);
         }
@@ -75,11 +75,11 @@ namespace Selah.Infrastructure.Repository
             string sql = @"
     INSERT INTO user_transaction(
         account_id, user_id, transaction_amount,
-        transaction_date, merchant_name, transaction_name, pending, payment_method
+        transaction_date, merchant_name, transaction_name, pending, payment_method, recurring_transaction_id
     )
     VALUES (
         @account_id, @user_id, @transaction_amount,
-        @transaction_date, @merchant_name, @transaction_name, @pending, @payment_method
+        @transaction_date, @merchant_name, @transaction_name, @pending, @payment_method, @recurring_transaction_id
     );
     SELECT LAST_INSERT_ID();";
             var objectToSave = new
@@ -92,6 +92,7 @@ namespace Selah.Infrastructure.Repository
                 transaction_name = transaction.TransactionName,
                 pending = transaction.Pending,
                 payment_method = transaction.PaymentMethod,
+                recurring_transaction_id = transaction.RecurringTransactionId
             };
             return await _baseRepository.AddAsync<int>(sql, objectToSave);
         }
@@ -158,17 +159,16 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.GetAllAsync<TransactionSummarySql>(sql, parameters);
         }
 
-      
 
         public async Task<IEnumerable<TransactionAmountByCategorySql>> GetTransactionTotalsByCategory(int userId)
         {
             string sql = @"
     SELECT utc.id, SUM(tli.itemized_amount) AS total_itemized_amount,
-           utc.category_name
+           utc.name
     FROM transaction_line_item tli
     INNER JOIN user_transaction_category utc ON tli.transaction_category_id = utc.id
     WHERE tli.transaction_id IN (SELECT id FROM user_transaction WHERE user_id = @user_id)
-    GROUP BY utc.id, utc.category_name;
+    GROUP BY utc.id, utc.name;
 ";
 
             var parameters = new { user_id = userId };
@@ -181,7 +181,7 @@ namespace Selah.Infrastructure.Repository
         {
             string sql = @"
                 SELECT utc.id, 
-                       utc.category_name,  
+                       utc.name,  
                        COUNT(1) as total,
                         COALESCE(SUM(itemized_amount), 0) as transactions,
                 FROM transaction_line_item

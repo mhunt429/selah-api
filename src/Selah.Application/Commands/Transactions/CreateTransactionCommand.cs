@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System;
+using FluentValidation;
 using MediatR;
 using Selah.Domain.Data.Models.Transactions;
 using Selah.Domain.Data.Models.Transactions.Commands;
@@ -7,33 +8,56 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
+using Selah.Application.Services.Interfaces;
+
 namespace Selah.Application.Commands.Transactions
 {
     public class CreateTransactionCommand : IRequest<TransactionCreateResponse>
     {
-        public TransactionCreate Data { get; set; } = new TransactionCreate();
+        public string UserId { get; set; }
+
+        public string AccountId { get; set; }
+
+        public decimal TransactionAmount { get; set; }
+
+        public DateTime TransactionDate { get; set; }
+
+        public string MerchantName { get; set; }
+
+        public string TransactionName { get; set; }
+
+        public bool Pending { get; set; }
+
+        public string PaymentMethod { get; set; }
+
+        public string RecurringTransactionId { get; set; }
+        public List<LineItem> LineItems { get; set; } = new List<LineItem>();
+
 
         public class Validator : AbstractValidator<CreateTransactionCommand>
         {
             private readonly ITransactionRepository _trxRepo;
             private readonly IBankingRepository _bankingRepo;
-            public Validator(ITransactionRepository trxRepo, IBankingRepository bankingRepo)
+            private readonly ISecurityService _securityService;
+
+            public Validator(ITransactionRepository trxRepo, IBankingRepository bankingRepo,
+                ISecurityService securityService)
             {
                 _trxRepo = trxRepo;
                 _bankingRepo = bankingRepo;
-
-                RuleFor(x => x.Data.MerchantName).NotEmpty()
+                _securityService = securityService;
+                RuleFor(x => x.MerchantName).NotEmpty()
                     .WithMessage("Merchant name cannot be empty");
 
-                RuleFor(x => x.Data.TransactionAmount).GreaterThan(0);
+                RuleFor(x => x.TransactionAmount).GreaterThan(0);
 
-                RuleFor(x => x.Data.TransactionDate).LessThanOrEqualTo(System.DateTime.UtcNow)
+                RuleFor(x => x.TransactionDate).LessThanOrEqualTo(System.DateTime.UtcNow)
                     .WithMessage("Transaction date cannot be in the future");
 
-                RuleFor(x => x.Data.LineItems.Sum(x => x.ItemizedAmount)).Equal(x => x.Data.TransactionAmount)
+                RuleFor(x => x.LineItems.Sum(x => x.ItemizedAmount)).Equal(x => x.TransactionAmount)
                     .WithMessage("The total of all line items must equal the transaction amount");
 
-                RuleForEach(x => x.Data.LineItems).ChildRules(item =>
+                RuleForEach(x => x.LineItems).ChildRules(item =>
                 {
                     item.RuleFor(x => x.TransactionCategoryId).MustAsync(async (model, id, cancellation) =>
                     {
@@ -42,9 +66,10 @@ namespace Selah.Application.Commands.Transactions
                     }).WithMessage("The category associated with this line item could not be found");
                 });
 
-                RuleFor(x => x.Data.AccountId).MustAsync(async (id, cancellation) =>
+                RuleFor(x => x.AccountId).MustAsync(async (id, cancellation) =>
                 {
-                    var account = await _bankingRepo.GetAccountById(id);
+                    int bankAccountId = _securityService.DecodeHashId(id);
+                    var account = await _bankingRepo.GetAccountById(bankAccountId);
 
                     return account != null;
                 }).WithMessage("The account associated with this transaction could not be found");
@@ -54,22 +79,24 @@ namespace Selah.Application.Commands.Transactions
         public class Handler : IRequestHandler<CreateTransactionCommand, TransactionCreateResponse>
         {
             private readonly ITransactionRepository _transactionRepository;
+            private readonly ISecurityService _securityService;
 
-            public Handler(ITransactionRepository transactionRepository)
+            public Handler(ITransactionRepository transactionRepository, ISecurityService securityService)
             {
                 _transactionRepository = transactionRepository;
+                _securityService = securityService;
             }
 
-            
-            public async Task<TransactionCreateResponse> Handle(CreateTransactionCommand command, CancellationToken cancellationToken)
+
+            public async Task<TransactionCreateResponse> Handle(CreateTransactionCommand command,
+                CancellationToken cancellationToken)
             {
-                var transaction = command.Data;
-                var transactionId = await _transactionRepository.InsertTransaction(transaction);
+                var transactionId = await _transactionRepository.InsertTransaction(MapToDbCreateModel(command));
 
                 if (transactionId > 0)
                 {
                     var lineTitems = new List<TransactionLineItemCreate>();
-                    foreach (var item in transaction.LineItems)
+                    foreach (var item in command.LineItems)
                     {
                         lineTitems.Add(new TransactionLineItemCreate
                         {
@@ -79,19 +106,42 @@ namespace Selah.Application.Commands.Transactions
                             TransactionCategoryId = item.TransactionCategoryId
                         });
                     }
+
                     await _transactionRepository.InsertTransactionLineItems(lineTitems);
 
                     return new TransactionCreateResponse
                     {
                         TransactionId = transactionId,
-                        TransactionDate = transaction.TransactionDate,
-                        TranscationAmount = transaction.TransactionAmount,
-                        LineItems = transaction.LineItems.Count
+                        TransactionDate = command.TransactionDate,
+                        TranscationAmount = command.TransactionAmount,
+                        LineItems = command.LineItems.Count
                     };
                 }
+
                 return null;
             }
 
+            private TransactionCreate MapToDbCreateModel(CreateTransactionCommand command)
+            {
+                var transaction = new TransactionCreate
+                {
+                    UserId = _securityService.DecodeHashId(command.UserId),
+                    AccountId = _securityService.DecodeHashId(command.AccountId),
+                    TransactionAmount = command.TransactionAmount,
+                    TransactionDate = command.TransactionDate,
+                    MerchantName = command.MerchantName,
+                    TransactionName = command.TransactionName,
+                    PaymentMethod = command.PaymentMethod,
+                    Pending = command.Pending
+                };
+
+                if (!string.IsNullOrEmpty(command.RecurringTransactionId))
+                {
+                    transaction.RecurringTransactionId = _securityService.DecodeHashId(command.RecurringTransactionId);
+                }
+
+                return transaction;
+            }
         }
     }
 }

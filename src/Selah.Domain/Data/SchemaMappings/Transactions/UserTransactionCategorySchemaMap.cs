@@ -8,13 +8,13 @@ namespace Selah.Domain.Data.SchemaMappings.Transactions
         public UserTransactionCategorySchemaMap()
         {
             Map(b => b.Id)
-              .ToColumn("id");
+                .ToColumn("id");
 
             Map(b => b.UserId)
-              .ToColumn("user_id");
+                .ToColumn("user_id");
 
-            Map(b => b.CategoryName)
-              .ToColumn("category_name");
+            Map(b => b.Name)
+                .ToColumn("name");
         }
     }
 }
