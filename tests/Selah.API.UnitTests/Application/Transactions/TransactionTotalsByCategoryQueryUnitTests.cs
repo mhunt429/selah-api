@@ -18,7 +18,7 @@ public class TransactionTotalsByCategoryQueryUnitTests
         _transactionRepositoryMock = Substitute.For<ITransactionRepository>();
         _securityServiceMock = Substitute.For<ISecurityService>();
 
-        _transactionRepositoryMock.GetTransactionTotalsByCategory(Arg.Any<int>()).Returns(
+        _transactionRepositoryMock.GetTransactionTotalsByCategory(Arg.Any<long>()).Returns(
             new List<TransactionAmountByCategorySql>()
             {
                 new()
@@ -35,7 +35,7 @@ public class TransactionTotalsByCategoryQueryUnitTests
                 }
             });
 
-        _securityServiceMock.EncodeHashId(Arg.Any<int>()).Returns("hashed id");
+        _securityServiceMock.EncodeHashId(Arg.Any<long>()).Returns("hashed id");
     }
 
     [Fact]

@@ -25,7 +25,7 @@ public class GetUserByIdQuery : IRequest<UserViewModel>
         public async Task<UserViewModel> Handle(GetUserByIdQuery query, CancellationToken cancellationToken)
         {
             //Get the plain text id by decoding the value found in the claims
-            int id = _securityService.DecodeHashId(query.Id);
+            long id = _securityService.DecodeHashId(query.Id);
             var userDto = await _userRepository.GetUser(id);
             if (userDto == null)
             {

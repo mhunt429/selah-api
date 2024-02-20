@@ -127,15 +127,15 @@ namespace Selah.Application.Services
             }
         }
 
-        public int DecodeHashId(string hashId)
+        public long DecodeHashId(string hashId)
         {
-            int[] decodedId = _hashIds.Decode((hashId));
-            return decodedId.Length > 0 ? decodedId[0] : 0;
+           long decodedId = _hashIds.DecodeSingle((hashId));
+            return decodedId > 0 ? decodedId : 0;
         }
 
-        public string EncodeHashId(int id)
+        public string EncodeHashId(long id)
         {
-            return _hashIds.Encode(id);
+            return _hashIds.EncodeLong(id);
         }
     }
 }

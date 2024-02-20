@@ -29,9 +29,9 @@ namespace Selah.Domain.Data.Models.Transactions
 
     public class TransactionCreate
     {
-        public int UserId { get; set; }
+        public long UserId { get; set; }
 
-        public int AccountId { get; set; }
+        public long AccountId { get; set; }
 
         public decimal TransactionAmount { get; set; }
 
@@ -45,18 +45,18 @@ namespace Selah.Domain.Data.Models.Transactions
 
         public string PaymentMethod { get; set; }
 
-        public decimal? RecurringTransactionId { get; set; }
+        public long? RecurringTransactionId { get; set; }
         public List<LineItem> LineItems { get; set; } = new List<LineItem>();
     }
 
     public class LineItem
     {
-        public int TransactionCategoryId { get; set; }
+        public long TransactionCategoryId { get; set; }
 
         public decimal ItemizedAmount { get; set; }
 
         public bool DefaultCategory { get; set; }
 
-        public int UserId { get; set; }
+        public long UserId { get; set; }
     }
 }

@@ -83,10 +83,10 @@ namespace Selah.API.IntegrationTests.helpers
             return await client.GetAsync(servicePath);
         }
 
-        public string GetEncodedToken(int id)
+        public string GetEncodedToken(long id)
         {
             IHashids hashids = Services.GetRequiredService<IHashids>();
-            return hashids.Encode(id);
+            return hashids.EncodeLong(id);
         }
     }
 }

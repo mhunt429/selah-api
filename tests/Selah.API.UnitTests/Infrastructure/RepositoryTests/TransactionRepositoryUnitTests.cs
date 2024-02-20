@@ -17,7 +17,7 @@ public class TransactionRepositoryUnitTests
     public TransactionRepositoryUnitTests()
     {
         _baseRepository = Substitute.For<IBaseRepository>();
-        _baseRepository.AddAsync<int>(Arg.Any<string>(), Arg.Any<object>())
+        _baseRepository.AddAsync<long>(Arg.Any<string>(), Arg.Any<object>())
             .Returns(1);
         _baseRepository.UpdateAsync(Arg.Any<string>(), Arg.Any<object>())
             .Returns(true);

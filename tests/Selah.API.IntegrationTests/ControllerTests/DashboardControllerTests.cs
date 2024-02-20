@@ -31,15 +31,15 @@ namespace Selah.API.IntegrationTests.ControllerTests
         [Fact]
         public async Task Unauthorized_RequestReturns401()
         {
-            var response = await _testFactory.GetAsync<CreateUserCommand>(_testClient, $"api/v1/users/{_testUser.Id}/dashboard/summary");
+            var response = await _testFactory.GetAsync<CreateUserCommand>(_testClient, $"api/v1/dashboard/summary");
             response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
-        [Fact]
+        [Fact(Skip = "User id is now pulled from the Http Request JWT instead of route")]
         public async Task InvalidUserId_RequestReturns403()
         {
             _testClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
-            var response = await _testFactory.GetAsync<CreateUserCommand>(_testClient, $"api/v1/users/{0}/dashboard/summary");
+            var response = await _testFactory.GetAsync<CreateUserCommand>(_testClient, $"api/v1/dashboard/summary");
             response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
 
@@ -48,7 +48,7 @@ namespace Selah.API.IntegrationTests.ControllerTests
         {
             _testClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
             var hashId = _testFactory.GetEncodedToken(_testUser.Id);
-            var response = await _testFactory.GetAsync<CreateUserCommand>(_testClient, $"api/v1/users/{hashId}/dashboard/summary");
+            var response = await _testFactory.GetAsync<CreateUserCommand>(_testClient, $"api/v1/dashboard/summary");
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 

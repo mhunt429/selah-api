@@ -14,7 +14,7 @@ namespace Selah.Infrastructure.Repository
             _baseRepository = baseRepository;
         }
 
-        public async Task<AppUser> GetUser(int id)
+        public async Task<AppUser> GetUser(long id)
         {
             var sql = @"SELECT id, email, user_name, password, 
                         first_name, last_name, date_created
@@ -63,7 +63,7 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.AddAsync<int>(sql, parameters);
         }
 
-        public async Task<bool> UpdateUser(AppUserUpdate updatedUser, int id)
+        public async Task<bool> UpdateUser(AppUserUpdate updatedUser, long id)
         {
             var sql = @"UPDATE app_user 
                     SET email = @email,
@@ -83,13 +83,13 @@ namespace Selah.Infrastructure.Repository
          return  await _baseRepository.UpdateAsync(sql, parameters);
         }
 
-        public async Task<bool> DeleteUser(int id)
+        public async Task<bool> DeleteUser(long id)
         {
             var sql = "DELETE FROM app_user WHERE id = @id";
             return await _baseRepository.DeleteAsync(sql, new { id });
         }
 
-        public async Task<bool> UpdatePassword(int userId, string password)
+        public async Task<bool> UpdatePassword(long userId, string password)
         {
             var sql = @"UPDATE app_user 
                     SET password = @password

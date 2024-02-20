@@ -30,7 +30,7 @@ public class TransactionTotalsByCategoryQuery : IRequest<IEnumerable<Transaction
         public async Task<IEnumerable<TransactionAmountByCategory>> Handle(TransactionTotalsByCategoryQuery query,
             CancellationToken cancellationToken)
         {
-            int userId = _securityService.DecodeHashId(query.UserId);
+            long userId = _securityService.DecodeHashId(query.UserId);
             List<TransactionAmountByCategory> transactionAmountByCategories = new List<TransactionAmountByCategory>();
             var transactionCategoryAmountSql =
                 (await _transactionRepository.GetTransactionTotalsByCategory(userId)).ToList();

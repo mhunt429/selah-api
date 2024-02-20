@@ -19,10 +19,10 @@ public class CreateTransactionUnitTests
 
     public CreateTransactionUnitTests()
     {
-        _transactionRepoMock.GetTransactionCategoryById(Arg.Any<int>(), Arg.Any<int>())
+        _transactionRepoMock.GetTransactionCategoryById(Arg.Any<long>(), Arg.Any<long>())
             .Returns(TransactionCategoryTestHelpers.CreateCategories(true));
 
-        _bankingRepoMock.GetAccountById(Arg.Any<int>()).Returns((BankAccountSql)null);
+        _bankingRepoMock.GetAccountById(Arg.Any<long>()).Returns((BankAccountSql)null);
 
         _securityService.DecodeHashId(Arg.Any<string>()).Returns(1);
     }
@@ -57,12 +57,12 @@ public class CreateTransactionUnitTests
     [Fact]
     public async Task Can_Save_Valid_Model()
     {
-        _transactionRepoMock.GetTransactionCategoryById(Arg.Any<int>(), Arg.Any<int>())
+        _transactionRepoMock.GetTransactionCategoryById(Arg.Any<long>(), Arg.Any<long>())
             .Returns(TransactionCategoryTestHelpers.CreateCategories());
 
         _transactionRepoMock.InsertTransaction(Arg.Any<TransactionCreate>()).Returns(1);
 
-        _bankingRepoMock.GetAccountById(Arg.Any<int>()).Returns(new BankAccountSql());
+        _bankingRepoMock.GetAccountById(Arg.Any<long>()).Returns(new BankAccountSql());
 
         //Arrange
         var command = new CreateTransactionCommand

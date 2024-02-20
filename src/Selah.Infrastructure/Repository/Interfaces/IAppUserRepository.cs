@@ -5,11 +5,11 @@ namespace Selah.Infrastructure.Repository.Interfaces
 {
   public interface IAppUserRepository
   {
-    public Task<AppUser> GetUser(int id);
+    public Task<AppUser> GetUser(long id);
     public Task<AppUser> GetUser(string emailOrUsername);
-    public Task<bool> UpdateUser(AppUserUpdate updatedUser, int id);
+    public Task<bool> UpdateUser(AppUserUpdate updatedUser, long id);
     public Task<int> CreateUser(AppUserCreate createdUser);
-    public Task<bool> DeleteUser(int id);
-    public Task<bool> UpdatePassword(int userId, string password);
+    public Task<bool> DeleteUser(long id);
+    public Task<bool> UpdatePassword(long userId, string password);
   }
 }

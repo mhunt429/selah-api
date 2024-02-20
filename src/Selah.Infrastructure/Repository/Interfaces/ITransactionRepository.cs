@@ -9,16 +9,16 @@ namespace Selah.Infrastructure.Repository.Interfaces
 {
     public interface ITransactionRepository
     {
-        Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUser(int userId);
+        Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUser(long userId);
 
-        Task<int> InsertTransaction(TransactionCreate transaction);
+        Task<long> InsertTransaction(TransactionCreate transaction);
 
         /// <summary>
         /// Split transactions is the business case for this query
         /// </summary>
         /// <param name="transactionId"></param>
         /// <returns>1 element per transaction line item</returns>
-        Task<IEnumerable<ItemizedTransactionSql>> GetItemizedTransactionAsync(int transactionId);
+        Task<IEnumerable<ItemizedTransactionSql>> GetItemizedTransactionAsync(long transactionId);
 
         Task<int> InsertTransactionLineItems(IReadOnlyCollection<TransactionLineItemCreate> items);
 
@@ -29,7 +29,7 @@ namespace Selah.Infrastructure.Repository.Interfaces
         /// <param name="limit"></param>
         /// <param name="offset"></param>
         /// <returns></returns>
-        Task<IEnumerable<RecentTransactionSql>> GetRecentTransactions(int userId);
+        Task<IEnumerable<RecentTransactionSql>> GetRecentTransactions(long userId);
 
         /// <summary>
         /// Returns a list of transaction date, total amount, and count of transactions within a given date range
@@ -38,7 +38,7 @@ namespace Selah.Infrastructure.Repository.Interfaces
         /// <param name="startDate"></param>
         /// <param name="endDate"></param>
         /// <returns></returns>
-        Task<IEnumerable<TransactionSummarySql>> GetTransactionSummaryByDateRange(int userId, DateTime startDate,
+        Task<IEnumerable<TransactionSummarySql>> GetTransactionSummaryByDateRange(long userId, DateTime startDate,
             DateTime endDate);
 
         /// <summary>
@@ -48,21 +48,21 @@ namespace Selah.Infrastructure.Repository.Interfaces
         /// <param name="catgoryName">name of the category</param>
         /// <returns></returns>
         Task<IEnumerable<UserTransactionCategory>>
-            GetTransactionCategoriesByUserAndName(int userId, string catgoryName);
+            GetTransactionCategoriesByUserAndName(long userId, string catgoryName);
 
-        Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoryById(int userId, int id);
+        Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoryById(long userId, long id);
 
 
-        Task<int> CreateTransactionCategory(UserTransactionCategoryCreate category);
+        Task<long> CreateTransactionCategory(UserTransactionCategoryCreate category);
 
         /// <summary>
         /// Gets the total for transaction amounts by categories filtered by a user id
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        Task<IEnumerable<TransactionAmountByCategorySql>> GetTransactionTotalsByCategory(int userId);
+        Task<IEnumerable<TransactionAmountByCategorySql>> GetTransactionTotalsByCategory(long userId);
 
-        Task<TransactionCategoryDetailSql> GetTransactionCategoryDetails(int userId, int categoryId, DateTime startDate,
+        Task<TransactionCategoryDetailSql> GetTransactionCategoryDetails(long userId, long categoryId, DateTime startDate,
             DateTime endDate);
     }
 }

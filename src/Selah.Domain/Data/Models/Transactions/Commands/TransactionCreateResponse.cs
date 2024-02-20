@@ -4,7 +4,7 @@ namespace Selah.Domain.Data.Models.Transactions.Commands
 {
     public class TransactionCreateResponse
     {
-        public int TransactionId { get; set; }
+        public long TransactionId { get; set; }
 
         public DateTime TransactionDate { get; set; }
 

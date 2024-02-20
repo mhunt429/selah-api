@@ -31,7 +31,7 @@ namespace Selah.Application.Queries.Analytics
 
             public async Task<DashboardSummary> Handle(UserDashboardQuery query, CancellationToken cancellationToken)
             {
-                int id = _securityService.DecodeHashId(query.UserId);
+                long id = _securityService.DecodeHashId(query.UserId);
                 var transactionSummaryTuple = await GetLastAndCurrentMonthTrxSummary(id);
                 return new DashboardSummary
                 {
@@ -44,7 +44,7 @@ namespace Selah.Application.Queries.Analytics
                 };
             }
 
-            private async Task<List<RecentTransaction>> GetRecentTransactions(int userId)
+            private async Task<List<RecentTransaction>> GetRecentTransactions(long userId)
             {
                 IEnumerable<RecentTransactionSql> recentTransactionSql =
                     await _transactionRepository.GetRecentTransactions(userId);
@@ -72,7 +72,7 @@ namespace Selah.Application.Queries.Analytics
             /// <returns></returns>
             //TODO probably a good idea to move this to a separate handler/endpoint
             private async Task<(IEnumerable<TransactionSummarySql>, IEnumerable<TransactionSummarySql>)>
-                GetLastAndCurrentMonthTrxSummary(int userId)
+                GetLastAndCurrentMonthTrxSummary(long userId)
             {
                 var currentTimeUtc = DateTime.UtcNow;
 

@@ -20,7 +20,7 @@ namespace Selah.Infrastructure.Repository
         }
 
 
-        public async Task<int> CreateTransactionCategory(UserTransactionCategoryCreate category)
+        public async Task<long> CreateTransactionCategory(UserTransactionCategoryCreate category)
         {
             string sql = @"INSERT INTO user_transaction_category(user_id, name) 
                VALUES(@user_id, @name);
@@ -31,10 +31,10 @@ namespace Selah.Infrastructure.Repository
                 user_id = category.UserId,
                 name = category.Name
             };
-            return await _baseRepository.AddAsync<int>(sql, parameters);
+            return await _baseRepository.AddAsync<long>(sql, parameters);
         }
 
-        public async Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUser(int userId)
+        public async Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUser(long userId)
         {
             string sql = @"SELECT id, user_id, name 
             FROM user_transaction_category WHERE user_id = @user_id";
@@ -45,7 +45,7 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.GetAllAsync<UserTransactionCategory>(sql, parameters);
         }
 
-        public async Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoryById(int userId, int id)
+        public async Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoryById(long userId, long id)
         {
             string sql = @"SELECT id, user_id, name 
             FROM user_transaction_category WHERE user_id = @user_id AND id = id";
@@ -57,7 +57,7 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.GetAllAsync<UserTransactionCategory>(sql, parameters);
         }
 
-        public async Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUserAndName(int userId,
+        public async Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUserAndName(long userId,
             string catgoryName)
         {
             string sql = @"SELECT id, user_id, name 
@@ -70,7 +70,7 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.GetAllAsync<UserTransactionCategory>(sql, parameters);
         }
 
-        public async Task<int> InsertTransaction(TransactionCreate transaction)
+        public async Task<long> InsertTransaction(TransactionCreate transaction)
         {
             string sql = @"
     INSERT INTO user_transaction(
@@ -94,10 +94,10 @@ namespace Selah.Infrastructure.Repository
                 payment_method = transaction.PaymentMethod,
                 recurring_transaction_id = transaction.RecurringTransactionId
             };
-            return await _baseRepository.AddAsync<int>(sql, objectToSave);
+            return await _baseRepository.AddAsync<long>(sql, objectToSave);
         }
 
-        public async Task<IEnumerable<ItemizedTransactionSql>> GetItemizedTransactionAsync(int transactionId)
+        public async Task<IEnumerable<ItemizedTransactionSql>> GetItemizedTransactionAsync(long transactionId)
         {
             var sql = "select * from get_transaction_line_items_by_transaction(@transaction_id)";
 
@@ -117,7 +117,7 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.AddManyAsync<TransactionLineItemCreate>(sql, parameters);
         }
 
-        public async Task<IEnumerable<RecentTransactionSql>> GetRecentTransactions(int userId)
+        public async Task<IEnumerable<RecentTransactionSql>> GetRecentTransactions(long userId)
         {
             var sql = @"SELECT
                          ut.id as transaction_id,
@@ -142,7 +142,7 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.GetAllAsync<RecentTransactionSql>(sql, parameters);
         }
 
-        public async Task<IEnumerable<TransactionSummarySql>> GetTransactionSummaryByDateRange(int userId,
+        public async Task<IEnumerable<TransactionSummarySql>> GetTransactionSummaryByDateRange(long userId,
             DateTime startDate, DateTime endDate)
         {
             var sql = @"SELECT 
@@ -160,7 +160,7 @@ namespace Selah.Infrastructure.Repository
         }
 
 
-        public async Task<IEnumerable<TransactionAmountByCategorySql>> GetTransactionTotalsByCategory(int userId)
+        public async Task<IEnumerable<TransactionAmountByCategorySql>> GetTransactionTotalsByCategory(long userId)
         {
             string sql = @"
     SELECT utc.id, SUM(tli.itemized_amount) AS total_itemized_amount,
@@ -176,7 +176,7 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.GetAllAsync<TransactionAmountByCategorySql>(sql, parameters);
         }
 
-        public async Task<TransactionCategoryDetailSql> GetTransactionCategoryDetails(int userId, int categoryId,
+        public async Task<TransactionCategoryDetailSql> GetTransactionCategoryDetails(long userId, long categoryId,
             DateTime startDate, DateTime endDate)
         {
             string sql = @"

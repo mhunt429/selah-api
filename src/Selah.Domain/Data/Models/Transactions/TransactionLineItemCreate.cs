@@ -2,9 +2,9 @@
 {
     public class TransactionLineItemCreate
     {
-        public int TransactionId { get; set; }
+        public long TransactionId { get; set; }
 
-        public int? TransactionCategoryId { get; set; }
+        public long? TransactionCategoryId { get; set; }
 
         public decimal ItemizedAmount { get; set; }
 

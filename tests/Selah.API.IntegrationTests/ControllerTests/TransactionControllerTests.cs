@@ -30,11 +30,11 @@ public class TransactionControllerTests : IAsyncLifetime
     [Fact]
     public async Task TransactionTotalsByCategoryQuery_Unauthorized_RequestReturns401()
     {
-        var response = await _testFactory.GetAsync<TransactionTotalsByCategoryQuery>(_testClient, $"api/v1/users/{_testUser.Id}/transactions/categories/totals");
+        var response = await _testFactory.GetAsync<TransactionTotalsByCategoryQuery>(_testClient, $"api/v1/transactions/categories/totals");
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
-    [Fact]
+    [Fact(Skip = "User id is now pulled from the Http Request JWT instead of route")]
     public async Task TransactionTotalsByCategoryQuery_InvalidUserId_RequestReturns403()
     {
         _testClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
@@ -46,8 +46,7 @@ public class TransactionControllerTests : IAsyncLifetime
     public async Task TransactionTotalsByCategoryQuery_ValidTokenAndUserId_RequestReturns200()
     {
         _testClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
-        var hashId = _testFactory.GetEncodedToken(_testUser.Id);
-        var response = await _testFactory.GetAsync<CreateUserCommand>(_testClient, $"api/v1/users/{hashId}/transactions/categories/totals");
+        var response = await _testFactory.GetAsync<TransactionTotalsByCategoryQuery>(_testClient, $"api/v1/transactions/categories/totals");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
     

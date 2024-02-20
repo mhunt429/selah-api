@@ -65,14 +65,15 @@ namespace Selah.Application.Commands.Transactions
                         return categories.Any();
                     }).WithMessage("The category associated with this line item could not be found");
                 });
-
+                RuleFor(x => x.AccountId).NotEmpty();
+                
                 RuleFor(x => x.AccountId).MustAsync(async (id, cancellation) =>
                 {
-                    int bankAccountId = _securityService.DecodeHashId(id);
+                    long bankAccountId = _securityService.DecodeHashId(id);
                     var account = await _bankingRepo.GetAccountById(bankAccountId);
 
                     return account != null;
-                }).WithMessage("The account associated with this transaction could not be found");
+                }).WithMessage("The account associated with this transaction could not be found").When(x => !string.IsNullOrEmpty(x.AccountId));
             }
         }
 
@@ -95,19 +96,16 @@ namespace Selah.Application.Commands.Transactions
 
                 if (transactionId > 0)
                 {
-                    var lineTitems = new List<TransactionLineItemCreate>();
-                    foreach (var item in command.LineItems)
-                    {
-                        lineTitems.Add(new TransactionLineItemCreate
+                    await _transactionRepository.InsertTransactionLineItems(command.LineItems.Select(x =>
+                        new TransactionLineItemCreate
                         {
                             TransactionId = transactionId,
-                            DefaultCategory = item.DefaultCategory,
-                            ItemizedAmount = item.ItemizedAmount,
-                            TransactionCategoryId = item.TransactionCategoryId
-                        });
-                    }
-
-                    await _transactionRepository.InsertTransactionLineItems(lineTitems);
+                            DefaultCategory = x.DefaultCategory,
+                            ItemizedAmount = x.ItemizedAmount,
+                            TransactionCategoryId = x.TransactionCategoryId
+                        })
+                        .ToList()
+                    );
 
                     return new TransactionCreateResponse
                     {

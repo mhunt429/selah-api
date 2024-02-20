@@ -27,7 +27,7 @@ public class GetUserForLoginQueryUnitTests
             ExpirationTs = DateTime.Now.AddSeconds(86400)
         });
 
-        _securityServiceMock.EncodeHashId(Arg.Any<int>()).Returns("abc123");
+        _securityServiceMock.EncodeHashId(Arg.Any<long>()).Returns("abc123");
     }
 
     [Theory]

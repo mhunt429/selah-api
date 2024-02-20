@@ -27,7 +27,7 @@ public class CreateUserUnitTests
             ExpirationTs = DateTime.Now.AddSeconds(86400)
         });
 
-        _mockSecurityService.EncodeHashId(Arg.Any<int>()).Returns("abc123");
+        _mockSecurityService.EncodeHashId(Arg.Any<long>()).Returns("abc123");
     }
 
     [Fact]

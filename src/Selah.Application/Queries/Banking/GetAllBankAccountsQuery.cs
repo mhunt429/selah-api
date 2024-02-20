@@ -32,7 +32,7 @@ namespace Selah.Application.Queries.Banking
             public async Task<IEnumerable<BankAccount>> Handle(GetAllBankAccountsQuery query,
                 CancellationToken cancellationToken)
             {
-                int id = _securityService.DecodeHashId(query.UserId);
+                long id = _securityService.DecodeHashId(query.UserId);
 
                 List<BankAccount> accounts = new List<BankAccount>();
                 var queryResult = (await _bankingRepository.GetAccounts(id, query.Limit, query.Offset));

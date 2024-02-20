@@ -14,7 +14,7 @@ namespace Selah.Infrastructure.Repository
             _baseRepository = baseRepository;
         }
 
-        public async Task<IEnumerable<BankAccountSql>> GetAccounts(int userId, int limit = 25, int offset = 1)
+        public async Task<IEnumerable<BankAccountSql>> GetAccounts(long userId, int limit = 25, int offset = 1)
         {
             string sql = @"SELECT 
                     id, 
@@ -38,7 +38,7 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.GetAllAsync<BankAccountSql>(sql, parameters);
         }
 
-        public async Task<IEnumerable<BankAccountSql>> GetAccountsByInstitutionId(int institutionId)
+        public async Task<IEnumerable<BankAccountSql>> GetAccountsByInstitutionId(long institutionId)
         {
             string sql = @"SELECT 
                     id, 
@@ -59,7 +59,7 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.GetAllAsync<BankAccountSql>(sql, parameters);
         }
 
-        public async Task<BankAccountSql> GetAccountById(int id)
+        public async Task<BankAccountSql> GetAccountById(long id)
         {
             string sql = @"SELECT 
                     id, 

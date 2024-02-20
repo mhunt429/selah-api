@@ -19,7 +19,7 @@ public class GetAllBankAccountsQueryTests
         ISecurityService securityServiceMock = Substitute.For<ISecurityService>();
         
         securityServiceMock.DecodeHashId(Arg.Any<string>()).Returns(1);
-        securityServiceMock.EncodeHashId(Arg.Any<int>()).Returns("ABC123");
+        securityServiceMock.EncodeHashId(Arg.Any<long>()).Returns("ABC123");
         _handler = new GetAllBankAccountsQuery.Handler(_bankingRepositoryMock, securityServiceMock);
     }
 
@@ -52,7 +52,7 @@ public class GetAllBankAccountsQueryTests
                 AccountMask = "****1234"
             }
         };
-        _bankingRepositoryMock.GetAccounts(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int>())
+        _bankingRepositoryMock.GetAccounts(Arg.Any<long>(), Arg.Any<int>(), Arg.Any<int>())
             .Returns(bankAccounts);
 
         var query = new GetAllBankAccountsQuery { UserId = "ABC123", Limit = 10, Offset = 0 };

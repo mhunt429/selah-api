@@ -10,16 +10,16 @@ public class BankAccountCreate
     
     public decimal? CurrentBalance { get; set; }
     
-    public int UserId { get; set; }
+    public long UserId { get; set; }
     
     public string Subtype { get; set; }
     
-    public int InstitutionId { get; set; }
+    public long InstitutionId { get; set; }
 }
 
 public class BankAccountUpdate
 {
-    public int Id { get; set; }
+    public string Id { get; set; }
 
     public string AccountMask { get; set; }
     

@@ -18,9 +18,9 @@ namespace Selah.Application.Services.Interfaces
     /// <returns>A Base 64 Encoded encrypted string.</returns>
     Task<string> Encrypt(string input);
 
-    int DecodeHashId(string hashId);
+    long DecodeHashId(string hashId);
 
-    string EncodeHashId(int id);
+    string EncodeHashId(long id);
 
   }
 }
