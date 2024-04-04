@@ -28,7 +28,7 @@ namespace Selah.WebAPI.Controllers
         public async Task<IActionResult> CreateTransaction([FromBody] CreateTransactionCommand command)
         {
             command.UserId = Request.GetUserIdFromRequest();
-            var validationResult = await _validator.ValidateAsync(command);
+             var validationResult = await _validator.ValidateAsync(command);
             if (!validationResult.IsValid)
             {
                 return BadRequest(validationResult.GetValidationErrors());

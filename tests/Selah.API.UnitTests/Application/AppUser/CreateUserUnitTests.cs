@@ -6,6 +6,7 @@ using Selah.Domain.Data.Models.Authentication;
 using Selah.Infrastructure.Repository.Interfaces;
 using Xunit;
 using NSubstitute;
+using FluentAssertions.LanguageExt;
 
 namespace Selah.API.UnitTests.AppUser;
 
@@ -106,13 +107,11 @@ public class CreateUserUnitTests
 
         //Assert
         validationResult.IsValid.Should().BeTrue();
-        result.Item2.Should().BeNull();
-        result.Item1.User.Should().NotBeNull();
-        result.Item1.User.Email.Should().Be("test@selah.com");
-        result.Item1.User.FirstName.Should().Be("Test");
-        result.Item1.User.LastName.Should().Be("User");
-
-        result.Item1.AccessToken.Should().Be("token");
-        result.Item1.ExpirationTs.Should().BeAfter(DateTime.MinValue);
+        result.Should().BeRight(r => r.User.Should().NotBeNull());
+        result.Should().BeRight(r => r.User.Email.Should().Be("test@selah.com"));
+        result.Should().BeRight(r => r.User.FirstName.Should().Be("Test"));
+        result.Should().BeRight(r => r.User.LastName.Should().Be("User"));
+        result.Should().BeRight(r => r.AccessToken.Should().Be("token"));
+        result.Should().BeRight(r => r.ExpirationTs.Should().BeAfter(DateTime.MinValue));
     }
 }

@@ -5,13 +5,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.Results;
+using LanguageExt;
 using Selah.Application.Services.Interfaces;
 using Selah.Domain.Data.Models.Authentication;
 using Selah.Infrastructure.Repository.Interfaces;
 
 namespace Selah.Application.Commands.AppUser
 {
-    public class CreateUserCommand : IRequest<(AuthenticationResponse, ValidationResult)>
+    public class CreateUserCommand : IRequest<Either<ValidationResult, AuthenticationResponse>>
     {
         public string Email { get; set; }
         public string UserName { get; set; }
@@ -40,7 +41,7 @@ namespace Selah.Application.Commands.AppUser
             }
         }
 
-        public class Handler : IRequestHandler<CreateUserCommand, (AuthenticationResponse, ValidationResult)>
+        public class Handler : IRequestHandler<CreateUserCommand, Either<ValidationResult, AuthenticationResponse>>
         {
             private readonly IAppUserRepository _appUserRepository;
             private readonly ISecurityService _securityService;
@@ -54,7 +55,7 @@ namespace Selah.Application.Commands.AppUser
                 _authenticationService = authenticationService;
             }
 
-            public async Task<(AuthenticationResponse, ValidationResult)> Handle(CreateUserCommand request,
+            public async Task<Either<ValidationResult, AuthenticationResponse>> Handle(CreateUserCommand request,
                 CancellationToken cancellationToken)
             {
                 var validator = new Validator(_appUserRepository);
@@ -62,7 +63,7 @@ namespace Selah.Application.Commands.AppUser
                 var validationResult = await validator.ValidateAsync(request);
                 if (!validationResult.IsValid)
                 {
-                    return (null, validationResult);
+                    return Either<ValidationResult, AuthenticationResponse>.Left(validationResult);
                 }
 
                 int userId = await _appUserRepository.CreateUser(new AppUserCreate
@@ -86,12 +87,12 @@ namespace Selah.Application.Commands.AppUser
                 };
                 var jwtResult = _authenticationService.GenerateJwt(user);
 
-
-                return (new AuthenticationResponse
+                AuthenticationResponse authenticationResponse = new AuthenticationResponse
                 {
                     User = user, AccessToken = jwtResult.AccessToken,
                     ExpirationTs = jwtResult.ExpirationTs
-                }, null);
+                };
+                return Either<ValidationResult, AuthenticationResponse>.Right(authenticationResponse);
             }
         }
     }
