@@ -12,6 +12,7 @@ using System.Text.Json;
 using HashidsNet;
 using Selah.Application.Services;
 using Selah.Application.Services.Interfaces;
+using Selah.Infrastructure.Services;
 
 namespace Selah.API.IntegrationTests.helpers
 {

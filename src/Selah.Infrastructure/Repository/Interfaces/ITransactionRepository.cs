@@ -11,7 +11,7 @@ namespace Selah.Infrastructure.Repository.Interfaces
     {
         Task<IEnumerable<UserTransactionCategory>> GetTransactionCategoriesByUser(long userId);
 
-        Task<long> InsertTransaction(TransactionCreate transaction);
+        Task<long> InsertTransaction(TransactionCreateSql transaction);
 
         /// <summary>
         /// Split transactions is the business case for this query

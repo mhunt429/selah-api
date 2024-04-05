@@ -12,7 +12,7 @@ namespace Selah.WebAPI.DependencyInjection.Extensions
         {
             services.AddScoped<IValidator<CreateUserCommand>, CreateUserCommand.Validator>();
             services.AddScoped<IValidator<GetUserForLoginQuery>, GetUserForLoginQuery.Validator>();
-            services.AddScoped<IValidator<CreateTransactionCommand>, CreateTransactionCommand.Validator>();
+           // services.AddScoped<IValidator<CreateTransactionCommand>, CreateTransactionCommand.Validator>();
             return services;
         }
     }

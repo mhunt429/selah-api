@@ -1,10 +1,8 @@
 using System.Threading.Tasks;
-using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Selah.Application.Commands.Transactions;
-using Selah.Application.Filters;
 using Selah.Application.Queries;
 using Selah.WebAPI.Extensions;
 
@@ -16,25 +14,21 @@ namespace Selah.WebAPI.Controllers
     public class TransactionController : ControllerBase
     {
         private readonly IMediator _mediator;
-        private readonly IValidator<CreateTransactionCommand> _validator;
-
-        public TransactionController(IMediator mediator, IValidator<CreateTransactionCommand> validator)
+        public TransactionController(IMediator mediator)
         {
             _mediator = mediator;
-            _validator = validator;
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateTransaction([FromBody] CreateTransactionCommand command)
         {
-            command.UserId = Request.GetUserIdFromRequest();
-             var validationResult = await _validator.ValidateAsync(command);
-            if (!validationResult.IsValid)
+            command.Data.UserId = Request.GetUserIdFromRequest();
+            var result = await _mediator.Send(command);
+            if (result.IsLeft)
             {
-                return BadRequest(validationResult.GetValidationErrors());
+                return BadRequest(result);
             }
 
-            var result = await _mediator.Send(command);
             return Ok(result);
         }
 

@@ -11,7 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Selah.Application.Services.Interfaces;
 
-namespace Selah.Application.Services
+namespace Selah.Infrastructure.Services
 {
     public class SecurityService : ISecurityService
     {

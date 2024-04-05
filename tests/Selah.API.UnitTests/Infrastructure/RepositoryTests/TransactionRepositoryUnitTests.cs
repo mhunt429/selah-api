@@ -73,7 +73,7 @@ public class TransactionRepositoryUnitTests
     [Fact]
     public async Task InsertTransaction_ShoudlReturnNewId()
     {
-        var result = await _transactionRepository.InsertTransaction(new TransactionCreate());
+        var result = await _transactionRepository.InsertTransaction(new TransactionCreateSql());
         result.Should().Be(1);
     }
 

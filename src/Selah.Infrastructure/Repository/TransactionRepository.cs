@@ -70,7 +70,7 @@ namespace Selah.Infrastructure.Repository
             return await _baseRepository.GetAllAsync<UserTransactionCategory>(sql, parameters);
         }
 
-        public async Task<long> InsertTransaction(TransactionCreate transaction)
+        public async Task<long> InsertTransaction(TransactionCreateSql transaction)
         {
             string sql = @"
     INSERT INTO user_transaction(

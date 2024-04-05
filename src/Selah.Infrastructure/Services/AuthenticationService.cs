@@ -5,15 +5,14 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 using Selah.Application.Services.Interfaces;
 using Selah.Domain.Data.Models.ApplicationUser;
 using Selah.Domain.Data.Models.Authentication;
-using Microsoft.Extensions.Configuration;
 
-
-namespace Selah.Application.Services
+namespace Selah.Infrastructure.Services
 {
     public class AuthenticationService : IAuthenticationService
     {
