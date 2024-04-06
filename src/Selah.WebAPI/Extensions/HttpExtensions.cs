@@ -5,6 +5,8 @@ using Selah.Domain.Data.Models;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using LanguageExt;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Selah.WebAPI.Extensions
 {
@@ -19,6 +21,7 @@ namespace Selah.WebAPI.Extensions
                 var token = handler.ReadJwtToken(jwt);
                 return token.Claims.First().Value;
             }
+
             return "";
         }
 
@@ -40,6 +43,17 @@ namespace Selah.WebAPI.Extensions
         public static string GetRequestTraceId(this HttpRequest request)
         {
             return request.HttpContext.TraceIdentifier;
+        }
+
+        public static IActionResult MapEitherToHttpResult<L, R>(this Either<L, R> result, ControllerBase controller)
+            where L : ValidationResult
+        {
+            if (result.IsRight)
+            {
+                return controller.Ok(result.Right(x => x));
+            }
+
+            return controller.BadRequest(result.Map(x => x.Left.GetValidationErrors()));
         }
     }
 }

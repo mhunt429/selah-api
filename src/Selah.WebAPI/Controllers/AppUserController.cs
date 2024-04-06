@@ -1,8 +1,12 @@
 using System.Threading.Tasks;
+using FluentValidation.Results;
+using LanguageExt;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Selah.Application.Commands.AppUser;
+using Selah.Domain.Data.Models.Authentication;
+using Selah.WebAPI.Extensions;
 
 namespace Selah.WebAPI.Controllers
 {
@@ -15,7 +19,6 @@ namespace Selah.WebAPI.Controllers
 
         public AppUserController(IMediator mediator)
         {
-
             _mediatr = mediator;
         }
 
@@ -24,13 +27,8 @@ namespace Selah.WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserCommand command)
         {
-            var result = await _mediatr.Send(command);
-            if (result.IsRight)
-            {
-                return Ok(result);
-            }
-
-            return BadRequest(result);
+            Either<ValidationResult, AuthenticationResponse> result = await _mediatr.Send(command);
+            return result.MapEitherToHttpResult(this);
         }
     }
 }

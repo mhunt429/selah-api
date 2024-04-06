@@ -38,6 +38,12 @@ namespace Selah.Application.Commands.AppUser
                     var user = await _appUserRepository.GetUser(email);
                     return user == null;
                 }).WithMessage("An account with this email already exists.");
+                
+                RuleFor(x => x.UserName).MustAsync(async (username, cancellation) =>
+                {
+                    var user = await _appUserRepository.GetUser(username);
+                    return user == null;
+                }).WithMessage("An account with this username already exists.");
             }
         }
 
@@ -89,7 +95,8 @@ namespace Selah.Application.Commands.AppUser
 
                 AuthenticationResponse authenticationResponse = new AuthenticationResponse
                 {
-                    User = user, AccessToken = jwtResult.AccessToken,
+                    User = user, 
+                    AccessToken = jwtResult.AccessToken,
                     ExpirationTs = jwtResult.ExpirationTs
                 };
                 return Either<ValidationResult, AuthenticationResponse>.Right(authenticationResponse);
