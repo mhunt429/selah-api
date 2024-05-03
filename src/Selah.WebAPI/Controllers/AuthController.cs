@@ -10,7 +10,7 @@ namespace Selah.WebAPI.Controllers
 {
     [ApiController]
     [Authorize]
-    [Route("api/v1/oauth")]
+    [Route("api/v1/auth")]
     public class AuthController : ControllerBase
     {
         private readonly IMediator _mediatr;

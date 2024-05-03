@@ -33,7 +33,7 @@ namespace Selah.API.IntegrationTests.ControllerTests
             var command = new AuthenticationRequest { EmailOrUsername = "bad_user", Password = "BadP@ssword" };
             
             // Act
-            var response = await _testFactory.PostAsync<AuthenticationRequest>(command, _testClient, "api/v1/oauth/login");
+            var response = await _testFactory.PostAsync<AuthenticationRequest>(command, _testClient, "api/v1/auth/login");
             
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -46,7 +46,7 @@ namespace Selah.API.IntegrationTests.ControllerTests
             var command = new AuthenticationRequest { EmailOrUsername = _testUser.Email, Password = _testUser.Password };
           
             // Act
-            var response = await _testFactory.PostAsync<AuthenticationRequest>(command, _testClient, "api/v1/oauth/login");
+            var response = await _testFactory.PostAsync<AuthenticationRequest>(command, _testClient, "api/v1/auth/login");
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);

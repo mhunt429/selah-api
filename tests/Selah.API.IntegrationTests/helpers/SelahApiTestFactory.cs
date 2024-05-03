@@ -65,7 +65,7 @@ namespace Selah.API.IntegrationTests.helpers
             var httpContent = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
             // Act
-            var httpResponse = await client.PostAsync("api/v1/oauth/login", httpContent);
+            var httpResponse = await client.PostAsync("api/v1/auth/login", httpContent);
             var content = await httpResponse.Content.ReadAsStringAsync();
             var authResponse = JsonSerializer.Deserialize<AuthenticationResponse>(content);
             return authResponse;

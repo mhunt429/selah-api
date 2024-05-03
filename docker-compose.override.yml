@@ -9,6 +9,8 @@ services:
       - ASPNETCORE_URLS=http://+:80
       - DB_CONNECTION_STRING=User ID=mysqluser;Password=mysqlpassword;Host=selah-db;Database=selah_db
       - INTEGRATION_TEST_DB=User ID=mysqluser;Password=mysqlpassword;Host=selah-db-test;Database=selah_db_test
+      - REDIS_CONNECTION_STRING = redis:6379,password=PASSWORD
+     
     ports:
       - 8080:80
     env_file: secrets.env
@@ -49,8 +51,18 @@ services:
       - db-test:/var/lib/mysql
     networks:
       - dockerapi-dev
+  redis:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass PASSWORD
+    volumes:
+      - redis:/data
 volumes:
   db:
     driver: local
   db-test:
+    driver: local
+  redis:
     driver: local

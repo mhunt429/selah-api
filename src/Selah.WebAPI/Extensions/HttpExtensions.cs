@@ -48,12 +48,13 @@ namespace Selah.WebAPI.Extensions
         public static IActionResult MapEitherToHttpResult<L, R>(this Either<L, R> result, ControllerBase controller)
             where L : ValidationResult
         {
-            if (result.IsRight)
-            {
-                return controller.Ok(result.Right(x => x));
-            }
+            IActionResult ToActionResultLeft(L error) => controller.BadRequest(error.GetValidationErrors());
+            IActionResult ToActionResultRight(R value) => controller.Ok(value);
 
-            return controller.BadRequest(result.Map(x => x.Left.GetValidationErrors()));
+            return result.Match(
+                Left: ToActionResultLeft,
+                Right: ToActionResultRight
+            );
         }
     }
 }
