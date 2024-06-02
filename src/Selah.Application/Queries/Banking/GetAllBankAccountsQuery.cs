@@ -35,9 +35,9 @@ namespace Selah.Application.Queries.Banking
                 long id = _securityService.DecodeHashId(query.UserId);
 
                 List<BankAccount> accounts = new List<BankAccount>();
-                IEnumerable<BankAccountSql> queryResult = (await _bankingRepository.GetAccounts(id, query.Limit, query.Offset));
+                var queryResult = (await _bankingRepository.GetAccounts(id, query.Limit, query.Offset));
                 if (!queryResult.Any()) return accounts;
-                foreach (BankAccountSql account in queryResult)
+                foreach (var account in queryResult)
                 {
                     accounts.Add(new BankAccount
                     {

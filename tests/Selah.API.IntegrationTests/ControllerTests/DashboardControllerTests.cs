@@ -65,6 +65,7 @@ namespace Selah.API.IntegrationTests.ControllerTests
 
         public async Task DisposeAsync()
         {
+            await DatabaseHelpers.DeleteTestUsers(_baseRepository, _testUser.Id);
             _testClient.Dispose();
             _testFactory.Dispose();
         }

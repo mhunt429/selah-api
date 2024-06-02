@@ -36,13 +36,13 @@ namespace Selah.Application.Commands.Transactions
                 CreateTransactionCommand command,
                 CancellationToken cancellationToken)
             {
-                ValidationResult validationResult = await _transactionValidatorService.ValidateAsync(command.Data);
+                var validationResult = await _transactionValidatorService.ValidateAsync(command.Data);
                 if (!validationResult.IsValid)
                 {
                     return Either<ValidationResult, TransactionCreateResponse>.Left(validationResult);
                 }
 
-                long transactionId = await _transactionRepository.InsertTransaction(MapToDbCreateModel(command));
+                var transactionId = await _transactionRepository.InsertTransaction(MapToDbCreateModel(command));
 
                 await _transactionRepository.InsertTransactionLineItems(command.Data.LineItems.Select(x =>
                         new TransactionLineItemCreate

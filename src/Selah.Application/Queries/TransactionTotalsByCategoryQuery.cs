@@ -7,7 +7,6 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Selah.Application.Services.Interfaces;
 using Selah.Domain.Data.Models.Transactions;
-using Selah.Domain.Data.Models.Transactions.Sql;
 using Selah.Infrastructure.Repository.Interfaces;
 
 namespace Selah.Application.Queries;
@@ -33,14 +32,14 @@ public class TransactionTotalsByCategoryQuery : IRequest<IEnumerable<Transaction
         {
             long userId = _securityService.DecodeHashId(query.UserId);
             List<TransactionAmountByCategory> transactionAmountByCategories = new List<TransactionAmountByCategory>();
-            List<TransactionAmountByCategorySql> transactionCategoryAmountSql =
+            var transactionCategoryAmountSql =
                 (await _transactionRepository.GetTransactionTotalsByCategory(userId)).ToList();
             if (!transactionCategoryAmountSql.Any())
             {
                 return transactionAmountByCategories;
             }
 
-            foreach (TransactionAmountByCategorySql category in transactionCategoryAmountSql)
+            foreach (var category in transactionCategoryAmountSql)
             {
                 transactionAmountByCategories.Add(new TransactionAmountByCategory
                 {

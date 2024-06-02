@@ -1,11 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
-using MySqlConnector;
 using NSubstitute;
-using Respawn;
 using Selah.Domain.Data.Models.ApplicationUser;
 using Selah.Infrastructure;
 using Selah.Infrastructure.Repository;
-
 namespace Selah.API.IntegrationTests.helpers
 {
     public static class DatabaseHelpers
@@ -49,30 +46,6 @@ namespace Selah.API.IntegrationTests.helpers
         //Sets up all the connection string and dependency injection for testing the database layer
         public static BaseRepository CreateBaseRepository()
         {
-            ILogger<BaseRepository> loggerMock = Substitute.For<ILogger<BaseRepository>>();
-
-            return new BaseRepository(new MySqlConnectionFactory(BuildTestConnectionString()), loggerMock);
-        }
-
-        public static async Task ResetDb()
-        {
-            using (var conn = new MySqlConnection(BuildTestConnectionString()))
-            {
-                await conn.OpenAsync();
-                var respawner = await Respawner.CreateAsync(conn, new RespawnerOptions
-                {
-                    SchemasToInclude = new[]
-                    {
-                        "selah_db"
-                    },
-                    DbAdapter = DbAdapter.MySql
-                });
-                await respawner.ResetAsync(conn);
-            }
-        }
-
-        private static string BuildTestConnectionString()
-        {
             //DB_CONNECTION_STRING is set as an environment variable in the GitHub actions pipelines.
             //The value below is whatever port you are using for the local postgres image
             var dbConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
@@ -81,7 +54,9 @@ namespace Selah.API.IntegrationTests.helpers
                 dbConnectionString = "User ID=mysqluser;Password=mysqlpassword;Host=localhost;Database=selah_db";
             }
 
-            return dbConnectionString;
+            ILogger<BaseRepository> loggerMock = Substitute.For<ILogger<BaseRepository>>();
+
+            return new BaseRepository(new MySqlConnectionFactory(dbConnectionString), loggerMock);
         }
     }
 }

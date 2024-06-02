@@ -26,7 +26,7 @@ public class GetUserByIdQuery : IRequest<UserViewModel>
         {
             //Get the plain text id by decoding the value found in the claims
             long id = _securityService.DecodeHashId(query.Id);
-            AppUser userDto = await _userRepository.GetUser(id);
+            var userDto = await _userRepository.GetUser(id);
             if (userDto == null)
             {
                 return null;

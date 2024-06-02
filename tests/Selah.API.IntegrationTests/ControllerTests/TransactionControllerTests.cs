@@ -63,7 +63,7 @@ public class TransactionControllerTests : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        //await DatabaseHelpers.ResetDb(); When running the whole test suite, only have this in 1 place so it doesn't cause a collision with other test. Will re-visit this
+        await DatabaseHelpers.DeleteTestUsers(_baseRepository, _testUser.Id);
         _testClient.Dispose();
         _testFactory.Dispose();
     }

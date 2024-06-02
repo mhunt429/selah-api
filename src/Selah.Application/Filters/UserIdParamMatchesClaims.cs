@@ -21,9 +21,9 @@ namespace Selah.Application.Filters
             //Get the authorization header, if not present return 403
             if (context.HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues authToken))
             {
-                string jwt = authToken.ToString().Replace("Bearer ", "");
+                var jwt = authToken.ToString().Replace("Bearer ", "");
                 var handler = new JwtSecurityTokenHandler();
-                JwtSecurityToken token = handler.ReadJwtToken(jwt);
+                var token = handler.ReadJwtToken(jwt);
                 string subject = token.Claims.First().Value;
                 string userIdRoute = context.RouteData.Values["userId"].ToString();
 
