@@ -42,7 +42,7 @@ namespace Selah.Application.Queries.ApplicationUser
 
             public async Task<AuthenticationResponse> Handle(GetUserForLoginQuery query, CancellationToken cancellationToken)
             {
-                var user = await _appUserRepository.GetUser(query.EmailOrUsername);
+                AppUser user = await _appUserRepository.GetUser(query.EmailOrUsername);
                 if (user == null)
                 {
                     return null;
@@ -61,7 +61,7 @@ namespace Selah.Application.Queries.ApplicationUser
                     LastName = user.LastName,
                     DateCreated = user.DateCreated
                 };
-                var jwtResult = _authService.GenerateJwt(userResponse);
+                JwtResponse jwtResult = _authService.GenerateJwt(userResponse);
 
                 return new AuthenticationResponse
                 {

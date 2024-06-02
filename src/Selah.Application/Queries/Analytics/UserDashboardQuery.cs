@@ -32,7 +32,7 @@ namespace Selah.Application.Queries.Analytics
             public async Task<DashboardSummary> Handle(UserDashboardQuery query, CancellationToken cancellationToken)
             {
                 long id = _securityService.DecodeHashId(query.UserId);
-                var transactionSummaryTuple = await GetLastAndCurrentMonthTrxSummary(id);
+                (IEnumerable<TransactionSummarySql>, IEnumerable<TransactionSummarySql>) transactionSummaryTuple = await GetLastAndCurrentMonthTrxSummary(id);
                 return new DashboardSummary
                 {
                     RecentTransactions = await GetRecentTransactions(id),
@@ -48,9 +48,9 @@ namespace Selah.Application.Queries.Analytics
             {
                 IEnumerable<RecentTransactionSql> recentTransactionSql =
                     await _transactionRepository.GetRecentTransactions(userId);
-                var recentTransactions = new List<RecentTransaction>();
+                List<RecentTransaction> recentTransactions = new List<RecentTransaction>();
 
-                foreach (var trx in recentTransactionSql)
+                foreach (RecentTransactionSql trx in recentTransactionSql)
                 {
                     recentTransactions.Add(new RecentTransaction
                     {
@@ -74,19 +74,19 @@ namespace Selah.Application.Queries.Analytics
             private async Task<(IEnumerable<TransactionSummarySql>, IEnumerable<TransactionSummarySql>)>
                 GetLastAndCurrentMonthTrxSummary(long userId)
             {
-                var currentTimeUtc = DateTime.UtcNow;
+                DateTime currentTimeUtc = DateTime.UtcNow;
 
                 //First day of the previous month
-                var startOfLastMonth = new DateTime(currentTimeUtc.Year, currentTimeUtc.Month, 1).AddMonths(-1);
-                var endOfLastMonth = startOfLastMonth.AddMonths(1).AddSeconds(-1);
+                DateTime startOfLastMonth = new DateTime(currentTimeUtc.Year, currentTimeUtc.Month, 1).AddMonths(-1);
+                DateTime endOfLastMonth = startOfLastMonth.AddMonths(1).AddSeconds(-1);
 
-                var startOfCurrentMonth = new DateTime(currentTimeUtc.Year, currentTimeUtc.Month, 1);
+                DateTime startOfCurrentMonth = new DateTime(currentTimeUtc.Year, currentTimeUtc.Month, 1);
 
-                var lastMonthTrxSummary =
+                IEnumerable<TransactionSummarySql> lastMonthTrxSummary =
                     await _transactionRepository.GetTransactionSummaryByDateRange(userId, startOfLastMonth,
                         endOfLastMonth);
 
-                var currentMonthSummary =
+                IEnumerable<TransactionSummarySql> currentMonthSummary =
                     await _transactionRepository.GetTransactionSummaryByDateRange(userId, startOfCurrentMonth,
                         currentTimeUtc);
 

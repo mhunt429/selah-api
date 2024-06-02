@@ -35,13 +35,13 @@ namespace Selah.Application.Commands.AppUser
                 RuleFor(x => x.LastName).NotEmpty();
                 RuleFor(x => x.Email).MustAsync(async (email, cancellation) =>
                 {
-                    var user = await _appUserRepository.GetUser(email);
+                    Domain.Data.Models.ApplicationUser.AppUser user = await _appUserRepository.GetUser(email);
                     return user == null;
                 }).WithMessage("An account with this email already exists.");
                 
                 RuleFor(x => x.UserName).MustAsync(async (username, cancellation) =>
                 {
-                    var user = await _appUserRepository.GetUser(username);
+                    Domain.Data.Models.ApplicationUser.AppUser user = await _appUserRepository.GetUser(username);
                     return user == null;
                 }).WithMessage("An account with this username already exists.");
             }
@@ -66,7 +66,7 @@ namespace Selah.Application.Commands.AppUser
             {
                 var validator = new Validator(_appUserRepository);
 
-                var validationResult = await validator.ValidateAsync(request);
+                ValidationResult validationResult = await validator.ValidateAsync(request);
                 if (!validationResult.IsValid)
                 {
                     return Either<ValidationResult, AuthenticationResponse>.Left(validationResult);
@@ -91,7 +91,7 @@ namespace Selah.Application.Commands.AppUser
                     LastName = request.LastName,
                     DateCreated = request.DateCreated,
                 };
-                var jwtResult = _authenticationService.GenerateJwt(user);
+                JwtResponse jwtResult = _authenticationService.GenerateJwt(user);
 
                 AuthenticationResponse authenticationResponse = new AuthenticationResponse
                 {

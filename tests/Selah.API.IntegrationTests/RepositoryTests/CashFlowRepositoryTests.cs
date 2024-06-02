@@ -99,10 +99,7 @@ namespace Selah.API.IntegrationTests.RepositoryTests
 
         public async Task DisposeAsync()
         {
-            await DatabaseHelpers.RunSingleDelete(_baseRepository, @"DELETE FROM income_statement_deduction",
-                new { });
-            await DatabaseHelpers.RunSingleDelete(_baseRepository, @"DELETE FROM income_statement", new { });
-            await DatabaseHelpers.DeleteTestUsers(_baseRepository, _userId);
+            await DatabaseHelpers.ResetDb();
         }
 
         private async Task CreateTestUser()
